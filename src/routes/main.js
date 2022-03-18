@@ -1,18 +1,26 @@
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { View, Text } from 'react-native'
-import React, { useState } from 'react'
+import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import {View, Text} from 'react-native';
+import React, {useState} from 'react';
 
-import AuthStackScreen from "./auth";
-import HomeStackScreen from "./home";
+import AuthStackScreen from './auth';
+import HomeStackScreen from './home';
+import SplashScreen from '../screens/welcome/Splash';
+import Home from '../screens/Home';
 
 // The main route that evaluates whether the user is logged in or not and decides where to navigate when the app starts.
-const main = () => {
-    const [isLoggedIn, setIsLoggedIn] = useState(true); // User state value from the cache 
+const Main = () => {
+  const [isLoggedIn, setIsLoggedIn] = useState(true); // User state value from the cache
+  const [appIsLoaded, setAppIsLoaded] = useState(false); // whether the app is loading or finished loading.
+  const [openingForTheFirstTime, setOpeningForTheFirstTime] = useState(false); //whether the app is being opened for the first time.
 
-    //return stacks according to the user state
-    return (
-        isLoggedIn ? <AuthStackScreen /> : <HomeStackScreen />
-    );
-}
+  setTimeout(() => setAppIsLoaded(true), 3000);
 
-export default main;
+  const homeOrLogin = () => {
+    return isLoggedIn ? <HomeStackScreen /> : <AuthStackScreen />;
+  }; // return stacks according to the state of the user.
+
+  //Check whether the app finished loading; show the splash screen until it finishes loading; then call the homeOrLogin function.
+  return appIsLoaded ? homeOrLogin() : <SplashScreen />;
+};
+
+export default Main;
