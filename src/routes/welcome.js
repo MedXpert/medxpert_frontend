@@ -16,8 +16,16 @@ const WelcomeStackScreen = () => {
         name="Welcome1"
         component={Welcome1}
       />
-      <WelcomeStack.Screen name="Welcome2" component={Welcome2} />
-      <WelcomeStack.Screen name="Welcome3" component={Welcome3} />
+      <WelcomeStack.Screen
+        name="Welcome2"
+        component={Welcome2}
+        options={{headerShown: false}}
+      />
+      <WelcomeStack.Screen
+        name="Welcome3"
+        component={Welcome3}
+        options={{headerShown: false}}
+      />
     </WelcomeStack.Navigator>
   );
 };

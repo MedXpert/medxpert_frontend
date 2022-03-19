@@ -1,12 +1,72 @@
-import {View, Text} from 'react-native';
+import {View, Text, StyleSheet} from 'react-native';
 import React from 'react';
 
-const Welcome3 = () => {
+import CustomText from '../../components/general/CustomText';
+
+import PageIndicator from '../../components/welcome/PageIndicator';
+import Colors from '../../constants/colors';
+import LocateSvg from '../../assets/svg/welcome/alarm.svg';
+import Button from '../../components/welcome/Button';
+import {WELCOME3_STRINGS} from '../../constants/string/welcome';
+
+const Welcome1 = ({navigation}) => {
   return (
-    <View>
-      <Text>Welcome3</Text>
+    <View style={styles.container}>
+      <View style={styles.containerTop}>
+        <PageIndicator selectedPage={3} />
+        <View style={styles.textTop}>
+          <CustomText
+            content={WELCOME3_STRINGS.BRIEF_DESCRIPTION}
+            fontSize={14}
+            fontColor={'grey'}
+          />
+          <CustomText
+            content={WELCOME3_STRINGS.TITLE}
+            fontSize={32}
+            fontFamily={'Poppins-Bold'}
+          />
+        </View>
+        <View style={styles.alarmSvgContainer}>
+          <LocateSvg width={500} height={500} />
+        </View>
+      </View>
+      <View style={styles.bottomSection}>
+        <Button
+          customStyle={styles.buttonCustomStyle}
+          onPress={() => {
+            navigation.navigate('Login');
+          }}
+          title={'Get Started'}
+        />
+      </View>
     </View>
   );
 };
 
-export default Welcome3;
+const styles = StyleSheet.create({
+  container: {
+    backgroundColor: Colors.secondary,
+    flex: 1,
+    justifyContent: 'space-between',
+  },
+  bottomSection: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginBottom: 60,
+  },
+  buttonCustomStyle: {
+    borderRadius: 30,
+    width: 300,
+  },
+  containerTop: {
+    padding: 20,
+  },
+  textTop: {
+    marginTop: 10,
+  },
+  alarmSvgContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+  },
+});
+export default Welcome1;

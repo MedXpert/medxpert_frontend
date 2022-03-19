@@ -2,7 +2,7 @@ import {View, Text, StyleSheet} from 'react-native';
 import React from 'react';
 
 import Colors from '../../constants/colors';
-import SvgLogo from '../../assets/svg/logo_blue_background.svg';
+import SvgLogo from '../../assets/svg/logo/logo_blue_background.svg';
 
 const Splash = () => {
   return (
