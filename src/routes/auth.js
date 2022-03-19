@@ -7,12 +7,17 @@ import Welcome from './welcome';
 
 // Auth stack for users that are not logged in
 const AuthStackScreen = ({initialRoute}) => {
+  // Configuration of each screen behavior
+  const config = {
+    headerShown: false,
+    animation: 'none',
+  };
   const AuthStack = createNativeStackNavigator();
 
   return (
     <AuthStack.Navigator initialRouteName={initialRoute}>
-      <AuthStack.Screen name="Login" component={Login} />
-      <AuthStack.Screen name="SignUp" component={SignUp} />
+      <AuthStack.Screen name="Login" component={Login} options={config} />
+      <AuthStack.Screen name="SignUp" component={SignUp} options={config} />
       <AuthStack.Screen
         options={{headerShown: false}}
         name="Welcome"

@@ -7,4 +7,5 @@ export default {
   gray: '#646464',
   lightGray: '#9EADBD',
   white: '#FFFFFF',
+  whiteSmoke: '#F5F5F5',
 };
