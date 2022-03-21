@@ -11,7 +11,7 @@ import HomeScreen from '../screens/Home';
 const Main = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false); // User state value from the cache
   const [appIsLoaded, setAppIsLoaded] = useState(true); // whether the app is loading or finished loading.
-  const [openingForTheFirstTime, setOpeningForTheFirstTime] = useState(true); // Whether the app is being opened for the first time.
+  const [openingForTheFirstTime, setOpeningForTheFirstTime] = useState(false); // Whether the app is being opened for the first time.
 
   // setTimeout(() => setAppIsLoaded(true), 3000);
 

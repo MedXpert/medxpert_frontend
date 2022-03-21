@@ -8,11 +8,11 @@ import LoginSvg from '../../assets/svg/auth/login.svg';
 import CustomButton from '../../components/general/CustomButton';
 import Or from '../../components/login/Or';
 
-const Login = () => {
+const Login = ({navigation}) => {
   return (
     <View style={styles.container}>
       <View style={styles.loginSvgContainer}>
-        <LoginSvg width={250} height={280} />
+        <LoginSvg width={4000} height={280} />
       </View>
       <View style={styles.loginFormContainer}>
         <View style={styles.loginText}>
@@ -50,7 +50,10 @@ const Login = () => {
           />
           <View style={styles.registerContainer}>
             <CustomText content={'New to MedXpert?'} />
-            <TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => {
+                navigation.navigate('SignUp');
+              }}>
               <CustomText content={' Register'} fontColor={Colors.primary} />
             </TouchableOpacity>
           </View>
