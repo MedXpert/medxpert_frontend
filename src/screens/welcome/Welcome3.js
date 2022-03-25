@@ -1,12 +1,11 @@
 import {View, Text, StyleSheet} from 'react-native';
 import React from 'react';
 
-import CustomText from '../../components/general/CustomText';
-
-import PageIndicator from '../../components/welcome/PageIndicator';
+import {CustomText} from '../../components/general/CustomText';
+import {PageIndicator} from '../../components/welcome/PageIndicator';
 import Colors from '../../constants/colors';
 import LocateSvg from '../../assets/svg/welcome/alarm.svg';
-import Button from '../../components/welcome/Button';
+import {Button} from '../../components/welcome/Button';
 import {WELCOME3_STRINGS} from '../../constants/string/welcome';
 
 const Welcome1 = ({navigation}) => {

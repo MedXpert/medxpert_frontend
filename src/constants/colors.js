@@ -4,7 +4,7 @@ export default {
   black: '#000000',
   dark: '#222222',
   darkerBlue: '#005E9F',
-  gray: '#646464',
+  gray: '#616161',
   lightGray: '#9EADBD',
   white: '#FFFFFF',
   whiteSmoke: '#F5F5F5',

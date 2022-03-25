@@ -3,10 +3,10 @@ import React from 'react';
 import Icon from 'react-native-vector-icons/Ionicons';
 
 import Colors from '../../constants/colors';
-import CustomText from '../../components/general/CustomText';
+import {CustomText} from '../../components/general/CustomText';
 import LoginSvg from '../../assets/svg/auth/login.svg';
-import CustomButton from '../../components/general/CustomButton';
-import Or from '../../components/login/Or';
+import {CustomButton} from '../../components/general/CustomButton';
+import {Or} from '../../components/login/Or';
 
 const Login = ({navigation}) => {
   return (

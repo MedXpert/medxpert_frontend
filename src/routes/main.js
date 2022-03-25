@@ -9,7 +9,7 @@ import HomeScreen from '../screens/Home';
 
 // The main route that evaluates whether the user is logged in or not and decides where to navigate when the app starts.
 const Main = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false); // User state value from the cache
+  const [isLoggedIn, setIsLoggedIn] = useState(true); // User state value from the cache
   const [appIsLoaded, setAppIsLoaded] = useState(true); // whether the app is loading or finished loading.
   const [openingForTheFirstTime, setOpeningForTheFirstTime] = useState(false); // Whether the app is being opened for the first time.
 
