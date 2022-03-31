@@ -17,7 +17,7 @@ import {CustomTextInput} from '../../general/CustomTextInput';
 import LogoSvg from '../../../assets/svg/logo/logo blue no background.svg';
 import {CustomText} from '../CustomText';
 
-const SearchBar = ({containerWidth, elevation}) => {
+const SearchBar = ({containerWidth, elevation, marginHorizontal = 0}) => {
   const [fetchData, setFetchData] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
   const [textValue, setTextValue] = useState('');
@@ -31,9 +31,10 @@ const SearchBar = ({containerWidth, elevation}) => {
     setFetchData(data);
   };
 
-  // Calls the fetchData function  and searches for the key given as a parameter
+  // Calls the fetchData function and searches for the key given as a parameter
   const searchPosts = async searchKey => {
     setSearchClicked(true);
+
     setIsLoading(true);
     await fetchPosts();
     setFilteredData([]); // Empty the the existing list.
@@ -72,10 +73,22 @@ const SearchBar = ({containerWidth, elevation}) => {
       />
     );
   };
-
+  const loadingOrResults = () => {
+    return isLoading && searchClicked ? (
+      <ActivityIndicator />
+    ) : !isLoading && searchClicked && filteredData.length !== 0 ? (
+      listItems()
+    ) : !isLoading && searchClicked && filteredData.length === 0 ? (
+      <CustomText content={'No match found.'} />
+    ) : null;
+  };
   return (
     <View>
-      <View style={[styles.container]}>
+      <View
+        style={[
+          styles.container,
+          {width: Dimensions.get('window').width - marginHorizontal},
+        ]}>
         <View style={styles.logoContainer}>
           <LogoSvg width={50} height={50} />
         </View>
@@ -97,15 +110,9 @@ const SearchBar = ({containerWidth, elevation}) => {
           }}
         />
       </View>
-      <View style={styles.listContainer}>
-        {isLoading && searchClicked ? (
-          <ActivityIndicator />
-        ) : !isLoading && searchClicked && filteredData.length !== 0 ? (
-          listItems()
-        ) : !isLoading && searchClicked && filteredData.length === 0 ? (
-          <CustomText content={'No match found.'} />
-        ) : null}
-      </View>
+      {searchClicked && (
+        <View style={styles.listContainer}>{loadingOrResults()}</View>
+      )}
     </View>
   );
 };
@@ -114,10 +121,10 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: Colors.whiteSmoke,
-    borderRadius: 5,
+    backgroundColor: Colors.white,
+    borderRadius: 30,
     elevation: 3,
-    width: Dimensions.get('window').width - 20,
+    // width: Dimensions.get('window').width,
   },
   innerContainer: {
     // justifyContent: 'center',
@@ -127,7 +134,10 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.whiteSmoke,
     marginBottom: 5,
   },
-  logoContainer: {},
+  logoContainer: {
+    paddingTop: 5,
+    borderRadius: 50,
+  },
   listContainer: {
     backgroundColor: Colors.white,
     maxHeight: Dimensions.get('window').height / 2,

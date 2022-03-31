@@ -19,6 +19,7 @@ const CustomButton = ({
   };
   return (
     <TouchableOpacity
+      onPress={onPress}
       style={[
         styles.button,
         {width: width, height: height},

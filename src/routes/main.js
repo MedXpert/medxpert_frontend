@@ -5,7 +5,8 @@ import React, {useState} from 'react';
 import AuthStackScreen from './auth';
 import HomeStackScreen from './home';
 import SplashScreen from '../screens/welcome/Splash';
-import HomeScreen from '../screens/Home';
+import HomeScreen from '../screens/main/Home';
+import BottomNavBar from './bottomNavBar';
 
 // The main route that evaluates whether the user is logged in or not and decides where to navigate when the app starts.
 const Main = () => {
@@ -21,7 +22,7 @@ const Main = () => {
     } else if (!openingForTheFirstTime && !isLoggedIn) {
       return <AuthStackScreen initialRoute={'Login'} />;
     } else if (isLoggedIn) {
-      return <HomeStackScreen />;
+      return <BottomNavBar />;
     }
   }; // return stacks according to the state of the user.
 
