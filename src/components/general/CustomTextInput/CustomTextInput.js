@@ -18,7 +18,6 @@ const CustomTextInput = props => {
 const styles = StyleSheet.create({
   textInputStyle: {
     backgroundColor: Colors.whiteSmoke,
-    // borderRadius: 10,
     color: Colors.dark,
     padding: 10,
   },

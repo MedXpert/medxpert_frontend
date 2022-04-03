@@ -3,9 +3,9 @@ import React from 'react';
 import Icon from 'react-native-vector-icons/Ionicons';
 
 import Colors from '../../constants/colors';
-import CustomText from '../../components/general/CustomText';
+import {CustomText} from '../../components/general/CustomText';
 import SignUpSvg from '../../assets/svg/auth/signUp.svg';
-import CustomButton from '../../components/general/CustomButton';
+import {CustomButton} from '../../components/general/CustomButton';
 
 const SignUp = ({navigation}) => {
   return (
@@ -45,7 +45,7 @@ const SignUp = ({navigation}) => {
             <CustomText content={'Joined us before?'} />
             <TouchableOpacity
               onPress={() => {
-                navigation.navigate('SignUp');
+                navigation.navigate('Login');
               }}>
               <CustomText content={' Login'} fontColor={Colors.primary} />
             </TouchableOpacity>

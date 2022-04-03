@@ -12,6 +12,8 @@ const CustomButton = ({
   height = 50,
   customStyle,
   icon,
+  fontSize = 16,
+  fontColor = Colors.black,
 }) => {
   // Changes the justifyContent property of the Button depending on whether there is an icon in the button or not
   const buttonIconStyle = () => {
@@ -27,7 +29,7 @@ const CustomButton = ({
         buttonIconStyle(),
       ]}>
       <View style={styles.buttonIconContainer}>{icon}</View>
-      <CustomText content={title} fontSize={16} />
+      <CustomText content={title} fontSize={fontSize} fontColor={fontColor} />
     </TouchableOpacity>
   );
 };

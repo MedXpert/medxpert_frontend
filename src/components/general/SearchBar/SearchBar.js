@@ -17,7 +17,12 @@ import {CustomTextInput} from '../../general/CustomTextInput';
 import LogoSvg from '../../../assets/svg/logo/logo blue no background.svg';
 import {CustomText} from '../CustomText';
 
-const SearchBar = ({containerWidth, elevation, marginHorizontal = 0}) => {
+const SearchBar = ({
+  containerWidth,
+  elevation,
+  marginHorizontal = 0,
+  fontSize,
+}) => {
   const [fetchData, setFetchData] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
   const [textValue, setTextValue] = useState('');
@@ -87,7 +92,9 @@ const SearchBar = ({containerWidth, elevation, marginHorizontal = 0}) => {
       <View
         style={[
           styles.container,
-          {width: Dimensions.get('window').width - marginHorizontal},
+          {
+            width: Dimensions.get('window').width - marginHorizontal,
+          },
         ]}>
         <View style={styles.logoContainer}>
           <LogoSvg width={50} height={50} />
@@ -97,7 +104,7 @@ const SearchBar = ({containerWidth, elevation, marginHorizontal = 0}) => {
             onChangeText={text => setTextValue(text)}
             value={textValue}
             placeholder={'Search'}
-            customStyle={styles.textInput}
+            customStyle={[styles.textInput, {fontSize: fontSize}]}
           />
         </View>
 

@@ -12,6 +12,7 @@ import SvgProfile from '../assets/svg/bottomNavbar/Profile.svg';
 import SvgEmergency from '../assets/svg/bottomNavbar/Emergency.svg';
 import SvgHome from '../assets/svg/bottomNavbar/Home.svg';
 import {CustomText} from '../components/general/CustomText';
+import colors from '../constants/colors';
 
 const Tab = createBottomTabNavigator();
 
@@ -36,7 +37,11 @@ const bottomNavBar = () => {
             return (
               <View style={{alignItems: 'center'}}>
                 <SvgHome width={30} height={30} stroke={iconColor} />
-                {/* <CustomText content={'HOME'} /> */}
+                <CustomText
+                  content={'HOME'}
+                  fontSize={10}
+                  fontColor={Colors.gray}
+                />
               </View>
             );
           },
@@ -51,7 +56,11 @@ const bottomNavBar = () => {
             return (
               <View style={{alignItems: 'center'}}>
                 <SvgAmbulance width={30} height={30} fill={iconColor} />
-                {/* <CustomText content={'AMBULANCE'} /> */}
+                <CustomText
+                  content={'AMBULANCE'}
+                  fontSize={10}
+                  fontColor={Colors.gray}
+                />
               </View>
             );
           },
@@ -66,7 +75,11 @@ const bottomNavBar = () => {
             return (
               <View style={{alignItems: 'center'}}>
                 <SvgEmergency width={30} height={30} fill={iconColor} />
-                {/* <CustomText content={'EMERGENCY'} /> */}
+                <CustomText
+                  content={'EMERGENCY'}
+                  fontSize={10}
+                  fontColor={Colors.gray}
+                />
               </View>
             );
           },
@@ -81,7 +94,11 @@ const bottomNavBar = () => {
             return (
               <View style={{alignItems: 'center'}}>
                 <SvgProfile width={30} height={30} fill={iconColor} />
-                {/* <CustomText content={'PROFILE'} /> */}
+                <CustomText
+                  content={'PROFILE'}
+                  fontSize={10}
+                  fontColor={Colors.gray}
+                />
               </View>
             );
           },
