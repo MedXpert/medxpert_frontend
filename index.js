@@ -8,7 +8,8 @@ import App from './App';
 import {name as appName} from './app.json';
 
 MapboxGL.setAccessToken(
-  'sk.eyJ1IjoibGl5dW1rIiwiYSI6ImNsMWIwN3E5ajA0ZzMzaW96bTU2bHM1MGsifQ.h4CZp6bIa8qRyRA7GNx6aA',
+  'sk.eyJ1IjoibGl5dW1rIiwiYSI6ImNsMWtteG11NzAyZWgzZG9kOWpyb2x1dWMifQ.X4v8HxdCSmdrvVaCWXVjog',
 );
+MapboxGL.setConnected(true); // because we are using localhost
 
 AppRegistry.registerComponent(appName, () => App);

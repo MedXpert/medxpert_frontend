@@ -78,7 +78,6 @@ const Home = () => {
         buttonRightTitle={'Give Permission'}
         modalVisibility={locationPermissionDenied}
       />
-
       {/* Modal for blocked permission */}
       <PermissionModal
         TextContent={PERMISSION_MESSAGE.MODAL_BLOCKED}
@@ -93,9 +92,12 @@ const Home = () => {
         modalVisibility={locationPermissionBlocked}
         buttonWidth={160}
       />
-      {/* <View style={styles.mapContainer}>
-        <MapboxGL.MapView style={styles.map} />
-      </View> */}
+      {/* Display the map  / this is the container */}
+      <View style={styles.mapContainer}>
+        <MapboxGL.MapView style={styles.map}>
+          <MapboxGL.UserLocation visible />
+        </MapboxGL.MapView>
+      </View>
       <View style={styles.searchBarContainer}>
         <SearchBar fontSize={16} marginHorizontal={20} />
       </View>
@@ -122,7 +124,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     borderRadius: 15,
     paddingVertical: 20,
-
     width: Dimensions.get('window').width - 50,
     shadowColor: Colors.black,
     shadowOffset: {
@@ -138,13 +139,12 @@ const styles = StyleSheet.create({
     top: 10,
   },
   mapContainer: {
-    width: 500,
-    height: 500,
-
+    width: Dimensions.get('window').width,
+    height: Dimensions.get('window').height,
     backgroundColor: Colors.dark,
   },
   map: {
-    flexbox: 1,
+    flex: 1,
   },
 });
 
