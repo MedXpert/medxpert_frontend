@@ -92,10 +92,17 @@ const Home = () => {
         modalVisibility={locationPermissionBlocked}
         buttonWidth={160}
       />
+
       {/* Display the map  / this is the container */}
       <View style={styles.mapContainer}>
-        <MapboxGL.MapView style={styles.map}>
-          <MapboxGL.UserLocation visible />
+        <MapboxGL.MapView style={styles.map} zoomEnabled>
+          <MapboxGL.Camera followZoomLevel={12} followUserLocation />
+
+          {/* Display user location */}
+          {/* Checks if the user has granted location permission to the app. */}
+          {locationPermissionGranted && (
+            <MapboxGL.UserLocation visible showsUserHeadingIndicator={true} />
+          )}
         </MapboxGL.MapView>
       </View>
       <View style={styles.searchBarContainer}>
