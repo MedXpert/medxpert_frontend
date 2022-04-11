@@ -27,6 +27,8 @@ import {requestPermissions} from '../../services/permissions/requestPermissions'
 import {LOCATION_PERMISSION_MESSAGE} from '../../constants/string/requestPermissions/requestPermissions';
 
 const Home = () => {
+  var _map;
+  var _camera;
   const permissionName = PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION; //location permission name
   const [locationPermissionGranted, setLocationPermissionGranted] =
     useState(false); // Whether the location permission is granted
@@ -37,10 +39,7 @@ const Home = () => {
 
   const [locationChanged, setLocationChanged] = useState(false); // Whether the location is changed
   const [userPosition, setUserPosition] = useState(); // User's current position
-  const [centerCoordinate, setCenterCoordinate] = useState([]);
   const [followUserLocation, setFollowUserLocation] = useState(true);
-  const [regionDidChange, setRegionDidChange] = useState(false);
-  const [regionIsChanging, setRegionIsChanging] = useState(false);
 
   //Exit the app and go to settings. Called when the 'Go to settings' button is pressed.
   const settings = () => {
@@ -67,35 +66,21 @@ const Home = () => {
     }
   }, [permissionName]);
 
-  // Will be called when the region being displayed in the map is changing
-  const onRegionIsChanging = () => {
-    // console.log(followUserLocation);
-    setRegionIsChanging(true);
-    setLocationChanged(true);
-  };
-
-  // Will be called when the region being displayed in the map has changed
-  const onRegionDidChange = () => {
-    setRegionDidChange(true);
-    setFollowUserLocation(false);
-  };
-
   // Will be called when the user location is updated/changed
-  const userLocationUpdate = location => {
+  const userLocationUpdate = async location => {
     setUserPosition(location);
   };
 
   // Set center coordinate to the current position of the user.
-  const findMyLocation = () => {
-    setCenterCoordinate([
-      userPosition.coords.longitude,
-      userPosition.coords.latitude,
-    ]);
-    setLocationChanged(false);
+  const findMyLocation = async () => {
+    setFollowUserLocation(false);
+    let lng = userPosition.coords.longitude;
+    let lat = userPosition.coords.latitude;
+    await _camera.flyTo([lng, lat]);
   };
 
   useEffect(() => {
-    //call 'checkPermission' every time something in the function is changed.
+    // Call 'checkPermission' every time something in the function is changed.
     checkPermission();
   }, [checkPermission]);
 
@@ -130,11 +115,10 @@ const Home = () => {
       />
       <View style={styles.mapContainer}>
         <MapboxGL.MapView
-          // ref={c => (MapboxGL.MapView._map = c)}
+          // ref={c => (_map = c)}
+          ref={c => (_map = c)}
           style={styles.map}
-          styleURL={MapboxGL.StyleURL.Light}
-          onRegionIsChanging={onRegionIsChanging}
-          onRegionDidChange={onRegionDidChange}>
+          surfaceView>
           {/* Display user location */}
           {/* Checks if the user has granted location permission to the app. */}
           {locationPermissionGranted && (
@@ -144,10 +128,11 @@ const Home = () => {
             </>
           )}
           <MapboxGL.Camera
+            ref={c => (_camera = c)}
             followZoomLevel={15}
             zoomLevel={15}
             followUserLocation={followUserLocation}
-            centerCoordinate={centerCoordinate}
+            surfaceView
           />
         </MapboxGL.MapView>
       </View>
@@ -159,7 +144,8 @@ const Home = () => {
 
       <IconButton
         style={{position: 'absolute', right: 10, bottom: 80}}
-        icon={locationChanged ? 'crosshairs' : 'crosshairs-gps'}
+        // icon={locationChanged ? 'crosshairs' : 'crosshairs-gps'}
+        icon={'crosshairs-gps'}
         color={Colors.primary}
         size={40}
         onPress={findMyLocation}
