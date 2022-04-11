@@ -25,7 +25,9 @@ const bottomNavBar = () => {
         tabBarShowLabel: false,
         tabBarStyle: {
           position: 'absolute',
-          height: 50,
+          height: 80,
+          borderTopRightRadius: 30,
+          borderTopLeftRadius: 30,
         },
       }}>
       <Tab.Screen
@@ -33,7 +35,7 @@ const bottomNavBar = () => {
         component={Home}
         options={{
           tabBarIcon: ({focused}) => {
-            let iconColor = focused ? Colors.primary : Colors.lightGray;
+            let iconColor = focused ? Colors.primary : Colors.gray;
             return (
               <View style={{alignItems: 'center'}}>
                 <SvgHome width={30} height={30} stroke={iconColor} />
@@ -52,7 +54,7 @@ const bottomNavBar = () => {
         component={Ambulance}
         options={{
           tabBarIcon: ({focused}) => {
-            let iconColor = focused ? Colors.primary : Colors.lightGray;
+            let iconColor = focused ? Colors.primary : Colors.gray;
             return (
               <View style={{alignItems: 'center'}}>
                 <SvgAmbulance width={30} height={30} fill={iconColor} />
@@ -71,7 +73,7 @@ const bottomNavBar = () => {
         component={Emergency}
         options={{
           tabBarIcon: ({focused}) => {
-            let iconColor = focused ? Colors.primary : Colors.lightGray;
+            let iconColor = focused ? Colors.primary : Colors.gray;
             return (
               <View style={{alignItems: 'center'}}>
                 <SvgEmergency width={30} height={30} fill={iconColor} />
@@ -90,7 +92,7 @@ const bottomNavBar = () => {
         component={Profile}
         options={{
           tabBarIcon: ({focused}) => {
-            let iconColor = focused ? Colors.primary : Colors.lightGray;
+            let iconColor = focused ? Colors.primary : Colors.gray;
             return (
               <View style={{alignItems: 'center'}}>
                 <SvgProfile width={30} height={30} fill={iconColor} />

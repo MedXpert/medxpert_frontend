@@ -21,9 +21,10 @@ import Colors from '../../constants/colors';
 import {CustomButton} from '../../components/general/CustomButton';
 import {CustomText} from '../../components/general/CustomText';
 import {PermissionModal} from '../../components/permissions/PermissionModal';
+import {IconButton} from 'react-native-paper';
 
 import {requestPermissions} from '../../services/permissions/requestPermissions';
-import {PERMISSION_MESSAGE} from '../../constants/string/requestPermissions/requestPermissions';
+import {LOCATION_PERMISSION_MESSAGE} from '../../constants/string/requestPermissions/requestPermissions';
 
 const Home = () => {
   const permissionName = PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION; //location permission name
@@ -34,6 +35,13 @@ const Home = () => {
   const [locationPermissionBlocked, setLocationPermissionBlocked] =
     useState(false); //Whether the location permission is Denied
 
+  const [locationChanged, setLocationChanged] = useState(false); // Whether the location is changed
+  const [userPosition, setUserPosition] = useState(); // User's current position
+  const [centerCoordinate, setCenterCoordinate] = useState([]);
+  const [followUserLocation, setFollowUserLocation] = useState(true);
+  const [regionDidChange, setRegionDidChange] = useState(false);
+  const [regionIsChanging, setRegionIsChanging] = useState(false);
+
   //Exit the app and go to settings. Called when the 'Go to settings' button is pressed.
   const settings = () => {
     BackHandler.exitApp();
@@ -42,7 +50,8 @@ const Home = () => {
 
   const checkPermission = useCallback(async () => {
     const result = await requestPermissions(permissionName); // call requestPermissions function with the permissionName argument and wait for the result;
-    //Set the values of location permission states according to the result from 'requestPermissions' function
+
+    //Set the values of location permission according to the result from 'requestPermissions' function
     if (result === RESULTS.GRANTED) {
       setLocationPermissionBlocked(false);
       setLocationPermissionDenied(false);
@@ -58,6 +67,33 @@ const Home = () => {
     }
   }, [permissionName]);
 
+  // Will be called when the region being displayed in the map is changing
+  const onRegionIsChanging = () => {
+    // console.log(followUserLocation);
+    setRegionIsChanging(true);
+    setLocationChanged(true);
+  };
+
+  // Will be called when the region being displayed in the map has changed
+  const onRegionDidChange = () => {
+    setRegionDidChange(true);
+    setFollowUserLocation(false);
+  };
+
+  // Will be called when the user location is updated/changed
+  const userLocationUpdate = location => {
+    setUserPosition(location);
+  };
+
+  // Set center coordinate to the current position of the user.
+  const findMyLocation = () => {
+    setCenterCoordinate([
+      userPosition.coords.longitude,
+      userPosition.coords.latitude,
+    ]);
+    setLocationChanged(false);
+  };
+
   useEffect(() => {
     //call 'checkPermission' every time something in the function is changed.
     checkPermission();
@@ -67,12 +103,12 @@ const Home = () => {
     <View style={styles.container}>
       {/* Modal for denied permission*/}
       <PermissionModal
-        TextContent={PERMISSION_MESSAGE.MODAL_DENIED}
+        TextContent={LOCATION_PERMISSION_MESSAGE.MODAL_DENIED}
         buttonLeftOnPress={() => {
           BackHandler.exitApp();
         }}
         buttonOnRightOnPress={() => {
-          checkPermission();
+          checkPermission(); // If button is clicked request permission again
         }}
         buttonLeftTitle={'Close App'}
         buttonRightTitle={'Give Permission'}
@@ -80,34 +116,54 @@ const Home = () => {
       />
       {/* Modal for blocked permission */}
       <PermissionModal
-        TextContent={PERMISSION_MESSAGE.MODAL_BLOCKED}
+        TextContent={LOCATION_PERMISSION_MESSAGE.MODAL_BLOCKED}
         buttonLeftOnPress={() => {
           BackHandler.exitApp();
         }}
         buttonOnRightOnPress={() => {
-          settings();
+          settings(); // Go to permission settings
         }}
         buttonLeftTitle={'Close App'}
         buttonRightTitle={'Go to settings'}
         modalVisibility={locationPermissionBlocked}
         buttonWidth={160}
       />
-
-      {/* Display the map  / this is the container */}
       <View style={styles.mapContainer}>
-        <MapboxGL.MapView style={styles.map} zoomEnabled>
-          <MapboxGL.Camera followZoomLevel={12} followUserLocation />
-
+        <MapboxGL.MapView
+          // ref={c => (MapboxGL.MapView._map = c)}
+          style={styles.map}
+          styleURL={MapboxGL.StyleURL.Light}
+          onRegionIsChanging={onRegionIsChanging}
+          onRegionDidChange={onRegionDidChange}>
           {/* Display user location */}
           {/* Checks if the user has granted location permission to the app. */}
           {locationPermissionGranted && (
-            <MapboxGL.UserLocation visible showsUserHeadingIndicator={true} />
+            <>
+              {/* <MapboxGL.Camera followZoomLevel={15} followUserLocation /> */}
+              <MapboxGL.UserLocation visible onUpdate={userLocationUpdate} />
+            </>
           )}
+          <MapboxGL.Camera
+            followZoomLevel={15}
+            zoomLevel={15}
+            followUserLocation={followUserLocation}
+            centerCoordinate={centerCoordinate}
+          />
         </MapboxGL.MapView>
       </View>
+
       <View style={styles.searchBarContainer}>
+        {/* Display Search bar  */}
         <SearchBar fontSize={16} marginHorizontal={20} />
       </View>
+
+      <IconButton
+        style={{position: 'absolute', right: 10, bottom: 80}}
+        icon={locationChanged ? 'crosshairs' : 'crosshairs-gps'}
+        color={Colors.primary}
+        size={40}
+        onPress={findMyLocation}
+      />
     </View>
   );
 };
@@ -143,7 +199,7 @@ const styles = StyleSheet.create({
   },
   searchBarContainer: {
     position: 'absolute',
-    top: 10,
+    top: 30,
   },
   mapContainer: {
     width: Dimensions.get('window').width,

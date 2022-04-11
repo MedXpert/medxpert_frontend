@@ -129,7 +129,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: Colors.white,
-    borderRadius: 30,
+    borderRadius: 10,
     elevation: 3,
     // width: Dimensions.get('window').width,
   },
