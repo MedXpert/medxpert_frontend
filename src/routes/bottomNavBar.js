@@ -25,7 +25,7 @@ const bottomNavBar = () => {
         tabBarShowLabel: false,
         tabBarStyle: {
           position: 'absolute',
-          height: 80,
+          height: 70,
           borderTopRightRadius: 30,
           borderTopLeftRadius: 30,
         },

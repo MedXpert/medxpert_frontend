@@ -73,7 +73,9 @@ const Home = () => {
 
   // Set center coordinate to the current position of the user.
   const findMyLocation = async () => {
+    setFollowUserLocation(true);
     setFollowUserLocation(false);
+
     let lng = userPosition.coords.longitude;
     let lat = userPosition.coords.latitude;
     await _camera.flyTo([lng, lat]);
@@ -83,6 +85,8 @@ const Home = () => {
     // Call 'checkPermission' every time something in the function is changed.
     checkPermission();
   }, [checkPermission]);
+
+  useEffect(() => {}, [followUserLocation]);
 
   return (
     <View style={styles.container}>
@@ -123,16 +127,22 @@ const Home = () => {
           {/* Checks if the user has granted location permission to the app. */}
           {locationPermissionGranted && (
             <>
-              {/* <MapboxGL.Camera followZoomLevel={15} followUserLocation /> */}
-              <MapboxGL.UserLocation visible onUpdate={userLocationUpdate} />
+              <MapboxGL.Camera
+                followUserLevel={15}
+                zoomLevel={15}
+                followUserLocation={followUserLocation}
+              />
+              <MapboxGL.UserLocation
+                visible={true}
+                onUpdate={userLocationUpdate}
+              />
             </>
           )}
           <MapboxGL.Camera
             ref={c => (_camera = c)}
             followZoomLevel={15}
-            zoomLevel={15}
+            zoomLevel={16}
             followUserLocation={followUserLocation}
-            surfaceView
           />
         </MapboxGL.MapView>
       </View>
@@ -141,15 +151,15 @@ const Home = () => {
         {/* Display Search bar  */}
         <SearchBar fontSize={16} marginHorizontal={20} />
       </View>
-
-      <IconButton
-        style={{position: 'absolute', right: 10, bottom: 80}}
-        // icon={locationChanged ? 'crosshairs' : 'crosshairs-gps'}
-        icon={'crosshairs-gps'}
-        color={Colors.primary}
-        size={40}
-        onPress={findMyLocation}
-      />
+      <View style={styles.locationButtonContainer}>
+        <IconButton
+          // icon={locationChanged ? 'crosshairs' : 'crosshairs-gps'}
+          icon={'crosshairs-gps'}
+          color={Colors.secondary}
+          size={30}
+          onPress={findMyLocation}
+        />
+      </View>
     </View>
   );
 };
@@ -165,6 +175,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: Colors.secondary,
+  },
+  locationButtonContainer: {
+    backgroundColor: Colors.primary,
+    position: 'absolute',
+    bottom: 80,
+    right: 10,
+    borderRadius: 50,
   },
   modalView: {
     alignSelf: 'center',
