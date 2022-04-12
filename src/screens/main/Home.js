@@ -9,6 +9,7 @@ import {
 import React, {useState, useEffect, useCallback} from 'react';
 import MapboxGL from '@rnmapbox/maps';
 import {PERMISSIONS, RESULTS, openSettings} from 'react-native-permissions';
+import Geolocation from 'react-native-geolocation-service';
 
 import IconA from 'react-native-vector-icons/AntDesign';
 import IconM from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -38,8 +39,10 @@ const Home = () => {
     useState(false); //Whether the location permission is Denied
 
   const [locationChanged, setLocationChanged] = useState(false); // Whether the location is changed
-  const [userPosition, setUserPosition] = useState(); // User's current position
-  const [followUserLocation, setFollowUserLocation] = useState(true);
+  const [userPositionLng, setUserPositionLng] = useState(0); // User's current position
+  const [userPositionLat, setUserPositionLat] = useState(0); // User's current position
+  // const [followUserLocation, setFollowUserLocation] = useState(true);
+  const [locationFromMapbox, setLocationFromMapbox] = useState();
 
   //Exit the app and go to settings. Called when the 'Go to settings' button is pressed.
   const settings = () => {
@@ -68,25 +71,69 @@ const Home = () => {
 
   // Will be called when the user location is updated/changed
   const userLocationUpdate = async location => {
-    setUserPosition(location);
+    setLocationFromMapbox(location);
   };
 
   // Set center coordinate to the current position of the user.
   const findMyLocation = async () => {
-    setFollowUserLocation(true);
-    setFollowUserLocation(false);
-
-    let lng = userPosition.coords.longitude;
-    let lat = userPosition.coords.latitude;
+    // Use Geolocation library to get updated location of the user
+    Geolocation.getCurrentPosition(
+      position => {
+        let lng = position.coords.longitude;
+        let lat = position.coords.latitude;
+        setUserPositionLng(lng);
+        setUserPositionLat(lat);
+      },
+      error => {
+        // See error code charts below.
+        console.log(error.code, error.message);
+      },
+      {enableHighAccuracy: true, timeout: 15000, maximumAge: 10000},
+    );
+    let lng = userPositionLng;
+    let lat = userPositionLat;
     await _camera.flyTo([lng, lat]);
   };
 
   useEffect(() => {
     // Call 'checkPermission' every time something in the function is changed.
     checkPermission();
-  }, [checkPermission]);
+    // Use another library to get the location of the user
+    if (locationPermissionGranted) {
+      Geolocation.getCurrentPosition(
+        position => {
+          let lng = position.coords.longitude;
+          let lat = position.coords.latitude;
+          setUserPositionLng(lng);
+          setUserPositionLat(lat);
+        },
+        error => {
+          // See error code charts below.
+          console.log(error.code, error.message);
+        },
+        {enableHighAccuracy: true, timeout: 15000, maximumAge: 10000},
+      );
+    }
+  }, [checkPermission, locationPermissionGranted]);
 
-  useEffect(() => {}, [followUserLocation]);
+  // Follow user strictly
+
+  // useEffect(() => {
+  //   Geolocation.getCurrentPosition(
+  //     position => {
+  //       let lng = position.coords.longitude;
+  //       let lat = position.coords.latitude;
+  //       setUserPositionLng(lng);
+  //       setUserPositionLat(lat);
+  //     },
+  //     error => {
+  //       // See error code charts below.
+  //       console.log(error.code, error.message);
+  //     },
+  //     {enableHighAccuracy: true, timeout: 15000, maximumAge: 10000},
+  //   );
+  //   console.log(locationFromMapbox);
+  // }, [locationFromMapbox]);
 
   return (
     <View style={styles.container}>
@@ -121,6 +168,8 @@ const Home = () => {
         <MapboxGL.MapView
           // ref={c => (_map = c)}
           ref={c => (_map = c)}
+          logoEnabled={false}
+          compassViewMargins={{x: 10, y: 180}}
           style={styles.map}
           surfaceView>
           {/* Display user location */}
@@ -128,9 +177,10 @@ const Home = () => {
           {locationPermissionGranted && (
             <>
               <MapboxGL.Camera
-                followUserLevel={15}
                 zoomLevel={15}
-                followUserLocation={followUserLocation}
+                // followUserLevel={15}
+                // followUserLocation={followUserLocation}
+                centerCoordinate={[userPositionLng, userPositionLat]}
               />
               <MapboxGL.UserLocation
                 visible={true}
@@ -140,9 +190,10 @@ const Home = () => {
           )}
           <MapboxGL.Camera
             ref={c => (_camera = c)}
-            followZoomLevel={15}
-            zoomLevel={16}
-            followUserLocation={followUserLocation}
+            zoomLevel={15}
+            // followZoomLevel={15}
+            // followUserLocation={followUserLocation}
+            centerCoordinate={[userPositionLng, userPositionLat]}
           />
         </MapboxGL.MapView>
       </View>
