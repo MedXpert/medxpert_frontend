@@ -6,6 +6,8 @@ import {
   Modal,
   BackHandler,
   StatusBar,
+  Image,
+  Pressable,
 } from 'react-native';
 import React, {useState, useEffect, useCallback} from 'react';
 import MapboxGL from '@rnmapbox/maps';
@@ -23,28 +25,23 @@ import Colors from '../../constants/colors';
 import {CustomButton} from '../../components/general/CustomButton';
 import {CustomText} from '../../components/general/CustomText';
 import {PermissionModal} from '../../components/permissions/PermissionModal';
-import {IconButton, shadow} from 'react-native-paper';
+import {IconButton} from 'react-native-paper';
 
 import {requestPermissions} from '../../services/permissions/requestPermissions';
 import {LOCATION_PERMISSION_MESSAGE} from '../../constants/string/requestPermissions/requestPermissions';
 
+const dimensionHeight = Dimensions.get('window').height;
+const dimensionWidth = Dimensions.get('window').width;
+
 const Home = () => {
   var _map;
   var _camera;
+
   const streetStyleURL = MapboxGL.StyleURL.Street;
   const satelliteStyleURL = MapboxGL.StyleURL.Satellite;
   const lightStyleURL = MapboxGL.StyleURL.Light;
   const darkStyleURL = MapboxGL.StyleURL.Dark;
-  const shadow = {
-    shadowColor: Colors.black,
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
-  };
+
   const permissionName = PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION; //location permission name
   const [locationPermissionGranted, setLocationPermissionGranted] =
     useState(false); // Whether the location permission is granted
@@ -53,7 +50,7 @@ const Home = () => {
   const [locationPermissionBlocked, setLocationPermissionBlocked] =
     useState(false); //Whether the location permission is Denied
 
-  const [styleUrl, setStyleUrl] = useState(streetStyleURL);
+  const [styleUrl, setStyleUrl] = useState(lightStyleURL);
 
   const [locationChanged, setLocationChanged] = useState(false); // Whether the location is changed
   const [userPositionLng, setUserPositionLng] = useState(0); // User's current position
@@ -62,12 +59,15 @@ const Home = () => {
   const [locationFromMapboxLng, setLocationFromMapboxLng] = useState();
   const [locationFromMapboxLat, setLocationFromMapboxLat] = useState();
 
-  //Exit the app and go to settings. Called when the 'Go to settings' button is pressed.
+  const [mapTypeVisibility, setMapTypeVisibility] = useState(false); // MapType modal visibility
+
+  // Exit the app and go to settings. This function is called when the 'Go to settings' button in the permission denied modal is pressed.
   const settings = () => {
     BackHandler.exitApp();
     openSettings().catch(() => console.warn('Can not open settings'));
   };
 
+  // Checks permission
   const checkPermission = useCallback(async () => {
     const result = await requestPermissions(permissionName); // call requestPermissions function with the permissionName argument and wait for the result;
 
@@ -125,6 +125,20 @@ const Home = () => {
     await _camera.flyTo([userPositionLng, userPositionLat]);
   };
 
+  // Choose the Map type to be displayed
+  const chooseMapType = mapType => {
+    if (mapType === streetStyleURL) {
+      setStyleUrl(streetStyleURL);
+    } else if (mapType === lightStyleURL) {
+      setStyleUrl(lightStyleURL);
+    } else if (mapType === darkStyleURL) {
+      setStyleUrl(darkStyleURL);
+    } else if (mapType === satelliteStyleURL) {
+      setStyleUrl(satelliteStyleURL);
+    }
+    setMapTypeVisibility(false);
+  };
+
   useEffect(() => {
     // Call 'checkPermission' every time something in the function is changed.
     checkPermission();
@@ -146,46 +160,116 @@ const Home = () => {
     }
   }, [checkPermission, locationPermissionGranted]);
 
-  // Follow user position strictly
-
-  // useEffect(() => {
-  //   Geolocation.getCurrentPosition(
-  //     position => {
-  //       let lng = position.coords.longitude;
-  //       let lat = position.coords.latitude;
-  //       setUserPositionLng(lng);
-  //       setUserPositionLat(lat);
-  //     },
-  //     error => {
-  //       // See error code charts below.
-  //       console.log(error.code, error.message);
-  //     },
-  //     {enableHighAccuracy: true, timeout: 15000, maximumAge: 10000},
-  //   );
-  //   console.log(locationFromMapbox);
-  // }, [locationFromMapbox]);
-
   return (
     <View style={styles.container}>
-      {/* Modal for denied permission*/}
-      <StatusBar
-        translucent
-        backgroundColor="transparent"
-        barStyle="dark-content"
-      />
+      {/* Map types modal */}
       <Modal
         animationType="slide"
-        transparent={true}
-        visible={false}
-        onRequestClose={() => {}}>
+        transparent
+        visible={mapTypeVisibility}
+        onRequestClose={() => {
+          setMapTypeVisibility(false);
+        }}>
         <View style={styles.chooseMapModal}>
-          <View style={styles.mapOptionsContainers}>
-            <View />
-            <View />
-            <View />
+          {/* The header */}
+          <View style={styles.mapTypesTitleContainer}>
+            <CustomText content={'Map Type'} fontSize={20} />
+            <IconButton
+              icon={'window-close'}
+              onPress={() => {
+                setMapTypeVisibility(false);
+              }}
+            />
+          </View>
+
+          {/*The body */}
+          <View style={styles.mapTypesContainers}>
+            <View style={styles.mapTypeSingle}>
+              <Pressable
+                onPress={() => {
+                  chooseMapType(lightStyleURL);
+                }}>
+                <Image
+                  source={require('../../assets/img/mapThumbnails/light.jpg')}
+                  style={[
+                    styles.mapThumbnail,
+                    {
+                      borderColor:
+                        styleUrl === lightStyleURL
+                          ? Colors.primary
+                          : Colors.grey,
+                    },
+                  ]}
+                />
+              </Pressable>
+              <CustomText content={'Light'} />
+            </View>
+            <View style={styles.mapTypeSingle}>
+              <Pressable
+                onPress={() => {
+                  chooseMapType(darkStyleURL);
+                }}>
+                <Image
+                  source={require('../../assets/img/mapThumbnails/dark.jpg')}
+                  style={[
+                    styles.mapThumbnail,
+                    {
+                      borderColor:
+                        styleUrl === darkStyleURL
+                          ? Colors.primary
+                          : Colors.grey,
+                    },
+                  ]}
+                />
+                <CustomText content={'Dark'} />
+              </Pressable>
+            </View>
+            <View style={styles.mapTypeSingle}>
+              <Pressable
+                onPress={() => {
+                  chooseMapType(streetStyleURL);
+                }}>
+                <Image
+                  source={require('../../assets/img/mapThumbnails/street.jpg')}
+                  style={[
+                    styles.mapThumbnail,
+                    {
+                      borderColor:
+                        styleUrl === streetStyleURL
+                          ? Colors.primary
+                          : Colors.grey,
+                    },
+                  ]}
+                />
+                <CustomText content={'Street'} />
+              </Pressable>
+            </View>
+            <View style={styles.mapTypeSingle}>
+              <Pressable
+                onPress={() => {
+                  chooseMapType(satelliteStyleURL);
+                }}>
+                <Image
+                  source={require('../../assets/img/mapThumbnails/satellite.jpg')}
+                  style={[
+                    styles.mapThumbnail,
+                    {
+                      borderColor:
+                        styleUrl === satelliteStyleURL
+                          ? Colors.primary
+                          : Colors.grey,
+                    },
+                  ]}
+                />
+                <CustomText content={'Satellite'} />
+              </Pressable>
+            </View>
           </View>
         </View>
       </Modal>
+      {/* Modal for Map types ends here */}
+
+      {/* Modal for denied permission*/}
       <PermissionModal
         TextContent={LOCATION_PERMISSION_MESSAGE.MODAL_DENIED}
         buttonLeftOnPress={() => {
@@ -198,6 +282,7 @@ const Home = () => {
         buttonRightTitle={'Give Permission'}
         modalVisibility={locationPermissionDenied}
       />
+
       {/* Modal for blocked permission */}
       <PermissionModal
         TextContent={LOCATION_PERMISSION_MESSAGE.MODAL_BLOCKED}
@@ -218,7 +303,7 @@ const Home = () => {
           // ref={c => (_map = c)}
           ref={c => (_map = c)}
           logoEnabled={false}
-          compassViewMargins={{x: 10, y: Dimensions.get('window').height / 4}}
+          compassViewMargins={{x: 10, y: 380}}
           style={styles.map}
           surfaceView>
           {/* Display user location */}
@@ -264,8 +349,30 @@ const Home = () => {
           onPress={findMyLocation}
         />
       </View>
+      <View style={styles.mapIconContainer}>
+        <IconButton
+          icon="map-legend"
+          color={Colors.secondary}
+          style={styles.mapIcon}
+          onPress={() => {
+            setMapTypeVisibility(true);
+          }}
+        />
+      </View>
     </View>
   );
+};
+
+// Shadow property
+const shadow = {
+  shadowColor: Colors.black,
+  shadowOffset: {
+    width: 0,
+    height: 2,
+  },
+  shadowOpacity: 0.25,
+  shadowRadius: 4,
+  elevation: 5,
 };
 
 const styles = StyleSheet.create({
@@ -283,11 +390,13 @@ const styles = StyleSheet.create({
   chooseMapModal: {
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 300,
-    paddingHorizontal: 15,
+    marginTop: dimensionHeight / 3,
     borderRadius: 15,
-    paddingVertical: 20,
-    backgroundColor: Colors.secondary,
+    paddingBottom: 50,
+    margin: 10,
+    backgroundColor: Colors.white,
+    borderColor: Colors.secondary,
+    borderWidth: 1,
     ...shadow,
   },
   locationButtonContainer: {
@@ -297,37 +406,49 @@ const styles = StyleSheet.create({
     right: 10,
     borderRadius: 50,
   },
-  mapOptionsContainers: {
-    flexDirection: 'row',
-  },
-  // modalView: {
-  //   alignSelf: 'center',
-  //   backgroundColor: Colors.secondary,
-  //   marginTop: 300,
-  //   paddingHorizontal: 15,
-  //   borderRadius: 15,
-  //   paddingVertical: 20,
-  //   width: Dimensions.get('window').width - 50,
-  //   shadowColor: Colors.black,
-  //   shadowOffset: {
-  //     width: 0,
-  //     height: 2,
-  //   },
-  //   shadowOpacity: 0.25,
-  //   shadowRadius: 4,
-  //   elevation: 5,
-  // },
-  searchBarContainer: {
+  mapIconContainer: {
+    backgroundColor: Colors.primary,
+    borderRadius: 30,
     position: 'absolute',
-    top: 60,
+    top: 150,
+    right: 10,
+  },
+  mapTypesContainers: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginTop: 20,
+    width: '100%',
+  },
+  mapTypeSingle: {
+    alignItems: 'center',
   },
   mapContainer: {
-    width: Dimensions.get('window').width,
-    height: Dimensions.get('window').height,
+    width: dimensionWidth,
+    height: dimensionHeight,
     backgroundColor: Colors.dark,
+  },
+  mapIcon: {
+    color: Colors.white,
+  },
+  mapThumbnail: {
+    width: 70,
+    height: 70,
+    borderRadius: 20,
+    borderWidth: 1,
+  },
+  mapTypesTitleContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    width: '100%',
+    paddingHorizontal: 10,
   },
   map: {
     flex: 1,
+  },
+  searchBarContainer: {
+    position: 'absolute',
+    top: 40,
   },
 });
 
