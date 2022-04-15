@@ -5,6 +5,7 @@ import {
   Dimensions,
   Modal,
   BackHandler,
+  StatusBar,
 } from 'react-native';
 import React, {useState, useEffect, useCallback} from 'react';
 import MapboxGL from '@rnmapbox/maps';
@@ -30,6 +31,11 @@ import {LOCATION_PERMISSION_MESSAGE} from '../../constants/string/requestPermiss
 const Home = () => {
   var _map;
   var _camera;
+  const streetStyleURL = MapboxGL.StyleURL.Street;
+  const satelliteStyleURL = MapboxGL.StyleURL.Satellite;
+  const lightStyleURL = MapboxGL.StyleURL.Light;
+  const darkStyleURL = MapboxGL.StyleURL.Dark;
+
   const permissionName = PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION; //location permission name
   const [locationPermissionGranted, setLocationPermissionGranted] =
     useState(false); // Whether the location permission is granted
@@ -38,11 +44,14 @@ const Home = () => {
   const [locationPermissionBlocked, setLocationPermissionBlocked] =
     useState(false); //Whether the location permission is Denied
 
+  const [styleUrl, setStyleUrl] = useState(streetStyleURL);
+
   const [locationChanged, setLocationChanged] = useState(false); // Whether the location is changed
   const [userPositionLng, setUserPositionLng] = useState(0); // User's current position
   const [userPositionLat, setUserPositionLat] = useState(0); // User's current position
   // const [followUserLocation, setFollowUserLocation] = useState(true);
-  const [locationFromMapbox, setLocationFromMapbox] = useState();
+  const [locationFromMapboxLng, setLocationFromMapboxLng] = useState();
+  const [locationFromMapboxLat, setLocationFromMapboxLat] = useState();
 
   //Exit the app and go to settings. Called when the 'Go to settings' button is pressed.
   const settings = () => {
@@ -71,7 +80,12 @@ const Home = () => {
 
   // Will be called when the user location is updated/changed
   const userLocationUpdate = async location => {
-    setLocationFromMapbox(location);
+    if (location) {
+      let lng = location.coords.longitude;
+      let lat = location.coords.latitude;
+      setLocationFromMapboxLng(lng);
+      setLocationFromMapboxLat(lat);
+    }
   };
 
   // Set center coordinate to the current position of the user.
@@ -81,8 +95,16 @@ const Home = () => {
       position => {
         let lng = position.coords.longitude;
         let lat = position.coords.latitude;
-        setUserPositionLng(lng);
-        setUserPositionLat(lat);
+
+        if (locationFromMapboxLat && locationFromMapboxLng) {
+          setUserPositionLng(locationFromMapboxLng);
+          setUserPositionLat(locationFromMapboxLat);
+          console.log('Inside mapbox User position');
+        } else {
+          setUserPositionLng(lng);
+          setUserPositionLat(lat);
+          console.log('Third party user position');
+        }
       },
       error => {
         // See error code charts below.
@@ -90,9 +112,8 @@ const Home = () => {
       },
       {enableHighAccuracy: true, timeout: 15000, maximumAge: 10000},
     );
-    let lng = userPositionLng;
-    let lat = userPositionLat;
-    await _camera.flyTo([lng, lat]);
+
+    await _camera.flyTo([userPositionLng, userPositionLat]);
   };
 
   useEffect(() => {
@@ -116,7 +137,7 @@ const Home = () => {
     }
   }, [checkPermission, locationPermissionGranted]);
 
-  // Follow user strictly
+  // Follow user position strictly
 
   // useEffect(() => {
   //   Geolocation.getCurrentPosition(
@@ -138,6 +159,11 @@ const Home = () => {
   return (
     <View style={styles.container}>
       {/* Modal for denied permission*/}
+      <StatusBar
+        translucent
+        backgroundColor="transparent"
+        barStyle="dark-content"
+      />
       <PermissionModal
         TextContent={LOCATION_PERMISSION_MESSAGE.MODAL_DENIED}
         buttonLeftOnPress={() => {
@@ -166,6 +192,7 @@ const Home = () => {
       />
       <View style={styles.mapContainer}>
         <MapboxGL.MapView
+          styleURL={styleUrl}
           // ref={c => (_map = c)}
           ref={c => (_map = c)}
           logoEnabled={false}
@@ -178,8 +205,10 @@ const Home = () => {
             <>
               <MapboxGL.Camera
                 zoomLevel={15}
+                // animationDuration={4000}
                 // followUserLevel={15}
                 // followUserLocation={followUserLocation}
+                // animationMode={'flyTo'}
                 centerCoordinate={[userPositionLng, userPositionLat]}
               />
               <MapboxGL.UserLocation
@@ -191,6 +220,8 @@ const Home = () => {
           <MapboxGL.Camera
             ref={c => (_camera = c)}
             zoomLevel={15}
+            // animationMode={'flyTo'}
+            // animationDuration={4000}
             // followZoomLevel={15}
             // followUserLocation={followUserLocation}
             centerCoordinate={[userPositionLng, userPositionLat]}
@@ -222,10 +253,10 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   container: {
-    flex: 1,
+    // flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: Colors.secondary,
+    backgroundColor: Colors.primary,
   },
   locationButtonContainer: {
     backgroundColor: Colors.primary,

@@ -6,23 +6,23 @@ const requestPermissions = async permission => {
   const requestPermission = async permissionInput => {
     try {
       var requestPermissionResult = await request(permissionInput);
-      console.log('inside permission request');
+      // console.log('inside permission request');
     } catch (error) {
       console.log(error);
     }
     switch (requestPermissionResult) {
       case RESULTS.GRANTED:
-        console.log('Permission granted inside request requestPermission');
+        // console.log('Permission granted inside request requestPermission');
         return RESULTS.GRANTED;
       case RESULTS.DENIED:
-        console.log(
-          'Permission denied inside requestPermission / maybe blocked',
-        );
+        // console.log(
+        //   'Permission denied inside requestPermission / maybe blocked',
+        // );
         return RESULTS.DENIED;
       case RESULTS.BLOCKED:
-        console.log(
-          'Permission denied inside request Permission / can not be requested',
-        );
+        // console.log(
+        //   'Permission denied inside request Permission / can not be requested',
+        // );
         return RESULTS.BLOCKED;
     }
   };
@@ -36,14 +36,14 @@ const requestPermissions = async permission => {
 
   switch (CheckResult) {
     case RESULTS.GRANTED:
-      console.log('permission is granted');
+      // console.log('permission is granted');
       return RESULTS.GRANTED;
     case RESULTS.DENIED:
-      console.log('Permission is denied inside check result ');
+      // console.log('Permission is denied inside check result ');
       const resultFromRequest = await requestPermission(permission); // If permission is denied while checking result, it means it can be requested. thus call the 'requestPermission' function
       return resultFromRequest;
     case RESULTS.BLOCKED:
-      console.log('permission is blocked / can not be requested /  ');
+      // console.log('permission is blocked / can not be requested /  ');
       return RESULTS.BLOCKED;
   }
 };
