@@ -176,7 +176,7 @@ const Home = () => {
       <Modal
         animationType="slide"
         transparent={true}
-        visible={true}
+        visible={false}
         onRequestClose={() => {}}>
         <View style={styles.chooseMapModal}>
           <View style={styles.mapOptionsContainers}>
@@ -218,7 +218,7 @@ const Home = () => {
           // ref={c => (_map = c)}
           ref={c => (_map = c)}
           logoEnabled={false}
-          compassViewMargins={{x: 10, y: 180}}
+          compassViewMargins={{x: 10, y: Dimensions.get('window').height / 4}}
           style={styles.map}
           surfaceView>
           {/* Display user location */}
