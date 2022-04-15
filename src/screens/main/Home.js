@@ -23,7 +23,7 @@ import Colors from '../../constants/colors';
 import {CustomButton} from '../../components/general/CustomButton';
 import {CustomText} from '../../components/general/CustomText';
 import {PermissionModal} from '../../components/permissions/PermissionModal';
-import {IconButton} from 'react-native-paper';
+import {IconButton, shadow} from 'react-native-paper';
 
 import {requestPermissions} from '../../services/permissions/requestPermissions';
 import {LOCATION_PERMISSION_MESSAGE} from '../../constants/string/requestPermissions/requestPermissions';
@@ -35,7 +35,16 @@ const Home = () => {
   const satelliteStyleURL = MapboxGL.StyleURL.Satellite;
   const lightStyleURL = MapboxGL.StyleURL.Light;
   const darkStyleURL = MapboxGL.StyleURL.Dark;
-
+  const shadow = {
+    shadowColor: Colors.black,
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  };
   const permissionName = PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION; //location permission name
   const [locationPermissionGranted, setLocationPermissionGranted] =
     useState(false); // Whether the location permission is granted
@@ -164,6 +173,19 @@ const Home = () => {
         backgroundColor="transparent"
         barStyle="dark-content"
       />
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={true}
+        onRequestClose={() => {}}>
+        <View style={styles.chooseMapModal}>
+          <View style={styles.mapOptionsContainers}>
+            <View />
+            <View />
+            <View />
+          </View>
+        </View>
+      </Modal>
       <PermissionModal
         TextContent={LOCATION_PERMISSION_MESSAGE.MODAL_DENIED}
         buttonLeftOnPress={() => {
@@ -256,7 +278,17 @@ const styles = StyleSheet.create({
     // flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: Colors.primary,
+    backgroundColor: Colors.secondary,
+  },
+  chooseMapModal: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 300,
+    paddingHorizontal: 15,
+    borderRadius: 15,
+    paddingVertical: 20,
+    backgroundColor: Colors.secondary,
+    ...shadow,
   },
   locationButtonContainer: {
     backgroundColor: Colors.primary,
@@ -265,26 +297,29 @@ const styles = StyleSheet.create({
     right: 10,
     borderRadius: 50,
   },
-  modalView: {
-    alignSelf: 'center',
-    backgroundColor: Colors.secondary,
-    marginTop: 300,
-    paddingHorizontal: 15,
-    borderRadius: 15,
-    paddingVertical: 20,
-    width: Dimensions.get('window').width - 50,
-    shadowColor: Colors.black,
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
+  mapOptionsContainers: {
+    flexDirection: 'row',
   },
+  // modalView: {
+  //   alignSelf: 'center',
+  //   backgroundColor: Colors.secondary,
+  //   marginTop: 300,
+  //   paddingHorizontal: 15,
+  //   borderRadius: 15,
+  //   paddingVertical: 20,
+  //   width: Dimensions.get('window').width - 50,
+  //   shadowColor: Colors.black,
+  //   shadowOffset: {
+  //     width: 0,
+  //     height: 2,
+  //   },
+  //   shadowOpacity: 0.25,
+  //   shadowRadius: 4,
+  //   elevation: 5,
+  // },
   searchBarContainer: {
     position: 'absolute',
-    top: 30,
+    top: 60,
   },
   mapContainer: {
     width: Dimensions.get('window').width,
