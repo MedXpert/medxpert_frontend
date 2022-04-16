@@ -12,7 +12,6 @@ import SvgProfile from '../assets/svg/bottomNavbar/Profile.svg';
 import SvgEmergency from '../assets/svg/bottomNavbar/Emergency.svg';
 import SvgHome from '../assets/svg/bottomNavbar/Home.svg';
 import {CustomText} from '../components/general/CustomText';
-import colors from '../constants/colors';
 
 const Tab = createBottomTabNavigator();
 

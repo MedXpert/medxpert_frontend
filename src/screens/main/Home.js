@@ -26,6 +26,7 @@ import {CustomButton} from '../../components/general/CustomButton';
 import {CustomText} from '../../components/general/CustomText';
 import {PermissionModal} from '../../components/permissions/PermissionModal';
 import {IconButton} from 'react-native-paper';
+import {MapTypeModal} from '../../components/home/MapTypeModal';
 
 import {requestPermissions} from '../../services/permissions/requestPermissions';
 import {LOCATION_PERMISSION_MESSAGE} from '../../constants/string/requestPermissions/requestPermissions';
@@ -50,7 +51,7 @@ const Home = () => {
   const [locationPermissionBlocked, setLocationPermissionBlocked] =
     useState(false); //Whether the location permission is Denied
 
-  const [styleUrl, setStyleUrl] = useState(lightStyleURL);
+  const [styleUrl, setStyleUrl] = useState(streetStyleURL);
 
   const [locationChanged, setLocationChanged] = useState(false); // Whether the location is changed
   const [userPositionLng, setUserPositionLng] = useState(0); // User's current position
@@ -163,110 +164,32 @@ const Home = () => {
   return (
     <View style={styles.container}>
       {/* Map types modal */}
-      <Modal
-        animationType="slide"
-        transparent
-        visible={mapTypeVisibility}
-        onRequestClose={() => {
+      <MapTypeModal
+        mapTypeVisibility={mapTypeVisibility}
+        chooseLightMapType={() => {
+          chooseMapType(lightStyleURL);
+        }}
+        chooseDarkMapType={() => {
+          chooseMapType(darkStyleURL);
+        }}
+        chooseStreetMapType={() => {
+          chooseMapType(streetStyleURL);
+        }}
+        chooseSatelliteMapType={() => {
+          chooseMapType(satelliteStyleURL);
+        }}
+        onWindowClose={() => {
           setMapTypeVisibility(false);
-        }}>
-        <View style={styles.chooseMapModal}>
-          {/* The header */}
-          <View style={styles.mapTypesTitleContainer}>
-            <CustomText content={'Map Type'} fontSize={20} />
-            <IconButton
-              icon={'window-close'}
-              onPress={() => {
-                setMapTypeVisibility(false);
-              }}
-            />
-          </View>
-
-          {/*The body */}
-          <View style={styles.mapTypesContainers}>
-            <View style={styles.mapTypeSingle}>
-              <Pressable
-                onPress={() => {
-                  chooseMapType(lightStyleURL);
-                }}>
-                <Image
-                  source={require('../../assets/img/mapThumbnails/light.jpg')}
-                  style={[
-                    styles.mapThumbnail,
-                    {
-                      borderColor:
-                        styleUrl === lightStyleURL
-                          ? Colors.primary
-                          : Colors.grey,
-                    },
-                  ]}
-                />
-              </Pressable>
-              <CustomText content={'Light'} />
-            </View>
-            <View style={styles.mapTypeSingle}>
-              <Pressable
-                onPress={() => {
-                  chooseMapType(darkStyleURL);
-                }}>
-                <Image
-                  source={require('../../assets/img/mapThumbnails/dark.jpg')}
-                  style={[
-                    styles.mapThumbnail,
-                    {
-                      borderColor:
-                        styleUrl === darkStyleURL
-                          ? Colors.primary
-                          : Colors.grey,
-                    },
-                  ]}
-                />
-                <CustomText content={'Dark'} />
-              </Pressable>
-            </View>
-            <View style={styles.mapTypeSingle}>
-              <Pressable
-                onPress={() => {
-                  chooseMapType(streetStyleURL);
-                }}>
-                <Image
-                  source={require('../../assets/img/mapThumbnails/street.jpg')}
-                  style={[
-                    styles.mapThumbnail,
-                    {
-                      borderColor:
-                        styleUrl === streetStyleURL
-                          ? Colors.primary
-                          : Colors.grey,
-                    },
-                  ]}
-                />
-                <CustomText content={'Street'} />
-              </Pressable>
-            </View>
-            <View style={styles.mapTypeSingle}>
-              <Pressable
-                onPress={() => {
-                  chooseMapType(satelliteStyleURL);
-                }}>
-                <Image
-                  source={require('../../assets/img/mapThumbnails/satellite.jpg')}
-                  style={[
-                    styles.mapThumbnail,
-                    {
-                      borderColor:
-                        styleUrl === satelliteStyleURL
-                          ? Colors.primary
-                          : Colors.grey,
-                    },
-                  ]}
-                />
-                <CustomText content={'Satellite'} />
-              </Pressable>
-            </View>
-          </View>
-        </View>
-      </Modal>
+        }}
+        close={() => {
+          setMapTypeVisibility(false);
+        }}
+        lightStyleURL={lightStyleURL}
+        darkStyleURL={darkStyleURL}
+        streetStyleURL={streetStyleURL}
+        satelliteStyleURL={satelliteStyleURL}
+        styleUrl={styleUrl}
+      />
       {/* Modal for Map types ends here */}
 
       {/* Modal for denied permission*/}
@@ -363,18 +286,6 @@ const Home = () => {
   );
 };
 
-// Shadow property
-const shadow = {
-  shadowColor: Colors.black,
-  shadowOffset: {
-    width: 0,
-    height: 2,
-  },
-  shadowOpacity: 0.25,
-  shadowRadius: 4,
-  elevation: 5,
-};
-
 const styles = StyleSheet.create({
   buttonsContainer: {
     flexDirection: 'row',
@@ -387,17 +298,15 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     backgroundColor: Colors.secondary,
   },
-  chooseMapModal: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: dimensionHeight / 3,
-    borderRadius: 15,
-    paddingBottom: 50,
-    margin: 10,
-    backgroundColor: Colors.white,
-    borderColor: Colors.secondary,
-    borderWidth: 1,
-    ...shadow,
+  mapIconContainer: {
+    backgroundColor: Colors.primary,
+    borderRadius: 30,
+    position: 'absolute',
+    top: 150,
+    right: 10,
+  },
+  mapIcon: {
+    color: Colors.white,
   },
   locationButtonContainer: {
     backgroundColor: Colors.primary,
@@ -406,49 +315,18 @@ const styles = StyleSheet.create({
     right: 10,
     borderRadius: 50,
   },
-  mapIconContainer: {
-    backgroundColor: Colors.primary,
-    borderRadius: 30,
-    position: 'absolute',
-    top: 150,
-    right: 10,
-  },
-  mapTypesContainers: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    marginTop: 20,
-    width: '100%',
-  },
-  mapTypeSingle: {
-    alignItems: 'center',
-  },
   mapContainer: {
     width: dimensionWidth,
     height: dimensionHeight,
     backgroundColor: Colors.dark,
   },
-  mapIcon: {
-    color: Colors.white,
-  },
-  mapThumbnail: {
-    width: 70,
-    height: 70,
-    borderRadius: 20,
-    borderWidth: 1,
-  },
-  mapTypesTitleContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    width: '100%',
-    paddingHorizontal: 10,
-  },
+
   map: {
     flex: 1,
   },
   searchBarContainer: {
     position: 'absolute',
-    top: 40,
+    top: 30,
   },
 });
 
