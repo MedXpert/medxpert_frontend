@@ -27,6 +27,7 @@ import {CustomText} from '../../components/general/CustomText';
 import {PermissionModal} from '../../components/permissions/PermissionModal';
 import {IconButton} from 'react-native-paper';
 import {MapTypeModal} from '../../components/home/MapTypeModal';
+import {BottomSheetContent} from '../../components/home/BottomSheet';
 
 import {requestPermissions} from '../../services/permissions/requestPermissions';
 import {LOCATION_PERMISSION_MESSAGE} from '../../constants/string/requestPermissions/requestPermissions';
@@ -151,22 +152,11 @@ const Home = () => {
 
   // Tracks the index of BottomSheet
   const onSheetChange = index => {
-    console.log(index);
     if (index === 1) {
-      // setLocationButtonBottomMargin(dimensionHeight / 2.5);
-      animatedMove(-270, 50);
-    } else if (index === 0) {
       animatedMove(0, 50);
+    } else if (index === 0) {
+      animatedMove(220, 50);
     }
-  };
-
-  // Displayed
-  const renderBottomSheet = () => {
-    return (
-      <View style={styles.bottomSheetContainer}>
-        <CustomText content={'Hey there bottomSheet'} />
-      </View>
-    );
   };
 
   useEffect(() => {
@@ -219,7 +209,7 @@ const Home = () => {
         satelliteStyleURL={satelliteStyleURL}
         styleUrl={styleUrl}
       />
-      {/* Modal for Map types ends here */}
+
       {/* Modal for denied permission*/}
       <PermissionModal
         TextContent={LOCATION_PERMISSION_MESSAGE.MODAL_DENIED}
@@ -233,6 +223,7 @@ const Home = () => {
         buttonRightTitle={'Give Permission'}
         modalVisibility={locationPermissionDenied}
       />
+
       {/* Modal for blocked permission */}
       <PermissionModal
         TextContent={LOCATION_PERMISSION_MESSAGE.MODAL_BLOCKED}
@@ -247,6 +238,8 @@ const Home = () => {
         modalVisibility={locationPermissionBlocked}
         buttonWidth={160}
       />
+
+      {/* MapBoxGL */}
       <View style={styles.mapContainer}>
         <MapboxGL.MapView
           styleURL={styleUrl}
@@ -285,14 +278,17 @@ const Home = () => {
           />
         </MapboxGL.MapView>
       </View>
+
+      {/* SearchBar */}
       <View style={styles.searchBarContainer}>
         {/* Display Search bar  */}
         <SearchBar fontSize={16} marginHorizontal={20} />
       </View>
+
+      {/* Get location button */}
       <Animated.View
         style={[
           styles.locationButtonContainer,
-
           {
             transform: [
               {
@@ -309,6 +305,8 @@ const Home = () => {
           onPress={findMyLocation}
         />
       </Animated.View>
+
+      {/* Map Style modal show button */}
       <View style={styles.mapIconContainer}>
         <IconButton
           icon="map-legend"
@@ -320,13 +318,16 @@ const Home = () => {
           }}
         />
       </View>
+
+      {/* Bottom Sheet  */}
       <BottomSheet
-        ref={bsRef}
-        index={0}
-        snapPoints={['7%', '40%', '100%']}
-        // enablePanDownToClose
+        enableContentPanningGesture={false}
+        index={1}
         onChange={onSheetChange}
-      />
+        ref={bsRef}
+        snapPoints={['7%', '35%', '100%']}>
+        <BottomSheetContent />
+      </BottomSheet>
     </View>
   );
 };
@@ -360,7 +361,7 @@ const styles = StyleSheet.create({
   locationButtonContainer: {
     backgroundColor: Colors.primary,
     position: 'absolute',
-    bottom: 80,
+    bottom: 310,
     right: 10,
     borderRadius: 50,
   },
