@@ -2,6 +2,7 @@
  * @format
  */
 import 'react-native-gesture-handler';
+import {gestureHandlerRootHOC} from 'react-native-gesture-handler';
 import {AppRegistry} from 'react-native';
 import MapboxGL, {Logger} from '@rnmapbox/maps';
 import App from './App';
@@ -26,4 +27,4 @@ Logger.setLogCallback(log => {
   return false;
 });
 
-AppRegistry.registerComponent(appName, () => App);
+AppRegistry.registerComponent(appName, () => gestureHandlerRootHOC(App));

@@ -8,18 +8,18 @@ import {
   StatusBar,
   Image,
   Pressable,
+  Animated,
 } from 'react-native';
-import React, {useState, useEffect, useCallback} from 'react';
+import React, {useState, useEffect, useCallback, useRef, useMemo} from 'react';
 import MapboxGL from '@rnmapbox/maps';
 import {PERMISSIONS, RESULTS, openSettings} from 'react-native-permissions';
 import Geolocation from 'react-native-geolocation-service';
+import {onChange} from 'react-native-reanimated';
+import BottomSheet from '@gorhom/bottom-sheet';
 
 import IconA from 'react-native-vector-icons/AntDesign';
 import IconM from 'react-native-vector-icons/MaterialCommunityIcons';
-import SvgAmbulance from '../../assets/svg/bottomNavbar/Ambulance.svg';
-import SvgProfile from '../../assets/svg/bottomNavbar/Profile.svg';
-import SvgEmergency from '../../assets/svg/bottomNavbar/Emergency.svg';
-import SvgHome from '../../assets/svg/bottomNavbar/Home.svg';
+
 import {SearchBar} from '../../components/general/SearchBar';
 import Colors from '../../constants/colors';
 import {CustomButton} from '../../components/general/CustomButton';
@@ -37,13 +37,15 @@ const dimensionWidth = Dimensions.get('window').width;
 const Home = () => {
   var _map;
   var _camera;
+  var bsRef = useRef();
 
   const streetStyleURL = MapboxGL.StyleURL.Street;
   const satelliteStyleURL = MapboxGL.StyleURL.Satellite;
   const lightStyleURL = MapboxGL.StyleURL.Light;
   const darkStyleURL = MapboxGL.StyleURL.Dark;
+  const [styleUrl, setStyleUrl] = useState(streetStyleURL); // MapboxGL map style url
 
-  const permissionName = PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION; //location permission name
+  const permissionName = PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION; // location permission name
   const [locationPermissionGranted, setLocationPermissionGranted] =
     useState(false); // Whether the location permission is granted
   const [locationPermissionDenied, setLocationPermissionDenied] =
@@ -51,16 +53,14 @@ const Home = () => {
   const [locationPermissionBlocked, setLocationPermissionBlocked] =
     useState(false); //Whether the location permission is Denied
 
-  const [styleUrl, setStyleUrl] = useState(streetStyleURL);
-
-  const [locationChanged, setLocationChanged] = useState(false); // Whether the location is changed
   const [userPositionLng, setUserPositionLng] = useState(0); // User's current position
   const [userPositionLat, setUserPositionLat] = useState(0); // User's current position
-  // const [followUserLocation, setFollowUserLocation] = useState(true);
-  const [locationFromMapboxLng, setLocationFromMapboxLng] = useState();
-  const [locationFromMapboxLat, setLocationFromMapboxLat] = useState();
+  const [locationFromMapboxLng, setLocationFromMapboxLng] = useState(); // User's current position tracked from the mapboxGL userLocation - Longitude
+  const [locationFromMapboxLat, setLocationFromMapboxLat] = useState(); // User's current position tracked from the mapboxGL userLocation - Latitude
 
   const [mapTypeVisibility, setMapTypeVisibility] = useState(false); // MapType modal visibility
+
+  const startValueMoveY = useRef(new Animated.Value(0)).current; // Initial value of move Y animated for the location
 
   // Exit the app and go to settings. This function is called when the 'Go to settings' button in the permission denied modal is pressed.
   const settings = () => {
@@ -126,7 +126,7 @@ const Home = () => {
     await _camera.flyTo([userPositionLng, userPositionLat]);
   };
 
-  // Choose the Map type to be displayed
+  // Choose the Map type that'll be displayed
   const chooseMapType = mapType => {
     if (mapType === streetStyleURL) {
       setStyleUrl(streetStyleURL);
@@ -138,6 +138,35 @@ const Home = () => {
       setStyleUrl(satelliteStyleURL);
     }
     setMapTypeVisibility(false);
+  };
+
+  // locationButton animation move Y direction
+  const animatedMove = (endValue, duration) => {
+    Animated.timing(startValueMoveY, {
+      toValue: endValue,
+      duration: duration,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  // Tracks the index of BottomSheet
+  const onSheetChange = index => {
+    console.log(index);
+    if (index === 1) {
+      // setLocationButtonBottomMargin(dimensionHeight / 2.5);
+      animatedMove(-270, 50);
+    } else if (index === 0) {
+      animatedMove(0, 50);
+    }
+  };
+
+  // Displayed
+  const renderBottomSheet = () => {
+    return (
+      <View style={styles.bottomSheetContainer}>
+        <CustomText content={'Hey there bottomSheet'} />
+      </View>
+    );
   };
 
   useEffect(() => {
@@ -191,7 +220,6 @@ const Home = () => {
         styleUrl={styleUrl}
       />
       {/* Modal for Map types ends here */}
-
       {/* Modal for denied permission*/}
       <PermissionModal
         TextContent={LOCATION_PERMISSION_MESSAGE.MODAL_DENIED}
@@ -205,7 +233,6 @@ const Home = () => {
         buttonRightTitle={'Give Permission'}
         modalVisibility={locationPermissionDenied}
       />
-
       {/* Modal for blocked permission */}
       <PermissionModal
         TextContent={LOCATION_PERMISSION_MESSAGE.MODAL_BLOCKED}
@@ -226,7 +253,7 @@ const Home = () => {
           // ref={c => (_map = c)}
           ref={c => (_map = c)}
           logoEnabled={false}
-          compassViewMargins={{x: 10, y: 380}}
+          compassViewMargins={{x: 10, y: (38 * dimensionHeight) / 100}}
           style={styles.map}
           surfaceView>
           {/* Display user location */}
@@ -258,12 +285,22 @@ const Home = () => {
           />
         </MapboxGL.MapView>
       </View>
-
       <View style={styles.searchBarContainer}>
         {/* Display Search bar  */}
         <SearchBar fontSize={16} marginHorizontal={20} />
       </View>
-      <View style={styles.locationButtonContainer}>
+      <Animated.View
+        style={[
+          styles.locationButtonContainer,
+
+          {
+            transform: [
+              {
+                translateY: startValueMoveY,
+              },
+            ],
+          },
+        ]}>
         <IconButton
           // icon={locationChanged ? 'crosshairs' : 'crosshairs-gps'}
           icon={'crosshairs-gps'}
@@ -271,17 +308,25 @@ const Home = () => {
           size={30}
           onPress={findMyLocation}
         />
-      </View>
+      </Animated.View>
       <View style={styles.mapIconContainer}>
         <IconButton
           icon="map-legend"
           color={Colors.secondary}
           style={styles.mapIcon}
+          size={20}
           onPress={() => {
             setMapTypeVisibility(true);
           }}
         />
       </View>
+      <BottomSheet
+        ref={bsRef}
+        index={0}
+        snapPoints={['7%', '40%', '100%']}
+        // enablePanDownToClose
+        onChange={onSheetChange}
+      />
     </View>
   );
 };
@@ -292,6 +337,10 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     marginTop: 20,
   },
+  bottomSheetContainer: {
+    flex: 1,
+    alignContent: 'center',
+  },
   container: {
     // flex: 1,
     alignItems: 'center',
@@ -300,9 +349,9 @@ const styles = StyleSheet.create({
   },
   mapIconContainer: {
     backgroundColor: Colors.primary,
-    borderRadius: 30,
+    borderRadius: 50,
     position: 'absolute',
-    top: 150,
+    top: (15 * dimensionHeight) / 100,
     right: 10,
   },
   mapIcon: {

@@ -33,6 +33,19 @@ const MapTypeModal = ({
 
   styleUrl,
 }) => {
+  const checkActiveStyle = (style, checkThisStyle) => {
+    if (style === checkThisStyle) {
+      return {
+        borderColor: Colors.primary,
+        borderWidth: 2,
+      };
+    } else {
+      return {
+        borderColor: Colors.lightGray,
+      };
+    }
+  };
+
   return (
     <View>
       <Modal
@@ -55,12 +68,7 @@ const MapTypeModal = ({
                   source={require('../../../assets/img/mapThumbnails/street.jpg')}
                   style={[
                     styles.mapThumbnail,
-                    {
-                      borderColor:
-                        styleUrl === streetStyleURL
-                          ? Colors.primary
-                          : Colors.lightGray,
-                    },
+                    checkActiveStyle(styleUrl, streetStyleURL),
                   ]}
                 />
               </Pressable>
@@ -73,12 +81,7 @@ const MapTypeModal = ({
                   source={require('../../../assets/img/mapThumbnails/dark.jpg')}
                   style={[
                     styles.mapThumbnail,
-                    {
-                      borderColor:
-                        styleUrl === darkStyleURL
-                          ? Colors.primary
-                          : Colors.lightGray,
-                    },
+                    checkActiveStyle(styleUrl, darkStyleURL),
                   ]}
                 />
               </Pressable>
@@ -90,12 +93,7 @@ const MapTypeModal = ({
                   source={require('../../../assets/img/mapThumbnails/light.jpg')}
                   style={[
                     styles.mapThumbnail,
-                    {
-                      borderColor:
-                        styleUrl === lightStyleURL
-                          ? Colors.primary
-                          : Colors.lightGray,
-                    },
+                    checkActiveStyle(styleUrl, lightStyleURL),
                   ]}
                 />
               </Pressable>
@@ -108,12 +106,7 @@ const MapTypeModal = ({
                   source={require('../../../assets/img/mapThumbnails/satellite.jpg')}
                   style={[
                     styles.mapThumbnail,
-                    {
-                      borderColor:
-                        styleUrl === satelliteStyleURL
-                          ? Colors.primary
-                          : Colors.lightGray,
-                    },
+                    checkActiveStyle(styleUrl, satelliteStyleURL),
                   ]}
                 />
               </Pressable>
@@ -165,7 +158,7 @@ const styles = StyleSheet.create({
     width: 70,
     height: 70,
     borderRadius: 20,
-    borderWidth: 1.5,
+    borderWidth: 1,
   },
   mapTypesTitleContainer: {
     flexDirection: 'row',

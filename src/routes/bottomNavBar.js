@@ -23,10 +23,11 @@ const bottomNavBar = () => {
         headerShown: false,
         tabBarShowLabel: false,
         tabBarStyle: {
-          position: 'absolute',
+          // position: 'absolute',
           height: 70,
-          borderTopRightRadius: 30,
-          borderTopLeftRadius: 30,
+          borderTopWidth: 0,
+          // borderTopRightRadius: 30,
+          // borderTopLeftRadius: 30,
         },
       }}>
       <Tab.Screen
