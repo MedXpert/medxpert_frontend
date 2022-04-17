@@ -5,8 +5,8 @@ import {
   FlatList,
   Image,
   StyleSheet,
-  Text,
   Pressable,
+  Modal,
 } from 'react-native';
 import {CustomButton} from '../../../components/general/CustomButton';
 import Colors from '../../../constants/colors';
@@ -20,6 +20,8 @@ const ImageItem = ({image, onPress}) => (
 
 const Detail = ({navigation}) => {
   const [selectedImage, setSelectedImage] = useState(facility.images[0]);
+  const [imageModalVisible, setImageModalVisible] = useState(false);
+
   const renderItem = ({item}) => (
     <ImageItem
       image={item}
@@ -30,18 +32,44 @@ const Detail = ({navigation}) => {
   );
   return (
     <View style={styles.container}>
-      <View style={styles.head}>
-        <ImageBackground
-          source={selectedImage}
-          resizeMode="cover"
-          style={styles.imageBackground}>
-          <CustomButton
-            title=""
-            customStyle={styles.backButton}
-            icon={<Icon name="chevron-back" size={40} color={Colors.white} />}
-            onPress={() => navigation.goBack()}
+      <Modal visible={imageModalVisible} transparent={true}>
+        <View
+          style={{
+            width: '100%',
+            height: '100%',
+            alignContent: 'center',
+            justifyContent: 'center',
+            backgroundColor: Colors.secondary,
+          }}>
+          <Pressable
+            onPress={() => setImageModalVisible(false)}
+            style={{position: 'absolute', top: 20, right: 20}}>
+            <Icon name="ios-close" size={50} color={Colors.primary} />
+          </Pressable>
+          <Image
+            source={selectedImage}
+            style={{width: '100%', height: 400}}
+            resizeMode="contain"
           />
-        </ImageBackground>
+        </View>
+      </Modal>
+      <View style={styles.head}>
+        <Pressable
+          onPress={() => {
+            setImageModalVisible(true);
+          }}>
+          <ImageBackground
+            source={selectedImage}
+            resizeMode="cover"
+            style={styles.imageBackground}>
+            <CustomButton
+              title=""
+              customStyle={styles.backButton}
+              icon={<Icon name="chevron-back" size={40} color={Colors.white} />}
+              onPress={() => navigation.goBack()}
+            />
+          </ImageBackground>
+        </Pressable>
       </View>
       <View style={styles.main} />
       <FlatList
