@@ -9,6 +9,7 @@ const CustomText = ({
   fontSize = 14,
   fontColor = Colors.black,
   fontFamily = 'Poppins',
+  customStyles = {},
 }) => {
   const buttonDynamicStyles = {
     fontSize: fontSize,
@@ -16,7 +17,7 @@ const CustomText = ({
     fontFamily: fontFamily,
   };
 
-  return <Text style={[buttonDynamicStyles]}>{content}</Text>;
+  return <Text style={[buttonDynamicStyles, customStyles]}>{content}</Text>;
 };
 
 // const styles = StyleSheet.create({
