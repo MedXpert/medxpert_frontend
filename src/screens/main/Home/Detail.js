@@ -14,7 +14,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 
 const ImageItem = ({image, onPress}) => (
   <Pressable onPress={onPress}>
-    <Image source={image} style={styles.ImageItem} resizeMethod="scale" />
+    <Image source={image} style={styles.imageItem} resizeMethod="scale" />
   </Pressable>
 );
 
@@ -33,22 +33,15 @@ const Detail = ({navigation}) => {
   return (
     <View style={styles.container}>
       <Modal visible={imageModalVisible} transparent={true}>
-        <View
-          style={{
-            width: '100%',
-            height: '100%',
-            alignContent: 'center',
-            justifyContent: 'center',
-            backgroundColor: Colors.secondary,
-          }}>
+        <View style={styles.modalFullScreen}>
           <Pressable
             onPress={() => setImageModalVisible(false)}
-            style={{position: 'absolute', top: 20, right: 20}}>
+            style={styles.modalCloseTag}>
             <Icon name="ios-close" size={50} color={Colors.primary} />
           </Pressable>
           <Image
             source={selectedImage}
-            style={{width: '100%', height: 400}}
+            style={styles.modalImage}
             resizeMode="contain"
           />
         </View>
@@ -77,7 +70,7 @@ const Detail = ({navigation}) => {
         renderItem={renderItem}
         keyExtractor={image => image.id}
         horizontal={true}
-        style={styles.ImageItemsFlatList}
+        style={styles.imageItemsFlatList}
       />
     </View>
   );
@@ -86,19 +79,29 @@ const Detail = ({navigation}) => {
 // create a style react native
 const styles = StyleSheet.create({
   container: {backgroundColor: 'white', flex: 1, flexDirection: 'column'},
-  head: {backgroundColor: 'blue', flex: 1},
+  head: {flex: 1, flexWrap: 'wrap'},
   imageBackground: {width: '100%', height: '100%'},
   backButton: {
-    width: 55,
-    height: 55,
+    width: 50,
+    height: 50,
     borderRadius: 50,
     position: 'absolute',
     top: 29,
     left: 14,
   },
-  ImageItem: {width: 100, height: 90, borderRadius: 10, marginRight: 14},
-  ImageItemsFlatList: {position: 'absolute', width: '100%', top: 220, left: 10},
+  imageItem: {width: 100, height: 90, borderRadius: 10, marginRight: 14},
+  imageItemsFlatList: {position: 'absolute', width: '100%', top: 220, left: 10},
   main: {flex: 2},
+  modalFullScreen: {
+    width: '100%',
+    height: '100%',
+    alignContent: 'center',
+    justifyContent: 'center',
+    backgroundColor: Colors.secondary,
+  },
+
+  modalCloseTag: {position: 'absolute', top: 20, right: 20},
+  modalImage: {width: '100%', height: 400}
 });
 
 const facility = {
