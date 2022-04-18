@@ -19,17 +19,7 @@ import {CustomText} from '../../../components/general/CustomText';
 
 const ImageItem = ({image, onPress}) => (
   <Pressable onPress={onPress}>
-    <View
-      style={{
-        shadowColor: '#000',
-        shadowOffset: {
-          width: 0,
-          height: 12,
-        },
-        shadowOpacity: 0.58,
-        shadowRadius: 16.0,
-        elevation: 24,
-      }}>
+    <View>
       <Image source={image} style={styles.imageItem} resizeMethod="scale" />
     </View>
   </Pressable>
@@ -65,7 +55,7 @@ const Detail = ({navigation}) => {
       </Modal>
       <View style={styles.head}>
         <Pressable
-          style={{width: '100%', height: '100%'}}
+          style={styles.imageBackground}
           onPress={() => {
             setImageModalVisible(true);
           }}>
@@ -83,20 +73,20 @@ const Detail = ({navigation}) => {
         />
       </View>
       <View style={styles.main}>
-        <View style={{paddingTop: 70, paddingHorizontal: 14}}>
+        <View style={styles.mainContainer}>
           <CustomText
             fontSize={30}
-            customStyles={{fontWeight: '900'}}
+            customStyles={styles.bold}
             content={facility.name}
           />
-          <View style={{flexDirection: 'row', marginVertical: 5}}>
+          <View style={styles.location}>
             <IconEntypo name="location-pin" size={20} color={Colors.primary} />
             <CustomText
-              customStyles={{marginLeft: 5}}
+              customStyles={styles.marginLeft5}
               content="6 kilo , Addis Ababa, Ethiopia"
             />
           </View>
-          <View style={{width: 150, marginBottom: 5}}>
+          <View style={styles.stars}>
             <StarRating
               disabled={false}
               maxStars={5}
@@ -106,26 +96,22 @@ const Detail = ({navigation}) => {
             />
           </View>
           <CustomText
-            customStyles={{fontSize: 16, marginTop: 5}}
+            customStyles={styles.open}
             fontColor={Colors.gray}
             content="Open 24 Hour"
           />
-          <View
-            style={{
-              marginTop: 5,
-              flexDirection: 'row',
-            }}>
-            <View style={{flexDirection: 'column', marginRight: 120}}>
+          <View style={styles.typeAndTravel}>
+            <View style={styles.type}>
               <CustomText
                 content="Type"
-                customStyles={{fontWeight: 'bold', marginBottom: 5}}
+                customStyles={styles.typeTravelElement}
               />
               <CustomText content={facility.type} fontColor={Colors.gray} />
             </View>
-            <View style={{flexDirection: 'column'}}>
+            <View style={styles.travel}>
               <CustomText
                 content="Travel Time"
-                customStyles={{fontWeight: 'bold', marginBottom: 5}}
+                customStyles={styles.typeTravelElement}
               />
               <CustomText
                 content={facility.travelTime}
@@ -134,10 +120,10 @@ const Detail = ({navigation}) => {
             </View>
           </View>
 
-          <View style={{flexDirection: 'column', marginTop: 8}}>
+          <View style={styles.overview}>
             <CustomText
               content="Overview"
-              customStyles={{fontWeight: 'bold', marginBottom: 5}}
+              customStyles={styles.typeAndTravelElement}
             />
             <CustomText
               content={facility.description}
@@ -146,20 +132,11 @@ const Detail = ({navigation}) => {
             />
           </View>
 
-          <View
-            style={{
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              marginTop: 15,
-            }}>
+          <View style={styles.buttons}>
             <CustomButton
               title="Direction"
               width={140}
-              customStyle={{
-                borderRadius: 20,
-                paddingHorizontal: 10,
-                paddingTop: 3,
-              }}
+              customStyle={styles.buttonStyle}
               icon={
                 <IconEntypo name="direction" size={25} color={Colors.dark} />
               }
@@ -169,14 +146,7 @@ const Detail = ({navigation}) => {
               title="Call"
               width={90}
               fontColor={Colors.lightGray}
-              customStyle={{
-                borderRadius: 20,
-                backgroundColor: Colors.secondary,
-                borderColor: Colors.lightGray,
-                borderWidth: 1,
-                paddingHorizontal: 10,
-                paddingTop: 3,
-              }}
+              customStyle={[styles.buttonStyle, styles.grayButtons]}
               icon={
                 <IconFeather name="phone" size={25} color={Colors.lightGray} />
               }
@@ -184,15 +154,8 @@ const Detail = ({navigation}) => {
             <CustomButton
               title="Message"
               width={130}
-              fontColor={Colors.gray}
-              customStyle={{
-                borderRadius: 20,
-                backgroundColor: Colors.secondary,
-                borderColor: Colors.lightGray,
-                borderWidth: 1,
-                paddingHorizontal: 8,
-                paddingTop: 3,
-              }}
+              fontColor={Colors.lightGray}
+              customStyle={[styles.buttonStyle, styles.grayButtons]}
               icon={
                 <IconEntypo name="message" size={30} color={Colors.lightGray} />
               }
@@ -243,6 +206,35 @@ const styles = StyleSheet.create({
 
   modalCloseTag: {position: 'absolute', top: 20, right: 20},
   modalImage: {width: '100%', height: 400},
+  mainContainer: {paddingTop: 70, paddingHorizontal: 14},
+  bold: {fontWeight: 'bold'},
+  location: {flexDirection: 'row', marginVertical: 5},
+  marginLeft5: {marginLeft: 5},
+  stars: {width: 150, marginBottom: 5},
+  open: {fontSize: 16, marginTop: 5},
+  typeAndTravel: {
+    marginTop: 5,
+    flexDirection: 'row',
+  },
+  type: {flexDirection: 'column', marginRight: 120},
+  travel: {flexDirection: 'column'},
+  typeTravelElement: {fontWeight: 'bold', marginBottom: 5},
+  overview: {flexDirection: 'column', marginTop: 8},
+  buttons: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 15,
+  },
+  buttonStyle: {
+    borderRadius: 20,
+    paddingHorizontal: 10,
+    paddingTop: 3,
+  },
+  grayButtons: {
+    backgroundColor: Colors.secondary,
+    borderColor: Colors.lightGray,
+    borderWidth: 1,
+  },
 });
 
 const facility = {
