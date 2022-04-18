@@ -26,7 +26,14 @@ const ImageItem = ({image, onPress}) => (
 );
 
 const Details = ({route, navigation}) => {
-  const {healthFacility} = route.params;
+  const healthFacilityId = route.params.id;
+
+  const findById = id => {
+    let hf = healthFacilities.find(hospital => hospital.id === id);
+    return hf;
+  };
+
+  const healthFacility = findById(healthFacilityId);
 
   const [selectedImage, setSelectedImage] = useState(healthFacility.images[0]);
   const [imageModalVisible, setImageModalVisible] = useState(false);
@@ -242,22 +249,74 @@ const styles = StyleSheet.create({
   },
 });
 
-// const facility = {
-//   name: 'Yekatit 12 Hospital',
-//   images: [
-//     {id: 1, uri: 'https://mapio.net/images-p/48157911.jpg'},
-//     {id: 2, uri: 'https://mapio.net/images-p/43332058.jpg'},
-//     {id: 3, uri: 'https://mapio.net/images-p/48157911.jpg'},
-//     {id: 4, uri: 'https://mapio.net/images-p/37190120.jpg'},
-//     {id: 5, uri: 'https://mapio.net/images-p/37190120.jpg'},
-//   ],
-//   description:
-//     'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
-//   street: '123 Main Street',
-//   travelTime: '5 min',
-//   rating: '4.5',
-//   type: 'clinic',
-//   availability: 'Open 24 hours',
-// };
+const healthFacilities = [
+  {
+    name: 'Yekatit 12 Hospital',
+    images: [
+      {id: 1, uri: 'https://mapio.net/images-p/48157911.jpg'},
+      {id: 2, uri: 'https://mapio.net/images-p/43332058.jpg'},
+      {id: 3, uri: 'https://mapio.net/images-p/48157911.jpg'},
+      {id: 4, uri: 'https://mapio.net/images-p/37190120.jpg'},
+      {id: 5, uri: 'https://mapio.net/images-p/37190120.jpg'},
+    ],
+    id: 1,
+    address: '6 kilo , Addis Ababa, Ethiopia',
+    description:
+      'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
+    street: '123 Main Street',
+    travelTime: '5 min',
+    rating: 4.5,
+    type: 'clinic',
+    availability: 'Open 24 hours',
+  },
+  {
+    name: 'Zewditu Hospital',
+    images: [{id: 1, uri: 'https://mapio.net/images-p/2347273.jpg'}],
+    id: 7,
+    address: '6 kilo , Addis Ababa, Ethiopia',
+    description:
+      'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
+    street: '123 Main Street',
+    travelTime: '30 min',
+    rating: 4,
+    type: 'Hospital',
+    availability: 'Open 24 hours',
+  },
+  {
+    name: 'Tikur Anbesa Hospital',
+    images: [
+      {id: 1, uri: 'https://mapio.net/images-p/17493410.jpg'},
+      {id: 2, uri: 'https://mapio.net/images-p/3638281.jpg'},
+    ],
+    id: 2,
+    address: 'Senga tera',
+    description:
+      'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
+    street: 'Senga tera Street',
+    travelTime: '1 hr',
+    rating: 4.8,
+    type: 'Hospital',
+    availability: 'Open 24 hours',
+  },
+  {
+    name: 'Yekatit 12 Hospital',
+    images: [
+      {id: 1, uri: 'https://mapio.net/images-p/48157911.jpg'},
+      {id: 2, uri: 'https://mapio.net/images-p/43332058.jpg'},
+      {id: 3, uri: 'https://mapio.net/images-p/48157911.jpg'},
+      {id: 4, uri: 'https://mapio.net/images-p/37190120.jpg'},
+      {id: 5, uri: 'https://mapio.net/images-p/37190120.jpg'},
+    ],
+    id: 6,
+    address: '6 kilo , Addis Ababa, Ethiopia',
+    description:
+      'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
+    street: '123 Main Street',
+    travelTime: '5 min',
+    rating: 4.5,
+    type: 'clinic',
+    availability: 'Open 24 hours',
+  },
+];
 
 export default Details;

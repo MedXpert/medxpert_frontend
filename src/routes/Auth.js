@@ -3,7 +3,7 @@ import {createNativeStackNavigator} from '@react-navigation/native-stack';
 
 import Login from '../screens/auth/Login';
 import SignUp from '../screens/auth/SignUp';
-import Welcome from './welcome';
+import Welcome from './Welcome';
 
 // Auth stack for users that are not logged in
 const AuthStackScreen = ({initialRoute}) => {

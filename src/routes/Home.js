@@ -14,7 +14,6 @@ const HomeStackScreen = () => {
   return (
     <HomeStack.Navigator initialRouteName="Home">
       <HomeStack.Screen name="Home" component={Home} options={config} />
-      <HomeStack.Screen name="Details" component={Details} options={config} />
     </HomeStack.Navigator>
   );
 };

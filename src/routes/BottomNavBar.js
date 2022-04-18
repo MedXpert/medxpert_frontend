@@ -5,8 +5,8 @@ import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import Colors from '../constants/colors';
 import Ambulance from '../screens/main/Ambulance';
 import Emergency from '../screens/main/Emergency';
-// import Home from '../screens/main/Home';
-import HomeStack from './home.js';
+import Home from '../screens/main/Home';
+import HomeStack from './Home.js';
 import Profile from '../screens/main/Profile';
 import SvgAmbulance from '../assets/svg/bottomNavbar/Ambulance.svg';
 import SvgProfile from '../assets/svg/bottomNavbar/Profile.svg';
@@ -16,7 +16,7 @@ import {CustomText} from '../components/general/CustomText';
 
 const Tab = createBottomTabNavigator();
 
-const bottomNavBar = () => {
+const BottomNavBar = ({route}) => {
   return (
     <Tab.Navigator
       initialRouteName="HomeStack"
@@ -32,18 +32,18 @@ const bottomNavBar = () => {
         },
       }}>
       <Tab.Screen
-        name="HomeStack"
-        component={HomeStack}
+        name="Home"
+        component={Home}
         options={{
           tabBarIcon: ({focused}) => {
-            let iconColor = focused ? Colors.primary : Colors.gray;
+            let activeColor = focused ? Colors.primary : Colors.gray;
             return (
               <View style={{alignItems: 'center'}}>
-                <SvgHome width={30} height={30} stroke={iconColor} />
+                <SvgHome width={30} height={30} stroke={activeColor} />
                 <CustomText
                   content={'HOME'}
                   fontSize={10}
-                  fontColor={Colors.gray}
+                  fontColor={activeColor}
                 />
               </View>
             );
@@ -55,14 +55,14 @@ const bottomNavBar = () => {
         component={Ambulance}
         options={{
           tabBarIcon: ({focused}) => {
-            let iconColor = focused ? Colors.primary : Colors.gray;
+            let activeColor = focused ? Colors.primary : Colors.gray;
             return (
               <View style={{alignItems: 'center'}}>
-                <SvgAmbulance width={30} height={30} fill={iconColor} />
+                <SvgAmbulance width={30} height={30} fill={activeColor} />
                 <CustomText
                   content={'AMBULANCE'}
                   fontSize={10}
-                  fontColor={Colors.gray}
+                  fontColor={activeColor}
                 />
               </View>
             );
@@ -74,14 +74,14 @@ const bottomNavBar = () => {
         component={Emergency}
         options={{
           tabBarIcon: ({focused}) => {
-            let iconColor = focused ? Colors.primary : Colors.gray;
+            let activeColor = focused ? Colors.primary : Colors.gray;
             return (
               <View style={{alignItems: 'center'}}>
-                <SvgEmergency width={30} height={30} fill={iconColor} />
+                <SvgEmergency width={30} height={30} fill={activeColor} />
                 <CustomText
                   content={'EMERGENCY'}
                   fontSize={10}
-                  fontColor={Colors.gray}
+                  fontColor={activeColor}
                 />
               </View>
             );
@@ -93,14 +93,14 @@ const bottomNavBar = () => {
         component={Profile}
         options={{
           tabBarIcon: ({focused}) => {
-            let iconColor = focused ? Colors.primary : Colors.gray;
+            let activeColor = focused ? Colors.primary : Colors.gray;
             return (
               <View style={{alignItems: 'center'}}>
-                <SvgProfile width={30} height={30} fill={iconColor} />
+                <SvgProfile width={30} height={30} fill={activeColor} />
                 <CustomText
                   content={'PROFILE'}
                   fontSize={10}
-                  fontColor={Colors.gray}
+                  fontColor={activeColor}
                 />
               </View>
             );
@@ -111,4 +111,4 @@ const bottomNavBar = () => {
   );
 };
 
-export default bottomNavBar;
+export default BottomNavBar;

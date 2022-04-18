@@ -17,7 +17,7 @@ import {CustomText} from '../../general/CustomText';
 import Colors from '../../../constants/colors';
 import shadow from '../../../constants/shadow';
 import colors from '../../../constants/colors';
-import {color} from 'react-native-reanimated';
+import {color, log} from 'react-native-reanimated';
 import {Title} from 'react-native-paper';
 
 const dimensionHeight = Dimensions.get('window').height;
@@ -104,7 +104,7 @@ const BottomSheetContent = ({navigation}) => {
     return (
       <Pressable
         onPress={() => {
-          navigation.navigate('Details', {healthFacility: findById(item.id)});
+          navigation.navigate('Details', {id: item.id});
         }}>
         <View style={styles.renderContainer}>
           {/* Card Image */}
