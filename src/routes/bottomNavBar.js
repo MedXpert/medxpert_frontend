@@ -5,7 +5,8 @@ import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import Colors from '../constants/colors';
 import Ambulance from '../screens/main/Ambulance';
 import Emergency from '../screens/main/Emergency';
-import Home from '../screens/main/Home';
+// import Home from '../screens/main/Home';
+import HomeStack from './home.js';
 import Profile from '../screens/main/Profile';
 import SvgAmbulance from '../assets/svg/bottomNavbar/Ambulance.svg';
 import SvgProfile from '../assets/svg/bottomNavbar/Profile.svg';
@@ -18,7 +19,7 @@ const Tab = createBottomTabNavigator();
 const bottomNavBar = () => {
   return (
     <Tab.Navigator
-      initialRouteName="Home"
+      initialRouteName="HomeStack"
       screenOptions={{
         headerShown: false,
         tabBarShowLabel: false,
@@ -31,8 +32,8 @@ const bottomNavBar = () => {
         },
       }}>
       <Tab.Screen
-        name="Home"
-        component={Home}
+        name="HomeStack"
+        component={HomeStack}
         options={{
           tabBarIcon: ({focused}) => {
             let iconColor = focused ? Colors.primary : Colors.gray;

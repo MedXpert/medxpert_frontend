@@ -3,11 +3,10 @@ import {View, Text} from 'react-native';
 import React, {useState} from 'react';
 
 import AuthStackScreen from './auth';
-import HomeStackScreen from './home';
 import SplashScreen from '../screens/welcome/Splash';
 import HomeScreen from '../screens/main/Home';
 import BottomNavBar from './bottomNavBar';
-import DetailScreen from '../screens/main/Home/Detail';
+import DetailScreen from '../screens/main/Home/Details';
 // The main route that evaluates whether the user is logged in or not and decides where to navigate when the app starts.
 const Main = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(true); // User state value from the cache

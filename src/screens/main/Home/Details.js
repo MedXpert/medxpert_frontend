@@ -25,8 +25,10 @@ const ImageItem = ({image, onPress}) => (
   </Pressable>
 );
 
-const Detail = ({navigation}) => {
-  const [selectedImage, setSelectedImage] = useState(facility.images[0]);
+const Details = ({route, navigation}) => {
+  const {healthFacility} = route.params;
+
+  const [selectedImage, setSelectedImage] = useState(healthFacility.images[0]);
   const [imageModalVisible, setImageModalVisible] = useState(false);
 
   const renderItem = ({item}) => (
@@ -77,20 +79,20 @@ const Detail = ({navigation}) => {
           <CustomText
             fontSize={30}
             customStyles={styles.bold}
-            content={facility.name}
+            content={healthFacility.name}
           />
           <View style={styles.location}>
             <IconEntypo name="location-pin" size={20} color={Colors.primary} />
             <CustomText
               customStyles={styles.marginLeft5}
-              content="6 kilo , Addis Ababa, Ethiopia"
+              content={healthFacility.address}
             />
           </View>
           <View style={styles.stars}>
             <StarRating
               disabled={false}
               maxStars={5}
-              rating={4.5}
+              rating={healthFacility.rating}
               starSize={25}
               fullStarColor={Colors.golden}
             />
@@ -98,7 +100,7 @@ const Detail = ({navigation}) => {
           <CustomText
             customStyles={styles.open}
             fontColor={Colors.gray}
-            content="Open 24 Hour"
+            content={healthFacility.availability}
           />
           <View style={styles.typeAndTravel}>
             <View style={styles.type}>
@@ -106,7 +108,10 @@ const Detail = ({navigation}) => {
                 content="Type"
                 customStyles={styles.typeTravelElement}
               />
-              <CustomText content={facility.type} fontColor={Colors.gray} />
+              <CustomText
+                content={healthFacility.type}
+                fontColor={Colors.gray}
+              />
             </View>
             <View style={styles.travel}>
               <CustomText
@@ -114,7 +119,7 @@ const Detail = ({navigation}) => {
                 customStyles={styles.typeTravelElement}
               />
               <CustomText
-                content={facility.travelTime}
+                content={healthFacility.travelTime}
                 fontColor={Colors.gray}
               />
             </View>
@@ -126,7 +131,7 @@ const Detail = ({navigation}) => {
               customStyles={styles.typeAndTravelElement}
             />
             <CustomText
-              content={facility.description}
+              content={healthFacility.description}
               fontColor={Colors.gray}
               fontSize={12}
             />
@@ -164,7 +169,7 @@ const Detail = ({navigation}) => {
         </View>
       </View>
       <FlatList
-        data={facility.images}
+        data={healthFacility.images}
         renderItem={renderItem}
         keyExtractor={image => image.id}
         horizontal={true}
@@ -237,22 +242,22 @@ const styles = StyleSheet.create({
   },
 });
 
-const facility = {
-  name: 'Yekatit 12 Hospital',
-  images: [
-    {id: 1, uri: 'https://mapio.net/images-p/48157911.jpg'},
-    {id: 2, uri: 'https://mapio.net/images-p/43332058.jpg'},
-    {id: 3, uri: 'https://mapio.net/images-p/48157911.jpg'},
-    {id: 4, uri: 'https://mapio.net/images-p/37190120.jpg'},
-    {id: 5, uri: 'https://mapio.net/images-p/37190120.jpg'},
-  ],
-  description:
-    'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
-  street: '123 Main Street',
-  travelTime: '5 min',
-  rating: '4.5',
-  type: 'clinic',
-  availability: 'Open 24 hours',
-};
+// const facility = {
+//   name: 'Yekatit 12 Hospital',
+//   images: [
+//     {id: 1, uri: 'https://mapio.net/images-p/48157911.jpg'},
+//     {id: 2, uri: 'https://mapio.net/images-p/43332058.jpg'},
+//     {id: 3, uri: 'https://mapio.net/images-p/48157911.jpg'},
+//     {id: 4, uri: 'https://mapio.net/images-p/37190120.jpg'},
+//     {id: 5, uri: 'https://mapio.net/images-p/37190120.jpg'},
+//   ],
+//   description:
+//     'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
+//   street: '123 Main Street',
+//   travelTime: '5 min',
+//   rating: '4.5',
+//   type: 'clinic',
+//   availability: 'Open 24 hours',
+// };
 
-export default Detail;
+export default Details;

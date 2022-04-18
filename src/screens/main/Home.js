@@ -27,7 +27,7 @@ import {CustomText} from '../../components/general/CustomText';
 import {PermissionModal} from '../../components/permissions/PermissionModal';
 import {IconButton} from 'react-native-paper';
 import {MapTypeModal} from '../../components/home/MapTypeModal';
-import {BottomSheetContent} from '../../components/home/BottomSheet';
+import {BottomSheetContent} from '../../components/home/BottomSheetContent';
 
 import {requestPermissions} from '../../services/permissions/requestPermissions';
 import {LOCATION_PERMISSION_MESSAGE} from '../../constants/string/requestPermissions/requestPermissions';
@@ -35,7 +35,7 @@ import {LOCATION_PERMISSION_MESSAGE} from '../../constants/string/requestPermiss
 const dimensionHeight = Dimensions.get('window').height;
 const dimensionWidth = Dimensions.get('window').width;
 
-const Home = () => {
+const Home = ({navigation}) => {
   var _map;
   var _camera;
   var bsRef = useRef();
@@ -326,7 +326,7 @@ const Home = () => {
         onChange={onSheetChange}
         ref={bsRef}
         snapPoints={['7%', '35%', '100%']}>
-        <BottomSheetContent />
+        <BottomSheetContent navigation={navigation} />
       </BottomSheet>
     </View>
   );
