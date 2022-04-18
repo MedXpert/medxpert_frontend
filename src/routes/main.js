@@ -22,8 +22,7 @@ const Main = () => {
     } else if (!openingForTheFirstTime && !isLoggedIn) {
       return <AuthStackScreen initialRoute={'Login'} />;
     } else if (isLoggedIn) {
-      // return <BottomNavBar />;
-      return <DetailScreen />;
+      return <BottomNavBar />;
     }
   }; // return stacks according to the state of the user.
 
