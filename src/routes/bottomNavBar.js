@@ -12,7 +12,6 @@ import SvgProfile from '../assets/svg/bottomNavbar/Profile.svg';
 import SvgEmergency from '../assets/svg/bottomNavbar/Emergency.svg';
 import SvgHome from '../assets/svg/bottomNavbar/Home.svg';
 import {CustomText} from '../components/general/CustomText';
-import colors from '../constants/colors';
 
 const Tab = createBottomTabNavigator();
 
@@ -24,10 +23,11 @@ const bottomNavBar = () => {
         headerShown: false,
         tabBarShowLabel: false,
         tabBarStyle: {
-          position: 'absolute',
+          // position: 'absolute',
           height: 70,
-          borderTopRightRadius: 30,
-          borderTopLeftRadius: 30,
+          borderTopWidth: 0,
+          // borderTopRightRadius: 30,
+          // borderTopLeftRadius: 30,
         },
       }}>
       <Tab.Screen
