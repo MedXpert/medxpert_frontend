@@ -9,6 +9,7 @@ import {
   Modal,
   Text,
 } from 'react-native';
+import StarRating from 'react-native-star-rating';
 import {CustomButton} from '../../../components/general/CustomButton';
 import Colors from '../../../constants/colors';
 import IconIon from 'react-native-vector-icons/Ionicons';
@@ -84,56 +85,81 @@ const Detail = ({navigation}) => {
       <View style={styles.main}>
         <View style={{paddingTop: 70, paddingHorizontal: 14}}>
           <CustomText
-            style={{fontSize: 25, color: Colors.dark, fontWeight: '900'}}
+            fontSize={30}
+            customStyles={{fontWeight: '900'}}
             content={facility.name}
           />
-          <View style={{flexDirection: 'row', marginVertical: 10}}>
+          <View style={{flexDirection: 'row', marginVertical: 5}}>
             <IconEntypo name="location-pin" size={20} color={Colors.primary} />
             <CustomText
-              style={{color: Colors.dark, marginLeft: 4}}
+              customStyles={{marginLeft: 5}}
               content="6 kilo , Addis Ababa, Ethiopia"
             />
           </View>
+          <View style={{width: 150, marginBottom: 5}}>
+            <StarRating
+              disabled={false}
+              maxStars={5}
+              rating={4.5}
+              starSize={25}
+              fullStarColor={Colors.golden}
+            />
+          </View>
           <CustomText
-            style={{color: Colors.dark, fontSize: 16}}
+            customStyles={{fontSize: 16, marginTop: 5}}
+            fontColor={Colors.gray}
             content="Open 24 Hour"
           />
           <View
             style={{
-              marginTop: 10,
+              marginTop: 5,
               flexDirection: 'row',
             }}>
             <View style={{flexDirection: 'column', marginRight: 120}}>
-              <CustomText content="Type" />
               <CustomText
-                customStyles={{fontWeight: 'bold'}}
-                content={facility.type}
+                content="Type"
+                customStyles={{fontWeight: 'bold', marginBottom: 5}}
               />
+              <CustomText content={facility.type} fontColor={Colors.gray} />
             </View>
             <View style={{flexDirection: 'column'}}>
-              <CustomText content="Travel Time" />
               <CustomText
-                customStyles={{fontWeight: 'bold'}}
+                content="Travel Time"
+                customStyles={{fontWeight: 'bold', marginBottom: 5}}
+              />
+              <CustomText
                 content={facility.travelTime}
+                fontColor={Colors.gray}
               />
             </View>
           </View>
 
-          <View style={{flexDirection: 'column', marginTop: 10}}>
-            <CustomText content="Overview" />
-            <CustomText content={facility.description} />
+          <View style={{flexDirection: 'column', marginTop: 8}}>
+            <CustomText
+              content="Overview"
+              customStyles={{fontWeight: 'bold', marginBottom: 5}}
+            />
+            <CustomText
+              content={facility.description}
+              fontColor={Colors.gray}
+              fontSize={12}
+            />
           </View>
 
           <View
             style={{
               flexDirection: 'row',
               justifyContent: 'space-between',
-              marginTop: 10,
+              marginTop: 15,
             }}>
             <CustomButton
               title="Direction"
-              width={130}
-              customStyle={{borderRadius: 20, paddingHorizontal: 10}}
+              width={140}
+              customStyle={{
+                borderRadius: 20,
+                paddingHorizontal: 10,
+                paddingTop: 3,
+              }}
               icon={
                 <IconEntypo name="direction" size={25} color={Colors.dark} />
               }
@@ -141,7 +167,7 @@ const Detail = ({navigation}) => {
 
             <CustomButton
               title="Call"
-              width={100}
+              width={90}
               fontColor={Colors.lightGray}
               customStyle={{
                 borderRadius: 20,
@@ -149,20 +175,23 @@ const Detail = ({navigation}) => {
                 borderColor: Colors.lightGray,
                 borderWidth: 1,
                 paddingHorizontal: 10,
+                paddingTop: 3,
               }}
               icon={
-                <IconFeather name="phone" size={22} color={Colors.lightGray} />
+                <IconFeather name="phone" size={25} color={Colors.lightGray} />
               }
             />
             <CustomButton
               title="Message"
-              width={120}
+              width={130}
               fontColor={Colors.gray}
               customStyle={{
                 borderRadius: 20,
                 backgroundColor: Colors.secondary,
                 borderColor: Colors.lightGray,
                 borderWidth: 1,
+                paddingHorizontal: 8,
+                paddingTop: 3,
               }}
               icon={
                 <IconEntypo name="message" size={30} color={Colors.lightGray} />
@@ -184,7 +213,11 @@ const Detail = ({navigation}) => {
 
 // create a style react native
 const styles = StyleSheet.create({
-  container: {backgroundColor: 'white', flex: 1, flexDirection: 'column'},
+  container: {
+    backgroundColor: Colors.secondary,
+    flex: 1,
+    flexDirection: 'column',
+  },
   head: {flex: 1, flexWrap: 'wrap'},
   imageBackground: {width: '100%', height: '100%'},
   backButton: {
