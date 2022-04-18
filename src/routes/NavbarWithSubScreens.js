@@ -3,10 +3,6 @@ import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import React from 'react';
 
 import BottomNavBar from './BottomNavBar';
-import HomePageSubScreens from './SubScreens/HomePageSubScreens';
-import AmbulancePageSubScreens from './SubScreens/AmbulancePageSubScreens';
-import EmergencyPageSubScreens from './SubScreens/EmergencyPageSubScreens';
-import ProfileSubScreens from './SubScreens/ProfilePageSubScreens';
 import Details from '../screens/main/Home/Details';
 
 const TabAndSubsStack = createNativeStackNavigator();
