@@ -8,6 +8,7 @@ const CustomText = ({
   content = isRequired(),
   fontSize = 14,
   fontColor = Colors.black,
+  fontWeight,
   fontFamily = 'Poppins',
   customStyles = {},
 }) => {
@@ -15,6 +16,7 @@ const CustomText = ({
     fontSize: fontSize,
     color: fontColor,
     fontFamily: fontFamily,
+    fontWeight: fontWeight,
   };
 
   return <Text style={[buttonDynamicStyles, customStyles]}>{content}</Text>;

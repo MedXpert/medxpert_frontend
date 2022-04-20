@@ -193,8 +193,14 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'column',
   },
-  head: {flex: 1, flexWrap: 'wrap'},
-  imageBackground: {width: '100%', height: '100%'},
+  head: {
+    flex: 1,
+    flexWrap: 'wrap',
+  },
+  imageBackground: {
+    width: '100%',
+    height: '100%',
+  },
   backButton: {
     width: 50,
     height: 50,
@@ -203,8 +209,18 @@ const styles = StyleSheet.create({
     top: 29,
     left: 14,
   },
-  imageItem: {width: 100, height: 90, borderRadius: 10, marginRight: 14},
-  imageItemsFlatList: {position: 'absolute', width: '100%', top: 220, left: 10},
+  imageItem: {
+    width: 100,
+    height: 90,
+    borderRadius: 10,
+    marginRight: 14,
+  },
+  imageItemsFlatList: {
+    position: 'absolute',
+    width: '100%',
+    top: 220,
+    left: 10,
+  },
   main: {
     flex: 2,
   },

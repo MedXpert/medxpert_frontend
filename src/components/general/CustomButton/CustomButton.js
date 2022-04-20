@@ -14,6 +14,7 @@ const CustomButton = ({
   icon,
   fontSize = 16,
   fontColor = Colors.black,
+  backgroundColor = Colors.primary,
 }) => {
   // Changes the justifyContent property of the Button depending on whether there is an icon in the button or not
   const buttonIconStyle = () => {
@@ -24,7 +25,7 @@ const CustomButton = ({
       onPress={onPress}
       style={[
         styles.button,
-        {width: width, height: height},
+        {width: width, height: height, backgroundColor: backgroundColor},
         customStyle,
         buttonIconStyle(),
       ]}>
@@ -39,7 +40,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: Colors.primary,
+
     borderRadius: 5,
   },
   // buttonIconContainer: {backgroundColor: 'red'},
