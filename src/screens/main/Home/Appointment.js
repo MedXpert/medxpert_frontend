@@ -6,6 +6,7 @@ import {CustomText} from '../../../components/general/CustomText';
 import colors from '../../../constants/colors';
 import IconEntypo from 'react-native-vector-icons/Entypo';
 import IonIcons from 'react-native-vector-icons/Ionicons';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import shadow from '../../../constants/shadow';
 import {CustomButton} from '../../../components/general/CustomButton';
 import {BackButton} from '../../../components/general/BackButton';
@@ -13,11 +14,18 @@ import {BackButton} from '../../../components/general/BackButton';
 const Appointment = () => {
   const [markedDates, setMarkedDates] = useState({});
   const [YearMonthDateNow, setYearMonthDateNow] = useState('');
+  const [isAppointmentPending, setIsAppointmentPending] = useState(false);
   const [isAppointmentScheduled, setIsAppointmentScheduled] = useState(false);
+  const [appointmentStatus, setAppointmentStatus] = useState('');
+  const [isNotificationOn, setIsNotificationOn] = useState(false);
   const [selectedDay, setSelectedDay] = useState({});
   const [
     scheduleAppointmentModalVisibility,
     setScheduleAppointmentModalVisibility,
+  ] = useState(false);
+  const [
+    cancelAppointmentModalVisibility,
+    setCancelAppointmentModalVisibility,
   ] = useState(false);
 
   //Get available dates set by health organizations (to be replaced by a result from the api)
@@ -52,6 +60,20 @@ const Appointment = () => {
     return markedDatesObject;
   }, []);
 
+  // Send appointment request to the health facility - api
+  const sendAppointmentRequest = day => {
+    console.log('Sent an appointment rquest');
+  };
+
+  const sendAppointmentCancel = day => {
+    console.log('Canceled appointment');
+  };
+
+  // Set appointment status from the api
+  const getSetAppointmentStatus = () => {
+    setAppointmentStatus('pending');
+  };
+
   // Returns the current Year, month and date as a string.
   const getYearMonthDate = useCallback(() => {
     let now = new Date();
@@ -75,9 +97,30 @@ const Appointment = () => {
     return YearMonthDateString;
   }, []);
 
+  //Triggered when a day is pressed
   const onDayPress = day => {
-    console.log(day);
+    setSelectedDay(day);
     setScheduleAppointmentModalVisibility(true);
+  };
+
+  //When Yes button in the schedule appointment modal is pressed
+  const onModalScheduleYesPressed = () => {
+    //send appointment request to the health facility
+    sendAppointmentRequest(selectedDay);
+    setAppointmentStatus('Pending');
+    setIsAppointmentPending(true);
+
+    setScheduleAppointmentModalVisibility(false);
+  };
+
+  const onModalCancelYesPressed = () => {
+    //send cancel appointment request to the health facility
+    sendAppointmentCancel(selectedDay);
+    setAppointmentStatus('');
+    setIsAppointmentPending(false);
+    setIsAppointmentScheduled(false);
+
+    setCancelAppointmentModalVisibility(false);
   };
 
   useEffect(() => {
@@ -89,10 +132,31 @@ const Appointment = () => {
       disabled: false,
       marked: true,
       markedColor: colors.primary,
+      disableTouchEvent: true,
     };
-    // set the markedDates variable to availableDatesObj
-    setMarkedDates(availableDatesObj);
-  }, [getAvailableDates, getYearMonthDate]);
+
+    if (selectedDay) {
+      let dateString = selectedDay.dateString;
+      var selectedDateObj = {};
+      selectedDateObj[dateString] = {
+        selected: true,
+        selectedColor: colors.golden,
+      };
+      selectedDateObj[getYearMonthDate()] = {
+        disabled: false,
+        marked: true,
+        markedColor: colors.primary,
+        disableTouchEvent: true,
+      };
+    }
+
+    // Set marked dates
+    if (isAppointmentPending) {
+      setMarkedDates(selectedDateObj);
+    } else {
+      setMarkedDates(availableDatesObj);
+    }
+  }, [getAvailableDates, getYearMonthDate, selectedDay, isAppointmentPending]);
 
   return (
     <View style={styles.container}>
@@ -112,6 +176,7 @@ const Appointment = () => {
           <CustomText content={'Address this '} />
         </View>
       </View>
+
       {/* Schedule Appointment Modal */}
       <Modal
         transparent
@@ -120,11 +185,18 @@ const Appointment = () => {
         <View style={styles.scheduleAppointmentModal}>
           <View style={styles.innerScheduleAppointmentModal}>
             <CustomText
+              content={'Send request'}
+              fontSize={17}
+              fontWeight="900"
+              customStyles={{alignSelf: 'flex-start'}}
+            />
+            <CustomText
               content={
                 'Do you want to schedule an appointment on ' +
                 selectedDay.dateString +
                 '?'
               }
+              customStyles={{marginTop: 10}}
             />
             <View style={styles.scheduleModalButtons}>
               <CustomButton
@@ -137,7 +209,51 @@ const Appointment = () => {
                   setScheduleAppointmentModalVisibility(false);
                 }}
               />
-              <CustomButton title={'Yes'} height={35} fontSize={13} />
+              <CustomButton
+                title={'Yes'}
+                height={35}
+                fontSize={13}
+                onPress={onModalScheduleYesPressed}
+              />
+            </View>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Cancel appointment modal */}
+      <Modal
+        transparent
+        visible={cancelAppointmentModalVisibility}
+        animationType={'fade'}>
+        <View style={styles.scheduleAppointmentModal}>
+          <View style={styles.innerScheduleAppointmentModal}>
+            <CustomText
+              content={'Cancel Appointment'}
+              fontSize={17}
+              fontWeight="900"
+              customStyles={{alignSelf: 'flex-start'}}
+            />
+            <CustomText
+              content={'Are you sure you want to cancel this appointment ?'}
+              customStyles={{marginTop: 10, alignSelf: 'flex-start'}}
+            />
+            <View style={styles.scheduleModalButtons}>
+              <CustomButton
+                title={'Cancel'}
+                height={35}
+                customStyle={{marginRight: 10}}
+                backgroundColor={colors.lightGray}
+                fontSize={13}
+                onPress={() => {
+                  setCancelAppointmentModalVisibility(false);
+                }}
+              />
+              <CustomButton
+                title={'Yes'}
+                height={35}
+                fontSize={13}
+                onPress={onModalCancelYesPressed}
+              />
             </View>
           </View>
         </View>
@@ -169,7 +285,7 @@ const Appointment = () => {
         </View>
       </View>
 
-      {/* Scheduled appointments */}
+      {/* Your appointments */}
       <View style={styles.yourAppointmentsContainer}>
         <View style={styles.titleAndCancelButton}>
           <CustomText
@@ -177,24 +293,65 @@ const Appointment = () => {
             fontSize={16}
             fontColor={colors.primary}
           />
-          <CustomButton
-            title={'Cancel'}
-            height={30}
-            width={80}
-            fontSize={12}
-            backgroundColor={colors.red}
-            fontColor={colors.white}
-          />
+          {(isAppointmentPending || isAppointmentScheduled) && (
+            <View style={styles.notificationAndCancel}>
+              {/* Show notification icon if an appointment is scheduled */}
+              {isAppointmentScheduled && (
+                <FontAwesome
+                  name={isNotificationOn ? 'bell' : 'bell-slash-o'}
+                  color={isNotificationOn ? colors.primary : colors.gray}
+                  size={20}
+                  style={{marginRight: 15}}
+                  onPress={() => {
+                    setIsNotificationOn(!isNotificationOn);
+                    // ... function to set notification to the appointment time
+                  }}
+                />
+              )}
+
+              {/*Cancel button is shown in 'Your appointment' section if an
+              appointment is pending or scheduled*/}
+              <CustomButton
+                title={'Cancel'}
+                height={30}
+                width={75}
+                fontSize={12}
+                backgroundColor={colors.red}
+                fontColor={colors.white}
+                onPress={() => {
+                  setCancelAppointmentModalVisibility(true);
+                }}
+              />
+            </View>
+          )}
         </View>
         <View style={styles.yourAppointmentsBody}>
-          <CustomText content={'Apr 23, 2022'} />
-          <CustomText content={'10:00 AM - 11:00 AM'} />
-          <View>
+          {(isAppointmentPending || isAppointmentScheduled) && (
+            <>
+              <CustomText content={'Apr 23, 2022'} />
+            </>
+          )}
+          {isAppointmentScheduled && (
+            <CustomText content={'10:00 AM - 11:00 AM'} />
+          )}
+          {(isAppointmentPending || isAppointmentScheduled) && (
+            <View style={styles.appointmentStatus}>
+              <CustomText content={'Status'} customStyles={{marginRight: 10}} />
+              <CustomText content={appointmentStatus} fontColor={colors.gray} />
+            </View>
+          )}
+          {isAppointmentScheduled && (
             <CustomText
               content={'Appointment ID    10219D32D '}
               fontColor={colors.lightGray}
             />
-          </View>
+          )}
+          {!isAppointmentPending && !isAppointmentScheduled && (
+            <CustomText
+              content={'No pending or scheduled Appointment.'}
+              fontColor={colors.gray}
+            />
+          )}
         </View>
       </View>
     </View>
@@ -203,6 +360,9 @@ const Appointment = () => {
 
 const styles = StyleSheet.create({
   appointedDatesLegend: {
+    flexDirection: 'row',
+  },
+  appointmentStatus: {
     flexDirection: 'row',
   },
   availableDatesLegend: {
@@ -248,7 +408,7 @@ const styles = StyleSheet.create({
   innerScheduleAppointmentModal: {
     backgroundColor: colors.white,
     borderRadius: 20,
-    height: 150,
+    height: 170,
     margin: 20,
     padding: 20,
     alignContent: 'center',
@@ -272,6 +432,9 @@ const styles = StyleSheet.create({
     width: '85%',
     justifyContent: 'space-between',
     alignItems: 'center',
+  },
+  notificationAndCancel: {
+    flexDirection: 'row',
   },
   scheduleAppointmentModal: {
     alignContent: 'center',
@@ -298,8 +461,7 @@ const styles = StyleSheet.create({
     elevation: 4,
   },
   yourAppointmentsBody: {
-    justifyContent: 'space-evenly',
-    // backgroundColor: 'red',
+    justifyContent: 'center',
     height: '70%',
   },
 });
