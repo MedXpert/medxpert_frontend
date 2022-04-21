@@ -45,7 +45,6 @@ const Home = ({navigation}) => {
   const lightStyleURL = MapboxGL.StyleURL.Light;
   const darkStyleURL = MapboxGL.StyleURL.Dark;
   const [styleUrl, setStyleUrl] = useState(streetStyleURL); // MapboxGL map style url
-
   const permissionName = PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION; // location permission name
   const [locationPermissionGranted, setLocationPermissionGranted] =
     useState(false); // Whether the location permission is granted
@@ -53,14 +52,11 @@ const Home = ({navigation}) => {
     useState(false); // Whether the location permission is Denied
   const [locationPermissionBlocked, setLocationPermissionBlocked] =
     useState(false); //Whether the location permission is Denied
-
   const [userPositionLng, setUserPositionLng] = useState(0); // User's current position
   const [userPositionLat, setUserPositionLat] = useState(0); // User's current position
   const [locationFromMapboxLng, setLocationFromMapboxLng] = useState(); // User's current position tracked from the mapboxGL userLocation - Longitude
   const [locationFromMapboxLat, setLocationFromMapboxLat] = useState(); // User's current position tracked from the mapboxGL userLocation - Latitude
-
   const [mapTypeVisibility, setMapTypeVisibility] = useState(false); // MapType modal visibility
-
   const startValueMoveY = useRef(new Animated.Value(0)).current; // Initial value of move Y animated for the location
 
   // Exit the app and go to settings. This function is called when the 'Go to settings' button in the permission denied modal is pressed.

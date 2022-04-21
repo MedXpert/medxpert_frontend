@@ -4,6 +4,7 @@ import React from 'react';
 
 import BottomNavBar from './BottomNavBar';
 import Details from '../screens/main/Home/Details';
+import Appointment from '../screens/main/Home/Appointment';
 
 const TabAndSubsStack = createNativeStackNavigator();
 
@@ -21,6 +22,11 @@ const NavbarWithSubScreens = () => {
       <TabAndSubsStack.Screen
         name="Details"
         component={Details}
+        options={config}
+      />
+      <TabAndSubsStack.Screen
+        name="Appointment"
+        component={Appointment}
         options={config}
       />
     </TabAndSubsStack.Navigator>
