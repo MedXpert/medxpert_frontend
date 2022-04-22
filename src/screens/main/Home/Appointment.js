@@ -176,7 +176,7 @@ const Appointment = () => {
       <View style={styles.healthFacilityInfo}>
         {/* Health facility and back button */}
         <View style={styles.nameAndBackButton}>
-          <BackButton />
+          {/* <BackButton /> */}
           <CustomText
             content={'Health facility name'}
             customStyles={styles.healthFacilityNameFont}
@@ -234,9 +234,11 @@ const Appointment = () => {
 
       {/* Choose Appointment Calendar */}
       <View style={styles.chooseAppointment}>
-        <CustomText content={'Appointment'} fontSize={20} fontWeight={'400'} />
+        {/* <CustomText content={'Appointment'} fontSize={20} fontWeight={'400'} /> */}
         <View style={styles.calendarContainer}>
-          <CustomText content={'Choose a date'} fontColor={colors.primary} />
+          {!isAppointmentPending && !isAppointmentScheduled && (
+            <CustomText content={'Choose a date'} fontColor={colors.primary} />
+          )}
           {/* Calendar */}
           <Calendar
             onDayPress={onDayPress}
@@ -388,7 +390,6 @@ const styles = StyleSheet.create({
   },
   location: {
     flexDirection: 'row',
-    marginLeft: 40,
   },
   modalContainer: {
     // flex: 1,

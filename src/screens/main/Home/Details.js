@@ -15,7 +15,9 @@ import Colors from '../../../constants/colors';
 import IconIon from 'react-native-vector-icons/Ionicons';
 import IconEntypo from 'react-native-vector-icons/Entypo';
 import IconFeather from 'react-native-vector-icons/Feather';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {CustomText} from '../../../components/general/CustomText';
+import {BackButton} from '../../../components/general/BackButton';
 
 const ImageItem = ({image, onPress}) => (
   <Pressable onPress={onPress}>
@@ -74,12 +76,22 @@ const Details = ({route, navigation}) => {
             style={styles.imageBackground}
           />
         </Pressable>
-        <CustomButton
+        {/* <CustomButton
           title=""
           customStyle={styles.backButton}
           icon={<IconIon name="chevron-back" size={40} color={Colors.white} />}
           onPress={() => navigation.goBack()}
-        />
+        /> */}
+        <View style={styles.backButton}>
+          <BackButton
+            backgroundColor={Colors.primary}
+            height={40}
+            width={40}
+            onPress={() => {
+              navigation.goBack();
+            }}
+          />
+        </View>
       </View>
       <View style={styles.main}>
         <View style={styles.mainContainer}>
@@ -147,29 +159,43 @@ const Details = ({route, navigation}) => {
           <View style={styles.buttons}>
             <CustomButton
               title="Direction"
-              width={140}
+              fontSize={13}
+              width={110}
+              height={45}
               customStyle={styles.buttonStyle}
               icon={
-                <IconEntypo name="direction" size={25} color={Colors.dark} />
+                <IconEntypo name="direction" size={20} color={Colors.dark} />
               }
             />
 
             <CustomButton
-              title="Call"
-              width={90}
+              title="Appointment"
+              fontSize={13}
+              width={140}
+              height={45}
               fontColor={Colors.lightGray}
               customStyle={[styles.buttonStyle, styles.grayButtons]}
               icon={
-                <IconFeather name="phone" size={25} color={Colors.lightGray} />
+                <MaterialIcons
+                  name="schedule"
+                  size={20}
+                  color={Colors.lightGray}
+                />
               }
+              onPress={() => {
+                navigation.navigate('Appointment');
+              }}
             />
+
             <CustomButton
               title="Message"
-              width={130}
+              fontSize={13}
+              width={110}
+              height={45}
               fontColor={Colors.lightGray}
               customStyle={[styles.buttonStyle, styles.grayButtons]}
               icon={
-                <IconEntypo name="message" size={30} color={Colors.lightGray} />
+                <IconEntypo name="message" size={20} color={Colors.lightGray} />
               }
             />
           </View>
@@ -202,9 +228,6 @@ const styles = StyleSheet.create({
     height: '100%',
   },
   backButton: {
-    width: 50,
-    height: 50,
-    borderRadius: 50,
     position: 'absolute',
     top: 29,
     left: 14,
@@ -255,8 +278,6 @@ const styles = StyleSheet.create({
   },
   buttonStyle: {
     borderRadius: 20,
-    paddingHorizontal: 10,
-    paddingTop: 3,
   },
   grayButtons: {
     backgroundColor: Colors.secondary,

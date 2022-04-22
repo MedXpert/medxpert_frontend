@@ -31,9 +31,12 @@ const CustomModal = ({
             content={modalTitle}
             fontSize={modalTitleFontSize}
             fontWeight={modalTitleFontWeight}
-            customStyles={{alignSelf: 'flex-start'}}
+            customStyles={styles.modalTitle}
           />
-          <CustomText content={modalContent} customStyles={{marginTop: 10}} />
+          <CustomText
+            content={modalContent}
+            customStyles={styles.modalContent}
+          />
           <View style={styles.modalButtons}>
             <CustomButton
               customStyle={{marginRight: 10}}
@@ -80,6 +83,11 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
     marginTop: 20,
     width: '100%',
+  },
+  modalTitle: {alignSelf: 'flex-start'},
+  modalContent: {
+    marginTop: 10,
+    alignSelf: 'flex-start',
   },
 });
 
