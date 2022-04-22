@@ -10,6 +10,7 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import shadow from '../../../constants/shadow';
 import {CustomButton} from '../../../components/general/CustomButton';
 import {BackButton} from '../../../components/general/BackButton';
+import {CustomModal} from '../../../components/general/CustomModal/CustomModal';
 
 const Appointment = () => {
   const [markedDates, setMarkedDates] = useState({});
@@ -140,8 +141,13 @@ const Appointment = () => {
       var selectedDateObj = {};
       selectedDateObj[dateString] = {
         selected: true,
-        selectedColor: colors.golden,
+        selectedColor: isAppointmentPending
+          ? colors.golden
+          : isAppointmentScheduled
+          ? colors.primary
+          : null,
       };
+
       selectedDateObj[getYearMonthDate()] = {
         disabled: false,
         marked: true,
@@ -151,12 +157,18 @@ const Appointment = () => {
     }
 
     // Set marked dates
-    if (isAppointmentPending) {
+    if (isAppointmentPending || isAppointmentScheduled) {
       setMarkedDates(selectedDateObj);
     } else {
       setMarkedDates(availableDatesObj);
     }
-  }, [getAvailableDates, getYearMonthDate, selectedDay, isAppointmentPending]);
+  }, [
+    getAvailableDates,
+    getYearMonthDate,
+    selectedDay,
+    isAppointmentPending,
+    isAppointmentScheduled,
+  ]);
 
   return (
     <View style={styles.container}>
@@ -178,86 +190,47 @@ const Appointment = () => {
       </View>
 
       {/* Schedule Appointment Modal */}
-      <Modal
+      <CustomModal
         transparent
-        visible={scheduleAppointmentModalVisibility}
-        animationType={'fade'}>
-        <View style={styles.scheduleAppointmentModal}>
-          <View style={styles.innerScheduleAppointmentModal}>
-            <CustomText
-              content={'Send request'}
-              fontSize={17}
-              fontWeight="900"
-              customStyles={{alignSelf: 'flex-start'}}
-            />
-            <CustomText
-              content={
-                'Do you want to schedule an appointment on ' +
-                selectedDay.dateString +
-                '?'
-              }
-              customStyles={{marginTop: 10}}
-            />
-            <View style={styles.scheduleModalButtons}>
-              <CustomButton
-                title={'Cancel'}
-                height={35}
-                customStyle={{marginRight: 10}}
-                backgroundColor={colors.lightGray}
-                fontSize={13}
-                onPress={() => {
-                  setScheduleAppointmentModalVisibility(false);
-                }}
-              />
-              <CustomButton
-                title={'Yes'}
-                height={35}
-                fontSize={13}
-                onPress={onModalScheduleYesPressed}
-              />
-            </View>
-          </View>
-        </View>
-      </Modal>
+        visibility={scheduleAppointmentModalVisibility}
+        animationType={'fade'}
+        modalTitle={'Send request'}
+        modalContent={
+          'Do you want to schedule an appointment on ' +
+          selectedDay.dateString +
+          '?'
+        }
+        leftButtonTitle={'Cancel'}
+        onPressLeftButton={() => {
+          setScheduleAppointmentModalVisibility(false);
+        }}
+        rightButtonTitle={'Yes'}
+        onPressRightButton={() => {
+          onModalScheduleYesPressed();
+          setTimeout(() => {
+            setAppointmentStatus('Scheduled');
+            setIsAppointmentScheduled(true);
+            setIsAppointmentPending(false);
+          }, 5000);
+        }}
+      />
+
+      {/*
 
       {/* Cancel appointment modal */}
-      <Modal
+      <CustomModal
         transparent
-        visible={cancelAppointmentModalVisibility}
-        animationType={'fade'}>
-        <View style={styles.scheduleAppointmentModal}>
-          <View style={styles.innerScheduleAppointmentModal}>
-            <CustomText
-              content={'Cancel Appointment'}
-              fontSize={17}
-              fontWeight="900"
-              customStyles={{alignSelf: 'flex-start'}}
-            />
-            <CustomText
-              content={'Are you sure you want to cancel this appointment ?'}
-              customStyles={{marginTop: 10, alignSelf: 'flex-start'}}
-            />
-            <View style={styles.scheduleModalButtons}>
-              <CustomButton
-                title={'Cancel'}
-                height={35}
-                customStyle={{marginRight: 10}}
-                backgroundColor={colors.lightGray}
-                fontSize={13}
-                onPress={() => {
-                  setCancelAppointmentModalVisibility(false);
-                }}
-              />
-              <CustomButton
-                title={'Yes'}
-                height={35}
-                fontSize={13}
-                onPress={onModalCancelYesPressed}
-              />
-            </View>
-          </View>
-        </View>
-      </Modal>
+        visibility={cancelAppointmentModalVisibility}
+        animationType={'fade'}
+        modalTitle={'Cancel Appointment'}
+        modalContent={'Are you Sure you want to cancel this appointment?'}
+        leftButtonTitle={'Cancel'}
+        onPressLeftButton={() => {
+          setCancelAppointmentModalVisibility(false);
+        }}
+        rightButtonTitle={'Yes'}
+        onPressRightButton={onModalCancelYesPressed}
+      />
 
       {/* Choose Appointment Calendar */}
       <View style={styles.chooseAppointment}>
@@ -274,13 +247,17 @@ const Appointment = () => {
           />
         </View>
         <View style={styles.legendContainer}>
-          <View style={styles.availableDatesLegend}>
-            <View style={styles.greenCircleLegend} />
+          <View style={styles.datesLegend}>
+            <View style={[styles.greenCircleLegend, styles.legendCircle]} />
             <CustomText content={'Available Dates'} />
           </View>
-          <View style={styles.appointedDatesLegend}>
-            <View style={styles.goldenCircleLegend} />
+          <View style={styles.datesLegend}>
+            <View style={[styles.goldenCircleLegend, styles.legendCircle]} />
             <CustomText content={'Pending Appointment'} />
+          </View>
+          <View style={styles.datesLegend}>
+            <View style={[styles.blueCircleLegend, styles.legendCircle]} />
+            <CustomText content={'Scheduled Appointment'} />
           </View>
         </View>
       </View>
@@ -359,16 +336,14 @@ const Appointment = () => {
 };
 
 const styles = StyleSheet.create({
-  appointedDatesLegend: {
+  datesLegend: {
     flexDirection: 'row',
+    alignItems: 'center',
   },
   appointmentStatus: {
     flexDirection: 'row',
   },
-  availableDatesLegend: {
-    flexDirection: 'row',
-    marginTop: 15,
-  },
+
   calendarContainer: {
     backgroundColor: colors.white,
     marginTop: 20,
@@ -386,35 +361,27 @@ const styles = StyleSheet.create({
   chooseAppointment: {
     marginTop: 40,
   },
-  greenCircleLegend: {
-    borderRadius: 40,
-    backgroundColor: colors.green,
-    height: 20,
-    width: 20,
+  legendCircle: {
+    borderRadius: 50,
+    height: 15,
+    width: 15,
     marginRight: 20,
   },
+  greenCircleLegend: {
+    backgroundColor: colors.green,
+  },
   goldenCircleLegend: {
-    borderRadius: 40,
     backgroundColor: colors.golden,
-    height: 20,
-    width: 20,
-    marginRight: 20,
+  },
+  blueCircleLegend: {
+    backgroundColor: colors.primary,
   },
   healthFacilityInfo: {},
   healthFacilityNameFont: {
     fontSize: 24,
     fontWeight: '600',
   },
-  innerScheduleAppointmentModal: {
-    backgroundColor: colors.white,
-    borderRadius: 20,
-    height: 170,
-    margin: 20,
-    padding: 20,
-    alignContent: 'center',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
+
   legendContainer: {
     marginLeft: 30,
     marginTop: 20,
@@ -436,19 +403,7 @@ const styles = StyleSheet.create({
   notificationAndCancel: {
     flexDirection: 'row',
   },
-  scheduleAppointmentModal: {
-    alignContent: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.7)',
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  scheduleModalButtons: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-    marginTop: 20,
-    width: '100%',
-  },
+
   titleAndCancelButton: {
     flexDirection: 'row',
     justifyContent: 'space-between',
