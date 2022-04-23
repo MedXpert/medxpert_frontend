@@ -11,6 +11,7 @@ import shadow from '../../../constants/shadow';
 import {CustomButton} from '../../../components/general/CustomButton';
 import {BackButton} from '../../../components/general/BackButton';
 import {CustomModal} from '../../../components/general/CustomModal/CustomModal';
+import PushNotification, {Importance} from 'react-native-push-notification';
 
 const Appointment = () => {
   const [markedDates, setMarkedDates] = useState({});
@@ -63,11 +64,11 @@ const Appointment = () => {
 
   // Send appointment request to the health facility - api
   const sendAppointmentRequest = day => {
-    console.log('Sent an appointment rquest');
+    // .log('Sent an appointment rquest');
   };
 
   const sendAppointmentCancel = day => {
-    console.log('Canceled appointment');
+    // console.log('Canceled appointment');
   };
 
   // Set appointment status from the api
@@ -123,6 +124,44 @@ const Appointment = () => {
 
     setCancelAppointmentModalVisibility(false);
   };
+
+  const createAppointmentChannel = () => {
+    PushNotification.createChannel(
+      {
+        channelId: 'appointmentNotificationChannel',
+        channelName: 'Appointment Notification',
+        channelDescription: 'A channel for appointment notification',
+        playSound: true,
+        soundName: 'default',
+        importance: Importance.HIGH,
+        vibrate: true,
+      },
+      created => console.log(`createChannel returned '${created}'`), // (optional) callback returns whether the channel was created, false means it already existed.
+    );
+  };
+
+  useEffect(() => {
+    createAppointmentChannel();
+  }, []);
+
+  useEffect(() => {
+    if (isNotificationOn) {
+      PushNotification.localNotificationSchedule({
+        channelId: 'appointmentNotificationChannel',
+        // id: 'appointmentPushNotification',
+        title: 'Appointment',
+        allowWhileIdle: false,
+        message: 'You have an appointment at 5 O"clock at Zewditu Hospital',
+        date: new Date(Date.now() + 10 * 1000),
+        bigText:
+          'My big text that will be shown when notification is expanded. Styling can be done using HTML tags(see android docs for details)',
+        subText: 'This is a subText',
+        bigPictureUrl: 'https://www.example.tld/picture.jpg',
+      });
+    } else {
+      PushNotification.cancelAllLocalNotifications();
+    }
+  }, [isNotificationOn]);
 
   useEffect(() => {
     //Set the YearMonthDateNow variable to the current date (String)

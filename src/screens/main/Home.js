@@ -106,11 +106,11 @@ const Home = ({navigation}) => {
         if (locationFromMapboxLat && locationFromMapboxLng) {
           setUserPositionLng(locationFromMapboxLng);
           setUserPositionLat(locationFromMapboxLat);
-          console.log('Inside mapbox User position');
+          // console.log('Inside mapbox User position');
         } else {
           setUserPositionLng(lng);
           setUserPositionLat(lat);
-          console.log('Third party user position');
+          // console.log('Third party user position');
         }
       },
       error => {
