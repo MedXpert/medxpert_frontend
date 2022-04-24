@@ -113,5 +113,15 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     paddingLeft: 10,
   },
+  updatebtn: {
+    width: 300,
+    height: 45,
+    margin: 8,
+    borderRadius: 13,
+    backgroundColor: "#5ed4ff",
+    paddingTop: 10,
+    alignSelf: "center",
+    alignItems:"center"
+  },
 });
 export default Profile;
