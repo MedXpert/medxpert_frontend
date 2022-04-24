@@ -87,8 +87,7 @@ const styles = StyleSheet.create({
   },
   txtstyle:{
     borderWidth: 1,
-    borderColor: "black",
-    
+    borderColor: "black",    
     height:50,margin: 10,
     width: 300,
     borderRadius: 5,
