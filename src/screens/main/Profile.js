@@ -44,7 +44,17 @@ const Profile = () => {
         <Text style={styles.lable}>Phone Number</Text>
         <TextInput placeholder="(+xxx) xxxxx xxxx" textContentType="int" style={styles.txtstyle}></TextInput>
 
+        <Text style={styles.lable}>User Name</Text>
+        <TextInput placeholder="user name" keyboardType="password" style={styles.txtstyle}></TextInput>
+       
       </View>
+      <TouchableOpacity style={styles.updatebtn}>
+        <Icon color="black" size={20}>
+          Update{" "}
+        </Icon>
+      </TouchableOpacity>
+
+
     </SafeAreaView>
   );
 };
