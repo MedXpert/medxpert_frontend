@@ -36,25 +36,29 @@ const Profile = () => {
       <View style={{alignSelf: 'center', marginTop: 10}}>
         <Text style={styles.lable}>Full Name</Text>
         <TextInput placeholder="Name" style={styles.txtstyle}></TextInput>
-      
-        <Text style={styles.lable}>E-mail</Text>
-        <TextInput placeholder="Example@gmail.com" style={styles.txtstyle}></TextInput>
 
+        <Text style={styles.lable}>E-mail</Text>
+        <TextInput
+          placeholder="Example@gmail.com"
+          style={styles.txtstyle}></TextInput>
 
         <Text style={styles.lable}>Phone Number</Text>
-        <TextInput placeholder="(+xxx) xxxxx xxxx" textContentType="int" style={styles.txtstyle}></TextInput>
+        <TextInput
+          placeholder="(+xxx) xxxxx xxxx"
+          textContentType="int"
+          style={styles.txtstyle}></TextInput>
 
         <Text style={styles.lable}>User Name</Text>
-        <TextInput placeholder="user name" keyboardType="password" style={styles.txtstyle}></TextInput>
-       
+        <TextInput
+          placeholder="user name"
+          keyboardType="password"
+          style={styles.txtstyle}></TextInput>
       </View>
       <TouchableOpacity style={styles.updatebtn}>
         <Icon color="black" size={20}>
-          Update{" "}
+          Update{' '}
         </Icon>
       </TouchableOpacity>
-
-
     </SafeAreaView>
   );
 };
@@ -118,10 +122,10 @@ const styles = StyleSheet.create({
     height: 45,
     margin: 8,
     borderRadius: 13,
-    backgroundColor: "#5ed4ff",
+    backgroundColor: '#5ed4ff',
     paddingTop: 10,
-    alignSelf: "center",
-    alignItems:"center"
+    alignSelf: 'center',
+    alignItems: 'center',
   },
 });
 export default Profile;
