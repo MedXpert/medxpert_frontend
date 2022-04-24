@@ -1,7 +1,8 @@
-import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
+import {View, Text, StyleSheet, TouchableOpacity, TextInput} from 'react-native';
 import React from 'react';
 
 import {CustomText} from '../../components/general/CustomText';
+import { Icon } from 'react-native-vector-icons/Icon';
 
 const Profile = () => {
   return (
@@ -18,9 +19,23 @@ const Profile = () => {
         />
       </View>
 
-      <TouchableOpacity style={}>
-
+      <TouchableOpacity style={styles.probtn}>
+        <Icon
+        name='camera'
+        color="gray"
+        size={15}
+        style={{padding:10}}
+        />
       </TouchableOpacity>
+
+      <View style={{alignSelf:'center', marginTop:10}}>
+        <Text style={{fontSize:30, alignItems:'center'}}>John Doe</Text>
+
+      </View>
+      <View style={{alignSelf:'center', marginTop:10}}>
+<Text style={styles.lable}>Full Name</Text>
+<TextInput placeholder='Name' style={styles.txtstyle}></TextInput>
+      </View>
 
     </SafeAreaView>
   );
@@ -65,8 +80,19 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     marginLeft: 90,
     marginTop: -30,
-    // height:40,width:40
     borderWidth: 1,
   },
+  lable:{
+    marginLeft:10, fontSize:15
+  },
+  txtstyle:{
+    borderWidth: 1,
+    borderColor: "black",
+    
+    height:50,margin: 10,
+    width: 300,
+    borderRadius: 5,
+    paddingLeft: 10,
+  }
 });
 export default Profile;
