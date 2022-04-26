@@ -106,11 +106,11 @@ const Home = ({navigation}) => {
         if (locationFromMapboxLat && locationFromMapboxLng) {
           setUserPositionLng(locationFromMapboxLng);
           setUserPositionLat(locationFromMapboxLat);
-          console.log('Inside mapbox User position');
+          // console.log('Inside mapbox User position');
         } else {
           setUserPositionLng(lng);
           setUserPositionLat(lat);
-          console.log('Third party user position');
+          // console.log('Third party user position');
         }
       },
       error => {
@@ -242,7 +242,7 @@ const Home = ({navigation}) => {
           // ref={c => (_map = c)}
           ref={c => (_map = c)}
           logoEnabled={false}
-          compassViewMargins={{x: 10, y: (38 * dimensionHeight) / 100}}
+          compassViewMargins={{x: 10, y: (40 * dimensionHeight) / 100}}
           style={styles.map}
           surfaceView>
           {/* Display user location */}
