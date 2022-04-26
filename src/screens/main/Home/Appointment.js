@@ -12,6 +12,7 @@ import {CustomButton} from '../../../components/general/CustomButton';
 import {BackButton} from '../../../components/general/BackButton';
 import {CustomModal} from '../../../components/general/CustomModal/CustomModal';
 import PushNotification, {Importance} from 'react-native-push-notification';
+import RNDisableBatteryOptimizationsAndroid from 'react-native-disable-battery-optimizations-android';
 
 const Appointment = () => {
   const [markedDates, setMarkedDates] = useState({});
@@ -138,6 +139,16 @@ const Appointment = () => {
       },
       created => console.log(`createChannel returned '${created}'`), // (optional) callback returns whether the channel was created, false means it already existed.
     );
+  };
+
+  const onReminderPressed = async () => {
+    const isBatteryOptimizationEnabled =
+      await RNDisableBatteryOptimizationsAndroid.isBatteryOptimizationEnabled();
+    if (isBatteryOptimizationEnabled) {
+      RNDisableBatteryOptimizationsAndroid.openBatteryModal();
+    } else {
+      setIsNotificationOn(!isNotificationOn);
+    }
   };
 
   useEffect(() => {
@@ -321,7 +332,8 @@ const Appointment = () => {
                   size={20}
                   style={{marginRight: 15}}
                   onPress={() => {
-                    setIsNotificationOn(!isNotificationOn);
+                    // setIsNotificationOn(!isNotificationOn);
+                    onReminderPressed();
                     // ... function to set notification to the appointment time
                   }}
                 />
