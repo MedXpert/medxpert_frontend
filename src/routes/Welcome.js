@@ -9,7 +9,6 @@ import Welcome3 from '../screens/welcome/Welcome3';
 // Welcome screens that will be shown for users when they open the app for the first time
 const WelcomeStackScreen = () => {
   const config = {
-    headerShown: false,
     animation: 'slide_from_right',
   };
   const WelcomeStack = createNativeStackNavigator();

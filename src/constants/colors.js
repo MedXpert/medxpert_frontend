@@ -9,6 +9,6 @@ export default {
   lightGray: '#9EADBD',
   white: '#FFFFFF',
   whiteSmoke: '#F5F5F5',
-  green: '#00FF00',
+  green: '#378805',
   red: '#FF0000',
 };
