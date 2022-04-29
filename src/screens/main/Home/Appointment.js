@@ -220,6 +220,10 @@ const Appointment = () => {
     isAppointmentScheduled,
   ]);
 
+  // if (healthCareFacilities.isSuccess) {
+  //   console.log(healthCareFacilities);
+  // }
+
   return (
     <View style={styles.container}>
       {/* Health facility info section */}

@@ -17,13 +17,14 @@ import {CustomText} from '../../general/CustomText';
 import Colors from '../../../constants/colors';
 import shadow from '../../../constants/shadow';
 import colors from '../../../constants/colors';
-import {color, log} from 'react-native-reanimated';
-import {Title} from 'react-native-paper';
+import {useHealthCareFacilities} from '../../../hooks/healthCareFacility';
 
 const dimensionHeight = Dimensions.get('window').height;
 const dimensionWidth = Dimensions.get('window').width;
 
 const BottomSheetContent = ({navigation}) => {
+  const {data, isSuccess, isError, isLoading, status} =
+    useHealthCareFacilities();
   const healthFacilities = [
     {
       name: 'Yekatit 12 Hospital',
@@ -122,7 +123,7 @@ const BottomSheetContent = ({navigation}) => {
             />
 
             {/* Address  */}
-            <View style={styles.location}>
+            <View style={styles.address}>
               <IconEntypo name="location-pin" size={18} color={Colors.black} />
               <CustomText
                 customStyles={styles.marginLeft}
@@ -149,7 +150,7 @@ const BottomSheetContent = ({navigation}) => {
                   fullStarColor={Colors.golden}
                 />
                 <CustomText
-                  content={item.rating}
+                  content={item.averageRating}
                   customStyles={styles.textStyle}
                   fontColor={colors.gray}
                 />
@@ -168,12 +169,14 @@ const BottomSheetContent = ({navigation}) => {
         customStyles={{fontWeight: '900', marginLeft: 5, marginBottom: 10}}
         fontSize={20}
       />
-      <FlatList
-        data={healthFacilities}
-        horizontal
-        renderItem={renderHealthFacilities}
-        keyExtractor={item => item.id}
-      />
+      {isSuccess && (
+        <FlatList
+          data={data}
+          horizontal
+          renderItem={renderHealthFacilities}
+          keyExtractor={item => item.id}
+        />
+      )}
     </View>
   );
 };
