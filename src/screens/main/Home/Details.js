@@ -8,7 +8,12 @@ import {
   Pressable,
   Modal,
   Text,
+  Dimensions,
 } from 'react-native';
+import ContentLoader, {
+  FacebookLoader,
+  InstagramLoader,
+} from 'react-native-easy-content-loader';
 import StarRating from 'react-native-star-rating';
 import {CustomButton} from '../../../components/general/CustomButton';
 import Colors from '../../../constants/colors';
@@ -19,7 +24,6 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {CustomText} from '../../../components/general/CustomText';
 import {BackButton} from '../../../components/general/BackButton';
 import {useHealthCareFacility} from '../../../hooks/healthCareFacility';
-import {useEffect} from 'react/cjs/react.production.min';
 
 const ImageItem = ({image, onPress}) => (
   <Pressable onPress={onPress}>
@@ -28,6 +32,9 @@ const ImageItem = ({image, onPress}) => (
     </View>
   </Pressable>
 );
+
+const dimensionsWidth = Dimensions.get('window').width;
+const dimensionsHeight = Dimensions.get('window').height;
 
 const Details = ({route, navigation}) => {
   const healthCareFacilityId = route.params.id;
@@ -50,9 +57,7 @@ const Details = ({route, navigation}) => {
       }}
     />
   );
-  if (isSuccess) {
-    console.log('data from details page', data);
-  }
+
   return (
     <View style={styles.container}>
       <Modal visible={imageModalVisible}>
@@ -69,6 +74,18 @@ const Details = ({route, navigation}) => {
           />
         </View>
       </Modal>
+      {isLoading && (
+        <View style={styles.loadingContainer}>
+          <ContentLoader
+            active
+            pHeight={100}
+            pRows={Math.floor(dimensionsHeight / 100)}
+            title={false}
+            animationDuration={400}
+            pWidth={Math.floor(dimensionsWidth - 20)}
+          />
+        </View>
+      )}
       {isSuccess && (
         <>
           <View style={styles.head}>
@@ -269,6 +286,9 @@ const styles = StyleSheet.create({
     width: '100%',
     top: 220,
     left: 10,
+  },
+  loadingContainer: {
+    alignItems: 'center',
   },
   main: {
     flex: 2,

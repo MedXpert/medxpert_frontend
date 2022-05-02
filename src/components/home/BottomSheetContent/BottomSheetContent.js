@@ -181,6 +181,7 @@ const BottomSheetContent = ({navigation}) => {
             active
             avatar={false}
             pRows={5}
+            animationDuration={400}
             pHeight={60}
             pWidth={dimensionWidth - 20}
             title={false}
