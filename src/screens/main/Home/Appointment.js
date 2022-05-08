@@ -49,7 +49,6 @@ const Appointment = ({route, navigation}) => {
   const healthCareFacility = useHealthCareFacility(hcfId);
   const deleteAppointment = useDeleteAppointment();
 
-  console.log(appointment);
   // Returns the current Year, month and date as a string.
   const getYearMonthDate = () => {
     let now = new Date();
@@ -89,9 +88,10 @@ const Appointment = ({route, navigation}) => {
       await readAsyncStorage('userId'),
       hcfId,
       healthCareFacility.data.type,
-      selectedDate,
+      selectedDate.dateString,
       appointmentStatus,
     );
+
     createAppointment.mutate(appointmentModel);
   };
 
@@ -171,6 +171,7 @@ const Appointment = ({route, navigation}) => {
     else if (appointment.data) {
       var selectedDateObj = {};
       const dat = new Date(appointment.data.dateTime);
+      console.log(dat);
       const appointmentDateString =
         dat.getFullYear().toString() +
         '-' +
@@ -179,14 +180,16 @@ const Appointment = ({route, navigation}) => {
           useGrouping: false,
         }) +
         '-' +
-        dat.getDate().toLocaleString('en-US', {
+        (dat.getDate() + 1).toLocaleString('en-US', {
           minimumIntegerDigits: 2,
           useGrouping: false,
         });
 
+      console.log(appointmentDateString);
+
       selectedDateObj[appointmentDateString] = {
         selected: true,
-        disabled: false,
+
         selectedColor:
           appointment.data.status === 'pending'
             ? colors.golden

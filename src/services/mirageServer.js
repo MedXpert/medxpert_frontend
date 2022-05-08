@@ -78,7 +78,7 @@ window.server = createServer({
       let userId = await readAsyncStorage('userId');
       return schema.appointments.findBy({
         healthCareFacilityID: id,
-        userId: 2,
+        userId: userId,
       });
     });
 
@@ -120,7 +120,7 @@ window.server = createServer({
       userId: 1,
       healthCareFacilityID: 1,
       healthCareFacilityType: 'Clinic',
-      dateTime: new Date('2022-05-28'),
+      dateTime: new Date('2022-05-30'),
       status: 'scheduled',
     });
     server.create('appointment', {
