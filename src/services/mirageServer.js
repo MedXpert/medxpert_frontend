@@ -1,4 +1,5 @@
-import {createServer, Model, Factory} from 'miragejs';
+import {createServer, Model, Factory, hasMany, belongsTo} from 'miragejs';
+import {readAsyncStorage} from './readAsyncStorage';
 
 if (window.server) {
   window.server.shutdown();
@@ -49,7 +50,22 @@ window.server = createServer({
       ],
       travelTime: '5 min',
     }),
+    user: Factory.extend({
+      firstName: 'Jhon',
+      lastName: 'Doe',
+      email: 'Jhon@email.com',
+      phoneNumber: '001122334455',
+      username: 'jhonDope',
+      profilePicture: '',
+      creationDateTime: '',
+      dateOfBirth: '',
+      sex: 'M',
+      healthProfileId: 1,
+      address: 'Addis Ababa',
+      additionalAttributes: [],
+    }),
   },
+
   routes() {
     this.namespace = 'api';
 
@@ -60,7 +76,9 @@ window.server = createServer({
     this.get('/appointments/:id', (schema, request) => {
       let id = request.params.id;
 
-      return schema.appointments.find(id);
+      return schema.appointments.findBy({
+        healthCareFacilityID: id,
+      });
     });
 
     this.post('/appointments', (schema, request) => {
@@ -98,32 +116,32 @@ window.server = createServer({
 
   seeds(server) {
     server.create('appointment', {
-      userID: 20,
-      healthFacilityID: 1,
-      healthFacilityType: 'Clinic',
-      dateTime: new Date('2022-04-28T14:00'),
-      status: 'approved',
+      userId: 1,
+      healthCareFacilityID: 1,
+      healthCareFacilityType: 'Clinic',
+      dateTime: new Date('2022-05-28'),
+      status: 'scheduled',
     });
     server.create('appointment', {
-      userID: 21,
-      healthFacilityID: 2,
-      healthFacilityType: 'Clinic',
+      userId: 1,
+      healthCareFacilityID: 2,
+      healthCareFacilityType: 'Clinic',
       dateTime: new Date('2022-04-28T14:00'),
-      status: 'approved',
+      status: 'scheduled',
     });
     server.create('appointment', {
-      userID: 26,
-      healthFacilityID: 3,
-      healthFacilityType: 'Clinic',
+      userId: 1,
+      healthCareFacilityID: 3,
+      healthCareFacilityType: 'Clinic',
       dateTime: new Date('2022-04-28T14:00'),
-      status: 'approved',
+      status: 'scheduled',
     });
     server.create('appointment', {
-      userID: 28,
-      healthFacilityID: 4,
-      healthFacilityType: 'Clinic',
+      userId: 1,
+      healthCareFacilityID: 4,
+      healthCareFacilityType: 'Clinic',
       dateTime: new Date('2022-04-28T14:00'),
-      status: 'approved',
+      status: 'scheduled',
     });
 
     server.create('healthCareFacility', {
@@ -144,6 +162,14 @@ window.server = createServer({
     server.create('healthCareFacility');
     server.create('healthCareFacility');
     server.create('healthCareFacility');
+
+    server.create('user');
+    server.create('user', {
+      firstName: 'Abebe',
+      lastName: 'Demeke',
+      email: 'abebe@email.com',
+      healthProfileId: 2,
+    });
   },
 });
 
@@ -154,25 +180,25 @@ window.server = createServer({
 //         appointments: [
 //           {
 //             id: 4,
-//             userID: 20,
-//             healthFacilityID: 23,
-//             healthFacilityType: 'Clinic',
+//             userId: 20,
+//             healthCareFacilityID: 23,
+//             healthCareFacilityType: 'Clinic',
 //             dateTime: new Date('2022-04-28T14:00'),
-//             status: 'approved',
+//             status: 'scheduled',
 //           },
 //           {
 //             id: 3,
-//             userID: 21,
-//             healthFacilityID: 21,
-//             healthFacilityType: 'Clinic',
+//             userId: 21,
+//             healthCareFacilityID: 21,
+//             healthCareFacilityType: 'Clinic',
 //             dateTime: new Date('2022-04-28T14:00'),
-//             status: 'approved',
+//             status: 'scheduled',
 //           },
 //           {
 //             id: 1,
-//             userID: 26,
-//             healthFacilityID: 20,
-//             healthFacilityType: 'Clinic',
+//             userId: 26,
+//             healthCareFacilityID: 20,
+//             healthCareFacilityType: 'Clinic',
 //             dateTime: new Date('2022-04-28T14:00'),
 //             status: 'pending',
 //           },

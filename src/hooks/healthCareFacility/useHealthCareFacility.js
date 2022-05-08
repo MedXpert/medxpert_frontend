@@ -2,6 +2,6 @@ import {useQuery} from 'react-query';
 import {fetchHealthCareFacility} from '../../services/api/healthCareFacility';
 
 const useHealthCareFacility = id =>
-  useQuery(['fetchHealthCareFacility', id], () => fetchHealthCareFacility(id));
+  useQuery(['healthCareFacility', id], () => fetchHealthCareFacility(id));
 
 export {useHealthCareFacility};

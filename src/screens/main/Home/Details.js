@@ -38,13 +38,9 @@ const dimensionsHeight = Dimensions.get('window').height;
 
 const Details = ({route, navigation}) => {
   const healthCareFacilityId = route.params.id;
+
   const {data, isError, isLoading, isSuccess} =
     useHealthCareFacility(healthCareFacilityId);
-
-  // const findById = id => {
-  //   let hf = healthFacilities.find(hospital => hospital.id === id);
-  //   return hf;
-  // };
 
   const [selectedImage, setSelectedImage] = useState();
   const [imageModalVisible, setImageModalVisible] = useState(false);
@@ -68,7 +64,9 @@ const Details = ({route, navigation}) => {
             <IconIon name="ios-close" size={50} color={Colors.primary} />
           </Pressable>
           <Image
-            source={selectedImage}
+            source={
+              selectedImage ? selectedImage : isSuccess ? data.images[0] : null
+            }
             style={styles.modalImage}
             resizeMode="contain"
           />
@@ -95,11 +93,7 @@ const Details = ({route, navigation}) => {
                 setImageModalVisible(true);
               }}>
               <Image
-                source={
-                  selectedImage
-                    ? selectedImage
-                    : data.healthCareFacility.images[0]
-                }
+                source={selectedImage ? selectedImage : data.images[0]}
                 resizeMode="cover"
                 style={styles.imageBackground}
               />
@@ -126,7 +120,7 @@ const Details = ({route, navigation}) => {
               <CustomText
                 fontSize={30}
                 customStyles={styles.bold}
-                content={data.healthCareFacility.name}
+                content={data.name}
               />
               <View style={styles.location}>
                 <IconEntypo
@@ -136,14 +130,14 @@ const Details = ({route, navigation}) => {
                 />
                 <CustomText
                   customStyles={styles.marginLeft5}
-                  content={data.healthCareFacility.address}
+                  content={data.address}
                 />
               </View>
               <View style={styles.stars}>
                 <StarRating
                   disabled={false}
                   maxStars={5}
-                  rating={data.healthCareFacility.averageRating}
+                  rating={data.averageRating}
                   starSize={25}
                   fullStarColor={Colors.golden}
                 />
@@ -151,7 +145,7 @@ const Details = ({route, navigation}) => {
               <CustomText
                 customStyles={styles.open}
                 fontColor={Colors.gray}
-                content={data.healthCareFacility.availability}
+                content={data.availability}
               />
               <View style={styles.typeAndTravel}>
                 <View style={styles.type}>
@@ -159,10 +153,7 @@ const Details = ({route, navigation}) => {
                     content="Type"
                     customStyles={styles.typeTravelElement}
                   />
-                  <CustomText
-                    content={data.healthCareFacility.type}
-                    fontColor={Colors.gray}
-                  />
+                  <CustomText content={data.type} fontColor={Colors.gray} />
                 </View>
                 <View style={styles.travel}>
                   <CustomText
@@ -170,7 +161,7 @@ const Details = ({route, navigation}) => {
                     customStyles={styles.typeTravelElement}
                   />
                   <CustomText
-                    content={data.healthCareFacility.travelTime}
+                    content={data.travelTime}
                     fontColor={Colors.gray}
                   />
                 </View>
@@ -182,7 +173,7 @@ const Details = ({route, navigation}) => {
                   customStyles={styles.typeAndTravelElement}
                 />
                 <CustomText
-                  content={data.healthCareFacility.description}
+                  content={data.description}
                   fontColor={Colors.gray}
                   fontSize={12}
                 />
@@ -219,7 +210,9 @@ const Details = ({route, navigation}) => {
                     />
                   }
                   onPress={() => {
-                    navigation.navigate('Appointment', {useId: data.id});
+                    navigation.navigate('Appointment', {
+                      hcfId: isSuccess ? data.id : false,
+                    });
                   }}
                 />
 
@@ -243,7 +236,7 @@ const Details = ({route, navigation}) => {
           </View>
 
           <FlatList
-            data={data.healthCareFacility.images}
+            data={data.images}
             renderItem={renderItem}
             keyExtractor={image => image.id}
             horizontal={true}

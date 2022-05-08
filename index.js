@@ -31,9 +31,7 @@ Logger.setLogCallback(log => {
 });
 
 PushNotification.configure({
-  onNotification: function (notification) {
-    console.log('NOTIFICATION:', notification);
-  },
+  onNotification: function (notification) {},
   requestPermissions: Platform.OS === 'ios',
 });
 

@@ -1,3 +1,7 @@
 import {useQuery} from 'react-query';
+import {fetchAppointment} from '../../services/api/appointment';
 
-const useAppointment = () => useQuery(['appointment', id], fetchAppointment);
+const useAppointment = id =>
+  useQuery(['appointment', id], () => fetchAppointment(id));
+
+export {useAppointment};

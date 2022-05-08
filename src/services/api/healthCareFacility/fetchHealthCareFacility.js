@@ -3,7 +3,7 @@ import axios from 'axios';
 const fetchHealthCareFacility = async id => {
   try {
     const res = await axios.get(`/api/healthCareFacilities/${id}`);
-    const data = res.data;
+    const data = res.data.healthCareFacility;
 
     return data;
   } catch (error) {

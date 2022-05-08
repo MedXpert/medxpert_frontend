@@ -1,4 +1,4 @@
-import {View, StyleSheet, Modal} from 'react-native';
+import {View, StyleSheet, Modal, ActivityIndicator} from 'react-native';
 import React, {useState, useEffect, useCallback, useMemo} from 'react';
 import {Calendar, CalendarList, Agenda} from 'react-native-calendars';
 
@@ -13,15 +13,23 @@ import {BackButton} from '../../../components/general/BackButton';
 import {CustomModal} from '../../../components/general/CustomModal/CustomModal';
 import PushNotification, {Importance} from 'react-native-push-notification';
 import RNDisableBatteryOptimizationsAndroid from 'react-native-disable-battery-optimizations-android';
+import {useAppointment, useCreateAppointment} from '../../../hooks/appointment';
+import {readAsyncStorage} from '../../../services/readAsyncStorage';
+import {AppointmentModel} from '../../../models/Appointment';
+import {useHealthCareFacility} from '../../../hooks/healthCareFacility';
+import {create} from 'react-test-renderer';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const Appointment = () => {
-  const [markedDates, setMarkedDates] = useState({});
+const Appointment = ({route, navigation}) => {
+  // const [markedDates, setMarkedDates] = useState({});
+  const [availableDates, setAvailableDates] = useState([]);
   const [YearMonthDateNow, setYearMonthDateNow] = useState('');
   const [isAppointmentPending, setIsAppointmentPending] = useState(false);
   const [isAppointmentScheduled, setIsAppointmentScheduled] = useState(false);
   const [appointmentStatus, setAppointmentStatus] = useState('');
   const [isNotificationOn, setIsNotificationOn] = useState(false);
-  const [selectedDay, setSelectedDay] = useState({});
+  const [selectedDate, setSelectedDate] = useState({});
+
   const [
     scheduleAppointmentModalVisibility,
     setScheduleAppointmentModalVisibility,
@@ -31,98 +39,75 @@ const Appointment = () => {
     setCancelAppointmentModalVisibility,
   ] = useState(false);
 
-  //Get available dates set by health organizations (to be replaced by a result from the api)
-  const getAvailableDates = useCallback(() => {
-    var markedDatesObject = {
-      '2022-04-13': {
-        selected: true,
-        selectedColor: colors.green,
-        disabled: false,
-      },
-      '2022-04-14': {
-        selected: true,
-        selectedColor: colors.green,
-        disabled: false,
-      },
-      '2022-04-15': {
-        selected: true,
-        selectedColor: colors.green,
-        disabled: false,
-      },
-      '2022-04-16': {
-        selected: true,
-        selectedColor: colors.green,
-        disabled: false,
-      },
-      '2022-04-18': {
-        selected: true,
-        selectedColor: colors.green,
-        disabled: false,
-      },
-    };
-    return markedDatesObject;
-  }, []);
-
-  // Send appointment request to the health facility - api
-  const sendAppointmentRequest = day => {
-    // .log('Sent an appointment rquest');
-  };
-
-  const sendAppointmentCancel = day => {
-    // console.log('Canceled appointment');
-  };
-
-  // Set appointment status from the api
-  const getSetAppointmentStatus = () => {
-    setAppointmentStatus('pending');
-  };
+  const hcfId = route.params.hcfId;
+  const appointment = useAppointment(hcfId);
+  const createAppointment = useCreateAppointment();
+  const healthCareFacility = useHealthCareFacility(hcfId);
 
   // Returns the current Year, month and date as a string.
-  const getYearMonthDate = useCallback(() => {
+  const getYearMonthDate = () => {
     let now = new Date();
     var [year, month, date] = [
       now.getFullYear(),
       now.getMonth(),
       now.getDate(),
     ];
-    const setMonthTwoDigitString = () => {
-      month = month + 1;
-      let monthString = month.toString();
-      if (monthString.length === 1) {
-        return '0' + month;
-      } else {
-        return monthString;
-      }
-    };
+
     var YearMonthDateString =
-      year.toString() + '-' + setMonthTwoDigitString() + '-' + date.toString();
+      year.toString() +
+      '-' +
+      (month + 1).toLocaleString('en-US', {
+        minimumIntegerDigits: 2,
+        useGrouping: false,
+      }) +
+      '-' +
+      date.toLocaleString('en-US', {
+        minimumIntegerDigits: 2,
+        useGrouping: false,
+      });
 
     return YearMonthDateString;
-  }, []);
+  };
 
   //Triggered when a day is pressed
   const onDayPress = day => {
-    setSelectedDay(day);
+    setSelectedDate(day);
     setScheduleAppointmentModalVisibility(true);
+  };
+
+  // Send appointment request to the health facility - api
+  const sendAppointmentRequest = async () => {
+    var appointmentModel = new AppointmentModel(
+      null,
+      await readAsyncStorage('userId'),
+      hcfId,
+      healthCareFacility.data.type,
+      selectedDate,
+      appointmentStatus,
+    );
+    createAppointment.mutate(appointmentModel);
+  };
+
+  const sendAppointmentCancel = day => {
+    // console.log('Canceled appointment');
   };
 
   //When Yes button in the schedule appointment modal is pressed
   const onModalScheduleYesPressed = () => {
     //send appointment request to the health facility
-    sendAppointmentRequest(selectedDay);
-    setAppointmentStatus('Pending');
-    setIsAppointmentPending(true);
+    setAppointmentStatus('pending');
+
+    sendAppointmentRequest();
 
     setScheduleAppointmentModalVisibility(false);
   };
 
   const onModalCancelYesPressed = () => {
     //send cancel appointment request to the health facility
-    sendAppointmentCancel(selectedDay);
-    setAppointmentStatus('');
+    sendAppointmentCancel(selectedDate);
+    setAppointmentStatus('canceled');
     setIsAppointmentPending(false);
     setIsAppointmentScheduled(false);
-
     setCancelAppointmentModalVisibility(false);
   };
 
@@ -137,7 +122,7 @@ const Appointment = () => {
         importance: Importance.HIGH,
         vibrate: true,
       },
-      created => console.log(`createChannel returned '${created}'`), // (optional) callback returns whether the channel was created, false means it already existed.
+      // created => console.log(`createChannel returned '${created}'`), // (optional) callback returns whether the channel was created, false means it already existed.
     );
   };
 
@@ -151,9 +136,88 @@ const Appointment = () => {
     }
   };
 
+  const markedDates = () => {
+    var avDatesCurrDateObj = {}; // available dates and current date object
+    if (healthCareFacility.data && appointment.data) {
+      //set properties of available dates (for the calendar)
+      healthCareFacility.data.availableDates.map(avDate => {
+        avDatesCurrDateObj[avDate] = {
+          selected: true,
+          selectedColor: colors.green,
+          disabled: false,
+        };
+      });
+      //set properties of current date
+      avDatesCurrDateObj[getYearMonthDate()] = {
+        disabled: false,
+        marked: true,
+        markedColor: colors.primary,
+        disableTouchEvent: true,
+      };
+
+      //if there is a pending or scheduled appointment
+      if (
+        appointment.data.status === 'pending' ||
+        appointment.data.status === 'scheduled'
+      ) {
+        // let dateString = selectedDate.dateString;
+
+        var selectedDateObj = {};
+        const dat = new Date(appointment.data.dateTime);
+        const appointmentDateString =
+          dat.getFullYear().toString() +
+          '-' +
+          (dat.getMonth() + 1).toLocaleString('en-US', {
+            minimumIntegerDigits: 2,
+            useGrouping: false,
+          }) +
+          '-' +
+          dat.getDate().toLocaleString('en-US', {
+            minimumIntegerDigits: 2,
+            useGrouping: false,
+          });
+
+        selectedDateObj[appointmentDateString] = {
+          selected: true,
+          disabled: false,
+          selectedColor:
+            appointment.data.status === 'pending'
+              ? colors.golden
+              : appointment.data.status === 'scheduled'
+              ? colors.primary
+              : null,
+        };
+        selectedDateObj[getYearMonthDate()] = {
+          disabled: false,
+          marked: true,
+          markedColor: colors.primary,
+          disableTouchEvent: true,
+        };
+      }
+
+      const appStatus = appointment.data.status;
+
+      if (appStatus === 'pending' || appStatus === 'scheduled') {
+        return selectedDateObj; //return selectedDateObj if there is an appointment [scheduled / pending]
+      } else {
+        return avDatesCurrDateObj; //
+      }
+    }
+  };
+
   useEffect(() => {
     createAppointmentChannel();
   }, []);
+
+  useEffect(() => {
+    if (appointmentStatus === 'pending') {
+      setIsAppointmentPending(true);
+      setIsAppointmentScheduled(false);
+    } else if (appointmentStatus === 'scheduled') {
+      setIsAppointmentScheduled(true);
+      setIsAppointmentPending(false);
+    }
+  }, [appointmentStatus]);
 
   useEffect(() => {
     if (isNotificationOn) {
@@ -174,220 +238,208 @@ const Appointment = () => {
     }
   }, [isNotificationOn]);
 
-  useEffect(() => {
-    //Set the YearMonthDateNow variable to the current date (String)
-    setYearMonthDateNow(getYearMonthDate());
-    let availableDatesObj = getAvailableDates(); // store the available dates fetched from the health facility
-    //Add the current date in the available dates object so that it will be enabled and set as the current date.
-    availableDatesObj[getYearMonthDate()] = {
-      disabled: false,
-      marked: true,
-      markedColor: colors.primary,
-      disableTouchEvent: true,
-    };
-
-    if (selectedDay) {
-      let dateString = selectedDay.dateString;
-      var selectedDateObj = {};
-      selectedDateObj[dateString] = {
-        selected: true,
-        selectedColor: isAppointmentPending
-          ? colors.golden
-          : isAppointmentScheduled
-          ? colors.primary
-          : null,
-      };
-
-      selectedDateObj[getYearMonthDate()] = {
-        disabled: false,
-        marked: true,
-        markedColor: colors.primary,
-        disableTouchEvent: true,
-      };
-    }
-
-    // Set marked dates
-    if (isAppointmentPending || isAppointmentScheduled) {
-      setMarkedDates(selectedDateObj);
-    } else {
-      setMarkedDates(availableDatesObj);
-    }
-  }, [
-    getAvailableDates,
-    getYearMonthDate,
-    selectedDay,
-    isAppointmentPending,
-    isAppointmentScheduled,
-  ]);
-
-  // if (healthCareFacilities.isSuccess) {
-  //   console.log(healthCareFacilities);
-  // }
-
   return (
     <View style={styles.container}>
-      {/* Health facility info section */}
-      <View style={styles.healthFacilityInfo}>
-        {/* Health facility and back button */}
-        <View style={styles.nameAndBackButton}>
-          {/* <BackButton /> */}
-          <CustomText
-            content={'Health facility name'}
-            customStyles={styles.healthFacilityNameFont}
+      {(appointment.isLoading || healthCareFacility.isLoading) && (
+        <ActivityIndicator
+          size="large"
+          color={colors.primary}
+          style={{justifyContent: 'center', flex: 1}}
+        />
+      )}
+
+      {appointment.isSuccess && healthCareFacility.isSuccess && (
+        <>
+          {/* Health facility info section */}
+          <View style={styles.healthFacilityInfo}>
+            {/* Health facility and back button */}
+            <View style={styles.nameAndBackButton}>
+              {/* <BackButton /> */}
+              <CustomText
+                content={healthCareFacility.data.name}
+                customStyles={styles.healthFacilityNameFont}
+              />
+            </View>
+            {/* Location of Health facility  */}
+            <View style={styles.location}>
+              <IconEntypo
+                name="location-pin"
+                size={20}
+                color={colors.primary}
+              />
+              <CustomText content={healthCareFacility.data.address} />
+            </View>
+          </View>
+
+          {/* Schedule Appointment Modal */}
+          <CustomModal
+            transparent
+            visibility={scheduleAppointmentModalVisibility}
+            animationType={'fade'}
+            modalTitle={'Send request'}
+            modalContent={
+              'Do you want to schedule an appointment on ' +
+              selectedDate.dateString +
+              '?'
+            }
+            leftButtonTitle={'Cancel'}
+            onPressLeftButton={() => {
+              setScheduleAppointmentModalVisibility(false);
+            }}
+            rightButtonTitle={'Yes'}
+            onPressRightButton={() => {
+              onModalScheduleYesPressed();
+              setTimeout(() => {
+                setAppointmentStatus('Scheduled');
+                setIsAppointmentScheduled(true);
+                setIsAppointmentPending(false);
+              }, 5000);
+            }}
           />
-        </View>
-        {/* Location of Health facility  */}
-        <View style={styles.location}>
-          <IconEntypo name="location-pin" size={20} color={colors.primary} />
-          <CustomText content={'Address this '} />
-        </View>
-      </View>
 
-      {/* Schedule Appointment Modal */}
-      <CustomModal
-        transparent
-        visibility={scheduleAppointmentModalVisibility}
-        animationType={'fade'}
-        modalTitle={'Send request'}
-        modalContent={
-          'Do you want to schedule an appointment on ' +
-          selectedDay.dateString +
-          '?'
-        }
-        leftButtonTitle={'Cancel'}
-        onPressLeftButton={() => {
-          setScheduleAppointmentModalVisibility(false);
-        }}
-        rightButtonTitle={'Yes'}
-        onPressRightButton={() => {
-          onModalScheduleYesPressed();
-          setTimeout(() => {
-            setAppointmentStatus('Scheduled');
-            setIsAppointmentScheduled(true);
-            setIsAppointmentPending(false);
-          }, 5000);
-        }}
-      />
-
-      {/*
+          {/*
 
       {/* Cancel appointment modal */}
-      <CustomModal
-        transparent
-        visibility={cancelAppointmentModalVisibility}
-        animationType={'fade'}
-        modalTitle={'Cancel Appointment'}
-        modalContent={'Are you Sure you want to cancel this appointment?'}
-        leftButtonTitle={'Cancel'}
-        onPressLeftButton={() => {
-          setCancelAppointmentModalVisibility(false);
-        }}
-        rightButtonTitle={'Yes'}
-        onPressRightButton={onModalCancelYesPressed}
-      />
-
-      {/* Choose Appointment Calendar */}
-      <View style={styles.chooseAppointment}>
-        {/* <CustomText content={'Appointment'} fontSize={20} fontWeight={'400'} /> */}
-        <View style={styles.calendarContainer}>
-          {!isAppointmentPending && !isAppointmentScheduled && (
-            <CustomText content={'Choose a date'} fontColor={colors.primary} />
-          )}
-          {/* Calendar */}
-          <Calendar
-            onDayPress={onDayPress}
-            markedDates={markedDates}
-            disabledByDefault
-            hideExtraDays
-            disableAllTouchEventsForDisabledDays
+          <CustomModal
+            transparent
+            visibility={cancelAppointmentModalVisibility}
+            animationType={'fade'}
+            modalTitle={'Cancel Appointment'}
+            modalContent={'Are you Sure you want to cancel this appointment?'}
+            leftButtonTitle={'Cancel'}
+            onPressLeftButton={() => {
+              setCancelAppointmentModalVisibility(false);
+            }}
+            rightButtonTitle={'Yes'}
+            onPressRightButton={onModalCancelYesPressed}
           />
-        </View>
-        <View style={styles.legendContainer}>
-          <View style={styles.datesLegend}>
-            <View style={[styles.greenCircleLegend, styles.legendCircle]} />
-            <CustomText content={'Available Dates'} />
-          </View>
-          <View style={styles.datesLegend}>
-            <View style={[styles.goldenCircleLegend, styles.legendCircle]} />
-            <CustomText content={'Pending Appointment'} />
-          </View>
-          <View style={styles.datesLegend}>
-            <View style={[styles.blueCircleLegend, styles.legendCircle]} />
-            <CustomText content={'Scheduled Appointment'} />
-          </View>
-        </View>
-      </View>
 
-      {/* Your appointments */}
-      <View style={styles.yourAppointmentsContainer}>
-        <View style={styles.titleAndCancelButton}>
-          <CustomText
-            content={'Your Appointment'}
-            fontSize={16}
-            fontColor={colors.primary}
-          />
-          {(isAppointmentPending || isAppointmentScheduled) && (
-            <View style={styles.notificationAndCancel}>
-              {/* Show notification icon if an appointment is scheduled */}
-              {isAppointmentScheduled && (
-                <FontAwesome
-                  name={isNotificationOn ? 'bell' : 'bell-slash-o'}
-                  color={isNotificationOn ? colors.primary : colors.gray}
-                  size={20}
-                  style={{marginRight: 15}}
-                  onPress={() => {
-                    // setIsNotificationOn(!isNotificationOn);
-                    onReminderPressed();
-                    // ... function to set notification to the appointment time
-                  }}
+          {/* Choose Appointment Calendar */}
+          <View style={styles.chooseAppointment}>
+            {/* <CustomText content={'Appointment'} fontSize={20} fontWeight={'400'} /> */}
+            <View style={styles.calendarContainer}>
+              {!isAppointmentPending && !isAppointmentScheduled && (
+                <CustomText
+                  content={'Choose a date'}
+                  fontColor={colors.primary}
                 />
               )}
 
-              {/*Cancel button is shown in 'Your appointment' section if an
-              appointment is pending or scheduled*/}
-              <CustomButton
-                title={'Cancel'}
-                height={30}
-                width={75}
-                fontSize={12}
-                backgroundColor={colors.red}
-                fontColor={colors.white}
-                onPress={() => {
-                  setCancelAppointmentModalVisibility(true);
-                }}
+              {/* Calendar */}
+              <Calendar
+                onDayPress={onDayPress}
+                markedDates={markedDates()}
+                disabledByDefault
+                hideExtraDays
+                disableAllTouchEventsForDisabledDays
               />
             </View>
-          )}
-        </View>
-        <View style={styles.yourAppointmentsBody}>
-          {(isAppointmentPending || isAppointmentScheduled) && (
-            <>
-              <CustomText content={'Apr 23, 2022'} />
-            </>
-          )}
-          {isAppointmentScheduled && (
-            <CustomText content={'10:00 AM - 11:00 AM'} />
-          )}
-          {(isAppointmentPending || isAppointmentScheduled) && (
-            <View style={styles.appointmentStatus}>
-              <CustomText content={'Status'} customStyles={{marginRight: 10}} />
-              <CustomText content={appointmentStatus} fontColor={colors.gray} />
+            <View style={styles.legendContainer}>
+              <View style={styles.datesLegend}>
+                <View style={[styles.greenCircleLegend, styles.legendCircle]} />
+                <CustomText content={'Available Dates'} />
+              </View>
+              <View style={styles.datesLegend}>
+                <View
+                  style={[styles.goldenCircleLegend, styles.legendCircle]}
+                />
+                <CustomText content={'Pending Appointment'} />
+              </View>
+              <View style={styles.datesLegend}>
+                <View style={[styles.blueCircleLegend, styles.legendCircle]} />
+                <CustomText content={'Scheduled Appointment'} />
+              </View>
             </View>
-          )}
-          {isAppointmentScheduled && (
-            <CustomText
-              content={'Appointment ID    10219D32D '}
-              fontColor={colors.lightGray}
-            />
-          )}
-          {!isAppointmentPending && !isAppointmentScheduled && (
-            <CustomText
-              content={'No pending or scheduled Appointment.'}
-              fontColor={colors.gray}
-            />
-          )}
-        </View>
-      </View>
+          </View>
+
+          {/* Your appointments */}
+          <View style={styles.yourAppointmentsContainer}>
+            <View style={styles.titleAndCancelButton}>
+              <CustomText
+                content={'Your Appointment'}
+                fontSize={16}
+                fontColor={colors.primary}
+              />
+              {(appointment.data.status === 'pending' ||
+                appointment.data.status === 'scheduled') && (
+                <View style={styles.notificationAndCancel}>
+                  {/* Show notification icon if an appointment is scheduled */}
+                  {appointment.data.status === 'scheduled' && (
+                    <FontAwesome
+                      name={isNotificationOn ? 'bell' : 'bell-slash-o'}
+                      color={isNotificationOn ? colors.primary : colors.gray}
+                      size={20}
+                      style={{marginRight: 15}}
+                      onPress={() => {
+                        // setIsNotificationOn(!isNotificationOn);
+                        onReminderPressed();
+                        // ... function to set notification to the appointment time
+                      }}
+                    />
+                  )}
+
+                  {/*Cancel button is shown in 'Your appointment' section if an
+              appointment is pending or scheduled*/}
+                  <CustomButton
+                    title={'Cancel'}
+                    height={30}
+                    width={75}
+                    fontSize={12}
+                    backgroundColor={colors.red}
+                    fontColor={colors.white}
+                    onPress={() => {
+                      setCancelAppointmentModalVisibility(true);
+                    }}
+                  />
+                </View>
+              )}
+            </View>
+            <View style={styles.yourAppointmentsBody}>
+              {(appointment.data.status === 'pending' ||
+                appointment.data.status === 'scheduled') && (
+                <>
+                  <CustomText
+                    content={new Date(appointment.data.dateTime).toDateString()}
+                  />
+                </>
+              )}
+              {appointment.data.status === 'scheduled' && (
+                <CustomText
+                  content={new Date(
+                    appointment.data.dateTime,
+                  ).toLocaleTimeString()}
+                />
+              )}
+              {(appointment.data.status === 'pending' ||
+                appointment.data.status === 'scheduled') && (
+                <View style={styles.appointmentStatus}>
+                  <CustomText
+                    content={'Status'}
+                    customStyles={{marginRight: 10}}
+                  />
+                  <CustomText
+                    content={appointment.data.status}
+                    fontColor={colors.gray}
+                  />
+                </View>
+              )}
+              {appointment.data.status === 'scheduled' && (
+                <CustomText
+                  content={'Appointment ID ' + appointment.data.id}
+                  fontColor={colors.lightGray}
+                />
+              )}
+              {!appointment.data.status === 'pending' &&
+                !appointment.data.status === 'scheduled' && (
+                  <CustomText
+                    content={'No pending or scheduled Appointment.'}
+                    fontColor={colors.gray}
+                  />
+                )}
+            </View>
+          </View>
+        </>
+      )}
     </View>
   );
 };
@@ -416,7 +468,7 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
   },
   chooseAppointment: {
-    marginTop: 40,
+    marginTop: 20,
   },
   legendCircle: {
     borderRadius: 50,

@@ -141,24 +141,39 @@ const BottomSheetContent = ({navigation}) => {
             {/* Type, Distance, Rating */}
             <View style={styles.typeDistanceRating}>
               <View style={styles.typeDistanceRatingInner}>
-                <CustomText content={item.type} fontColor={Colors.gray} />
-                <IconEntypo name="dot-single" size={20} color={colors.gray} />
-                <IconIon name="car-outline" size={20} color={colors.gray} />
+                <CustomText
+                  content={item.type}
+                  fontSize={12}
+                  fontColor={Colors.gray}
+                />
+                <IconEntypo name="dot-single" size={18} color={colors.gray} />
+                <IconIon
+                  name="car-outline"
+                  style={{marginRight: 5}}
+                  size={15}
+                  color={colors.gray}
+                />
+                <CustomText
+                  content={item.travelTime}
+                  fontSize={11}
+                  color={colors.gray}
+                />
               </View>
 
               {/* Rating */}
-              <View style={styles.typeDistanceRatingInner}>
+              <View style={styles.ratingInner}>
                 <StarRating
                   disabled={false}
                   maxStars={1}
                   rating={1}
-                  starSize={15}
+                  starSize={13}
                   fullStarColor={Colors.golden}
                 />
                 <CustomText
                   content={item.averageRating}
                   customStyles={styles.textStyle}
                   fontColor={colors.gray}
+                  fontSize={10}
                 />
               </View>
             </View>
@@ -246,6 +261,13 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   typeDistanceRatingInner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-around',
+    marginRight: 12,
+    flex: 1,
+  },
+  ratingInner: {
     flexDirection: 'row',
     alignItems: 'center',
   },
