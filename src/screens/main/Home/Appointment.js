@@ -13,7 +13,11 @@ import {BackButton} from '../../../components/general/BackButton';
 import {CustomModal} from '../../../components/general/CustomModal/CustomModal';
 import PushNotification, {Importance} from 'react-native-push-notification';
 import RNDisableBatteryOptimizationsAndroid from 'react-native-disable-battery-optimizations-android';
-import {useAppointment, useCreateAppointment} from '../../../hooks/appointment';
+import {
+  useAppointment,
+  useCreateAppointment,
+  useDeleteAppointment,
+} from '../../../hooks/appointment';
 import {readAsyncStorage} from '../../../services/readAsyncStorage';
 import {AppointmentModel} from '../../../models/Appointment';
 import {useHealthCareFacility} from '../../../hooks/healthCareFacility';
@@ -22,8 +26,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Appointment = ({route, navigation}) => {
   // const [markedDates, setMarkedDates] = useState({});
-  const [availableDates, setAvailableDates] = useState([]);
-  const [YearMonthDateNow, setYearMonthDateNow] = useState('');
+  // const [availableDates, setAvailableDates] = useState([]);
+  // const [YearMonthDateNow, setYearMonthDateNow] = useState('');
   const [isAppointmentPending, setIsAppointmentPending] = useState(false);
   const [isAppointmentScheduled, setIsAppointmentScheduled] = useState(false);
   const [appointmentStatus, setAppointmentStatus] = useState('');
@@ -43,7 +47,9 @@ const Appointment = ({route, navigation}) => {
   const appointment = useAppointment(hcfId);
   const createAppointment = useCreateAppointment();
   const healthCareFacility = useHealthCareFacility(hcfId);
+  const deleteAppointment = useDeleteAppointment();
 
+  console.log(appointment);
   // Returns the current Year, month and date as a string.
   const getYearMonthDate = () => {
     let now = new Date();
@@ -72,6 +78,7 @@ const Appointment = ({route, navigation}) => {
   //Triggered when a day is pressed
   const onDayPress = day => {
     setSelectedDate(day);
+
     setScheduleAppointmentModalVisibility(true);
   };
 
@@ -105,9 +112,11 @@ const Appointment = ({route, navigation}) => {
   const onModalCancelYesPressed = () => {
     //send cancel appointment request to the health facility
     sendAppointmentCancel(selectedDate);
-    setAppointmentStatus('canceled');
-    setIsAppointmentPending(false);
-    setIsAppointmentScheduled(false);
+
+    if (appointment.data) {
+      deleteAppointment.mutate(appointment.data.id);
+    }
+
     setCancelAppointmentModalVisibility(false);
   };
 
@@ -138,7 +147,8 @@ const Appointment = ({route, navigation}) => {
 
   const markedDates = () => {
     var avDatesCurrDateObj = {}; // available dates and current date object
-    if (healthCareFacility.data && appointment.data) {
+
+    if (healthCareFacility.data && !appointment.data) {
       //set properties of available dates (for the calendar)
       healthCareFacility.data.availableDates.map(avDate => {
         avDatesCurrDateObj[avDate] = {
@@ -155,69 +165,48 @@ const Appointment = ({route, navigation}) => {
         disableTouchEvent: true,
       };
 
-      //if there is a pending or scheduled appointment
-      if (
-        appointment.data.status === 'pending' ||
-        appointment.data.status === 'scheduled'
-      ) {
-        // let dateString = selectedDate.dateString;
+      return avDatesCurrDateObj;
+    }
+    //if there is an appointment
+    else if (appointment.data) {
+      var selectedDateObj = {};
+      const dat = new Date(appointment.data.dateTime);
+      const appointmentDateString =
+        dat.getFullYear().toString() +
+        '-' +
+        (dat.getMonth() + 1).toLocaleString('en-US', {
+          minimumIntegerDigits: 2,
+          useGrouping: false,
+        }) +
+        '-' +
+        dat.getDate().toLocaleString('en-US', {
+          minimumIntegerDigits: 2,
+          useGrouping: false,
+        });
 
-        var selectedDateObj = {};
-        const dat = new Date(appointment.data.dateTime);
-        const appointmentDateString =
-          dat.getFullYear().toString() +
-          '-' +
-          (dat.getMonth() + 1).toLocaleString('en-US', {
-            minimumIntegerDigits: 2,
-            useGrouping: false,
-          }) +
-          '-' +
-          dat.getDate().toLocaleString('en-US', {
-            minimumIntegerDigits: 2,
-            useGrouping: false,
-          });
-
-        selectedDateObj[appointmentDateString] = {
-          selected: true,
-          disabled: false,
-          selectedColor:
-            appointment.data.status === 'pending'
-              ? colors.golden
-              : appointment.data.status === 'scheduled'
-              ? colors.primary
-              : null,
-        };
-        selectedDateObj[getYearMonthDate()] = {
-          disabled: false,
-          marked: true,
-          markedColor: colors.primary,
-          disableTouchEvent: true,
-        };
-      }
-
-      const appStatus = appointment.data.status;
-
-      if (appStatus === 'pending' || appStatus === 'scheduled') {
-        return selectedDateObj; //return selectedDateObj if there is an appointment [scheduled / pending]
-      } else {
-        return avDatesCurrDateObj; //
-      }
+      selectedDateObj[appointmentDateString] = {
+        selected: true,
+        disabled: false,
+        selectedColor:
+          appointment.data.status === 'pending'
+            ? colors.golden
+            : appointment.data.status === 'scheduled'
+            ? colors.primary
+            : null,
+      };
+      selectedDateObj[getYearMonthDate()] = {
+        disabled: false,
+        marked: true,
+        markedColor: colors.primary,
+        disableTouchEvent: true,
+      };
+      return selectedDateObj; //return selectedDateObj if there is an appointment [scheduled / pending]
     }
   };
 
   useEffect(() => {
     createAppointmentChannel();
   }, []);
-
-  useEffect(() => {
-    if (appointmentStatus === 'pending') {
-      setIsAppointmentPending(true);
-      setIsAppointmentScheduled(false);
-    } else if (appointmentStatus === 'scheduled') {
-      setIsAppointmentScheduled(true);
-      setIsAppointmentPending(false);
-    }
-  }, [appointmentStatus]);
 
   useEffect(() => {
     if (isNotificationOn) {
@@ -246,6 +235,18 @@ const Appointment = ({route, navigation}) => {
           color={colors.primary}
           style={{justifyContent: 'center', flex: 1}}
         />
+      )}
+
+      {appointment.isError && (
+        <View style={{justifyContent: 'center', flex: 1}}>
+          <CustomText content={appointment.error} />
+        </View>
+      )}
+
+      {healthCareFacility.isError && (
+        <View style={{justifyContent: 'center', flex: 1}}>
+          <CustomText content={healthCareFacility.error} />
+        </View>
       )}
 
       {appointment.isSuccess && healthCareFacility.isSuccess && (
@@ -289,11 +290,6 @@ const Appointment = ({route, navigation}) => {
             rightButtonTitle={'Yes'}
             onPressRightButton={() => {
               onModalScheduleYesPressed();
-              setTimeout(() => {
-                setAppointmentStatus('Scheduled');
-                setIsAppointmentScheduled(true);
-                setIsAppointmentPending(false);
-              }, 5000);
             }}
           />
 
@@ -316,9 +312,9 @@ const Appointment = ({route, navigation}) => {
 
           {/* Choose Appointment Calendar */}
           <View style={styles.chooseAppointment}>
-            {/* <CustomText content={'Appointment'} fontSize={20} fontWeight={'400'} /> */}
             <View style={styles.calendarContainer}>
-              {!isAppointmentPending && !isAppointmentScheduled && (
+              {/* If there is no appointment show choose a date text */}
+              {!appointment.data && (
                 <CustomText
                   content={'Choose a date'}
                   fontColor={colors.primary}
@@ -360,8 +356,7 @@ const Appointment = ({route, navigation}) => {
                 fontSize={16}
                 fontColor={colors.primary}
               />
-              {(appointment.data.status === 'pending' ||
-                appointment.data.status === 'scheduled') && (
+              {appointment.data && (
                 <View style={styles.notificationAndCancel}>
                   {/* Show notification icon if an appointment is scheduled */}
                   {appointment.data.status === 'scheduled' && (
@@ -394,48 +389,46 @@ const Appointment = ({route, navigation}) => {
                 </View>
               )}
             </View>
+
             <View style={styles.yourAppointmentsBody}>
-              {(appointment.data.status === 'pending' ||
-                appointment.data.status === 'scheduled') && (
+              {appointment.data && (
                 <>
                   <CustomText
                     content={new Date(appointment.data.dateTime).toDateString()}
                   />
+                  {appointment.data.status === 'scheduled' && (
+                    <CustomText
+                      content={new Date(
+                        appointment.data.dateTime,
+                      ).toLocaleTimeString()}
+                    />
+                  )}
+                  {/* Show the status of the appointment  */}
+                  <View style={styles.appointmentStatus}>
+                    <CustomText
+                      content={'Status'}
+                      customStyles={{marginRight: 10}}
+                    />
+                    <CustomText
+                      content={appointment.data.status}
+                      fontColor={colors.gray}
+                    />
+                  </View>
+                  {appointment.data.status === 'scheduled' && (
+                    <CustomText
+                      content={'Appointment ID  ' + appointment.data.id}
+                      fontColor={colors.lightGray}
+                    />
+                  )}
                 </>
               )}
-              {appointment.data.status === 'scheduled' && (
+
+              {!appointment.data && (
                 <CustomText
-                  content={new Date(
-                    appointment.data.dateTime,
-                  ).toLocaleTimeString()}
+                  content={'No pending or scheduled Appointment.'}
+                  fontColor={colors.gray}
                 />
               )}
-              {(appointment.data.status === 'pending' ||
-                appointment.data.status === 'scheduled') && (
-                <View style={styles.appointmentStatus}>
-                  <CustomText
-                    content={'Status'}
-                    customStyles={{marginRight: 10}}
-                  />
-                  <CustomText
-                    content={appointment.data.status}
-                    fontColor={colors.gray}
-                  />
-                </View>
-              )}
-              {appointment.data.status === 'scheduled' && (
-                <CustomText
-                  content={'Appointment ID ' + appointment.data.id}
-                  fontColor={colors.lightGray}
-                />
-              )}
-              {!appointment.data.status === 'pending' &&
-                !appointment.data.status === 'scheduled' && (
-                  <CustomText
-                    content={'No pending or scheduled Appointment.'}
-                    fontColor={colors.gray}
-                  />
-                )}
             </View>
           </View>
         </>
@@ -517,7 +510,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   yourAppointmentsContainer: {
-    marginTop: 20,
+    marginTop: 30,
     backgroundColor: colors.white,
     height: 180,
     padding: 15,
@@ -525,7 +518,7 @@ const styles = StyleSheet.create({
   },
   yourAppointmentsBody: {
     justifyContent: 'center',
-    height: '70%',
+    height: '80%',
   },
 });
 export default Appointment;

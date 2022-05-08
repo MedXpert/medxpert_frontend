@@ -73,11 +73,12 @@ window.server = createServer({
       return schema.appointments.all();
     });
 
-    this.get('/appointments/:id', (schema, request) => {
+    this.get('/appointments/:id', async (schema, request) => {
       let id = request.params.id;
-
+      let userId = await readAsyncStorage('userId');
       return schema.appointments.findBy({
         healthCareFacilityID: id,
+        userId: 2,
       });
     });
 
