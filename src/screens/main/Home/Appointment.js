@@ -17,6 +17,7 @@ import {
   useAppointment,
   useCreateAppointment,
   useDeleteAppointment,
+  useUpdateAppointment,
 } from '../../../hooks/appointment';
 import {readAsyncStorage} from '../../../services/readAsyncStorage';
 import {AppointmentModel} from '../../../models/Appointment';
@@ -31,7 +32,7 @@ const Appointment = ({route, navigation}) => {
   const [isAppointmentPending, setIsAppointmentPending] = useState(false);
   const [isAppointmentScheduled, setIsAppointmentScheduled] = useState(false);
   const [appointmentStatus, setAppointmentStatus] = useState('');
-  const [isNotificationOn, setIsNotificationOn] = useState(false);
+  const [isReminderOn, setIsReminderOn] = useState(false);
   const [selectedDate, setSelectedDate] = useState({});
 
   const [
@@ -48,6 +49,7 @@ const Appointment = ({route, navigation}) => {
   const createAppointment = useCreateAppointment();
   const healthCareFacility = useHealthCareFacility(hcfId);
   const deleteAppointment = useDeleteAppointment();
+  const updateAppointment = useUpdateAppointment();
 
   // Returns the current Year, month and date as a string.
   const getYearMonthDate = () => {
@@ -90,6 +92,7 @@ const Appointment = ({route, navigation}) => {
       healthCareFacility.data.type,
       selectedDate.dateString,
       appointmentStatus,
+      false,
     );
 
     createAppointment.mutate(appointmentModel);
@@ -123,9 +126,9 @@ const Appointment = ({route, navigation}) => {
   const createAppointmentChannel = () => {
     PushNotification.createChannel(
       {
-        channelId: 'appointmentNotificationChannel',
-        channelName: 'Appointment Notification',
-        channelDescription: 'A channel for appointment notification',
+        channelId: 'appointmentReminderChannel',
+        channelName: 'Appointment Reminder',
+        channelDescription: 'A channel for appointment Reminder',
         playSound: true,
         soundName: 'default',
         importance: Importance.HIGH,
@@ -138,11 +141,17 @@ const Appointment = ({route, navigation}) => {
   const onReminderPressed = async () => {
     const isBatteryOptimizationEnabled =
       await RNDisableBatteryOptimizationsAndroid.isBatteryOptimizationEnabled();
+
     if (isBatteryOptimizationEnabled) {
       RNDisableBatteryOptimizationsAndroid.openBatteryModal();
     } else {
-      setIsNotificationOn(!isNotificationOn);
+      updateAppointment.mutate(appointment.data.id, {
+        reminderStatus: !appointment.data.reminderStatus,
+      });
+
+      setIsReminderOn(!isReminderOn);
     }
+    return;
   };
 
   const markedDates = () => {
@@ -171,7 +180,6 @@ const Appointment = ({route, navigation}) => {
     else if (appointment.data) {
       var selectedDateObj = {};
       const dat = new Date(appointment.data.dateTime);
-      console.log(dat);
       const appointmentDateString =
         dat.getFullYear().toString() +
         '-' +
@@ -184,8 +192,6 @@ const Appointment = ({route, navigation}) => {
           minimumIntegerDigits: 2,
           useGrouping: false,
         });
-
-      console.log(appointmentDateString);
 
       selectedDateObj[appointmentDateString] = {
         selected: true,
@@ -207,28 +213,32 @@ const Appointment = ({route, navigation}) => {
     }
   };
 
+  const setReminder = () => {
+    if (appointment.data) {
+      PushNotification.localNotificationSchedule({
+        channelId: 'appointmentReminderChannel',
+        // id: 'appointmentPushReminder',
+        title: 'Appointment reminder',
+        allowWhileIdle: false,
+        message:
+          'You have an appointment at 5 O"clock at' + appointment.data.name,
+        date: new Date(appointment.data.dateTime),
+        subText: 'Medxpert appointment reminder',
+        // bigPictureUrl: 'https://www.example.tld/picture.jpg',
+      });
+    }
+  };
+
+  // set appointment notificaiton
+  if (appointment.data) {
+    setReminder();
+  } else {
+    PushNotification.cancelAllLocalNotifications();
+  }
+
   useEffect(() => {
     createAppointmentChannel();
   }, []);
-
-  useEffect(() => {
-    if (isNotificationOn) {
-      PushNotification.localNotificationSchedule({
-        channelId: 'appointmentNotificationChannel',
-        // id: 'appointmentPushNotification',
-        title: 'Appointment',
-        allowWhileIdle: false,
-        message: 'You have an appointment at 5 O"clock at Zewditu Hospital',
-        date: new Date(Date.now() + 10 * 1000),
-        bigText:
-          'My big text that will be shown when notification is expanded. Styling can be done using HTML tags(see android docs for details)',
-        subText: 'This is a subText',
-        bigPictureUrl: 'https://www.example.tld/picture.jpg',
-      });
-    } else {
-      PushNotification.cancelAllLocalNotifications();
-    }
-  }, [isNotificationOn]);
 
   return (
     <View style={styles.container}>
@@ -360,18 +370,26 @@ const Appointment = ({route, navigation}) => {
                 fontColor={colors.primary}
               />
               {appointment.data && (
-                <View style={styles.notificationAndCancel}>
-                  {/* Show notification icon if an appointment is scheduled */}
+                <View style={styles.reminderAndCancel}>
+                  {/* Show Reminder icon if an appointment is scheduled */}
                   {appointment.data.status === 'scheduled' && (
                     <FontAwesome
-                      name={isNotificationOn ? 'bell' : 'bell-slash-o'}
-                      color={isNotificationOn ? colors.primary : colors.gray}
+                      name={
+                        appointment.data.reminderStatus
+                          ? 'bell'
+                          : 'bell-slash-o'
+                      }
+                      color={
+                        appointment.data.reminderStatus
+                          ? colors.primary
+                          : colors.gray
+                      }
                       size={20}
                       style={{marginRight: 15}}
                       onPress={() => {
-                        // setIsNotificationOn(!isNotificationOn);
+                        // setIsReminderOn(!isReminderOn);
                         onReminderPressed();
-                        // ... function to set notification to the appointment time
+                        // ... function to set Reminder to the appointment time
                       }}
                     />
                   )}
@@ -504,7 +522,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
   },
-  notificationAndCancel: {
+  reminderAndCancel: {
     flexDirection: 'row',
   },
 

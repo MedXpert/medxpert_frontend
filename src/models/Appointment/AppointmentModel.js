@@ -6,6 +6,7 @@ export class AppointmentModel {
     healthCareFacilityType,
     dateTime,
     status,
+    reminderStatus,
   ) {
     this.id = id;
     this.userId = userId;
@@ -13,6 +14,7 @@ export class AppointmentModel {
     this.healthCareFacilityType = healthCareFacilityType;
     this.dateTime = dateTime;
     this.status = status;
+    this.reminderStatus = reminderStatus;
   }
 
   getAppointment() {
@@ -23,6 +25,7 @@ export class AppointmentModel {
       healthCareFacilityType: this.healthCareFacilityType,
       dateTime: this.dateTime,
       status: this.status,
+      reminderStatus: this.reminderStatus,
     };
   }
 }

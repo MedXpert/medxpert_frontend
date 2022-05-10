@@ -91,9 +91,9 @@ window.server = createServer({
     this.patch('/appointments/:id', (schema, request) => {
       let newAttrs = JSON.parse(request.requestBody);
       let id = request.params.id;
-      let movie = schema.appointments.find(id);
+      let appointment = schema.appointments.find(id);
 
-      return movie.update(newAttrs);
+      return appointment.update(newAttrs);
     });
 
     this.delete('/appointments/:id', (schema, request) => {
@@ -122,6 +122,7 @@ window.server = createServer({
       healthCareFacilityType: 'Clinic',
       dateTime: new Date('2022-05-30'),
       status: 'scheduled',
+      reminderStatus: false,
     });
     server.create('appointment', {
       userId: 1,
@@ -129,6 +130,7 @@ window.server = createServer({
       healthCareFacilityType: 'Clinic',
       dateTime: new Date('2022-04-28T14:00'),
       status: 'scheduled',
+      reminderStatus: false,
     });
     server.create('appointment', {
       userId: 1,
@@ -136,6 +138,7 @@ window.server = createServer({
       healthCareFacilityType: 'Clinic',
       dateTime: new Date('2022-04-28T14:00'),
       status: 'scheduled',
+      reminderStatus: false,
     });
     server.create('appointment', {
       userId: 1,
@@ -143,6 +146,7 @@ window.server = createServer({
       healthCareFacilityType: 'Clinic',
       dateTime: new Date('2022-04-28T14:00'),
       status: 'scheduled',
+      reminderStatus: false,
     });
 
     server.create('healthCareFacility', {

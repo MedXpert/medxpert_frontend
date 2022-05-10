@@ -10,8 +10,6 @@ const useCreateAppointment = () => {
 
   return useMutation(createAppointment, {
     onSuccess: async () => {
-      const apps = await fetchAppointment('1');
-      console.log(apps);
       queryClient.invalidateQueries(['appointment']);
     },
   });
