@@ -1,7 +1,9 @@
 import axios from 'axios';
-const createAppointment = appointment => {
+import {fetchAppointments} from './fetchAppointment';
+const createAppointment = async appointment => {
   try {
-    return axios.post('/api/appointments', {...appointment});
+    const post = await axios.post('/api/appointments', appointment);
+    return post;
   } catch (error) {
     console.warn('create appointment => error: ', error);
   }

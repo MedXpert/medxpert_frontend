@@ -24,15 +24,17 @@ import {AppointmentModel} from '../../../models/Appointment';
 import {useHealthCareFacility} from '../../../hooks/healthCareFacility';
 import {create} from 'react-test-renderer';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {log} from 'react-native-reanimated';
 
 const Appointment = ({route, navigation}) => {
   // const [markedDates, setMarkedDates] = useState({});
   // const [availableDates, setAvailableDates] = useState([]);
   // const [YearMonthDateNow, setYearMonthDateNow] = useState('');
-  const [isAppointmentPending, setIsAppointmentPending] = useState(false);
-  const [isAppointmentScheduled, setIsAppointmentScheduled] = useState(false);
-  const [appointmentStatus, setAppointmentStatus] = useState('');
-  const [isReminderOn, setIsReminderOn] = useState(false);
+  // const [isAppointmentPending, setIsAppointmentPending] = useState(false);
+  // const [isAppointmentScheduled, setIsAppointmentScheduled] = useState(false);
+  // const [appointmentStatus, setAppointmentStatus] = useState('');
+  const [reminderOn, setReminderOn] = useState(false);
+
   const [selectedDate, setSelectedDate] = useState({});
 
   const [
@@ -79,7 +81,6 @@ const Appointment = ({route, navigation}) => {
   //Triggered when a day is pressed
   const onDayPress = day => {
     setSelectedDate(day);
-
     setScheduleAppointmentModalVisibility(true);
   };
 
@@ -91,11 +92,12 @@ const Appointment = ({route, navigation}) => {
       hcfId,
       healthCareFacility.data.type,
       selectedDate.dateString,
-      appointmentStatus,
+      'pending',
       false,
     );
 
-    createAppointment.mutate(appointmentModel);
+    // Add a new appointment
+    createAppointment.mutate({...appointmentModel});
   };
 
   const sendAppointmentCancel = day => {
@@ -105,10 +107,7 @@ const Appointment = ({route, navigation}) => {
   //When Yes button in the schedule appointment modal is pressed
   const onModalScheduleYesPressed = () => {
     //send appointment request to the health facility
-    setAppointmentStatus('pending');
-
     sendAppointmentRequest();
-
     setScheduleAppointmentModalVisibility(false);
   };
 
@@ -145,14 +144,38 @@ const Appointment = ({route, navigation}) => {
     if (isBatteryOptimizationEnabled) {
       RNDisableBatteryOptimizationsAndroid.openBatteryModal();
     } else {
-      updateAppointment.mutate(appointment.data.id, {
+      updateAppointment.mutate({
+        id: appointment.data.id,
         reminderStatus: !appointment.data.reminderStatus,
       });
-
-      setIsReminderOn(!isReminderOn);
     }
     return;
   };
+
+  const setReminder = () => {
+    if (appointment.data) {
+      PushNotification.localNotificationSchedule({
+        channelId: 'appointmentReminderChannel',
+        // id: 'appointmentPushReminder',
+        title: 'Appointment reminder',
+        allowWhileIdle: false,
+        message:
+          'You have an appointment at 5 O"clock at' + appointment.data.name,
+        date: new Date(appointment.data.dateTime),
+        subText: 'Medxpert appointment reminder',
+        // bigPictureUrl: 'https://www.example.tld/picture.jpg',
+      });
+    }
+  };
+
+  // set appointment notification
+  if (appointment.data) {
+    if (appointment.data.reminderStatus) {
+      setReminder();
+    } else {
+      PushNotification.cancelAllLocalNotifications();
+    }
+  }
 
   const markedDates = () => {
     var avDatesCurrDateObj = {}; // available dates and current date object
@@ -212,29 +235,6 @@ const Appointment = ({route, navigation}) => {
       return selectedDateObj; //return selectedDateObj if there is an appointment [scheduled / pending]
     }
   };
-
-  const setReminder = () => {
-    if (appointment.data) {
-      PushNotification.localNotificationSchedule({
-        channelId: 'appointmentReminderChannel',
-        // id: 'appointmentPushReminder',
-        title: 'Appointment reminder',
-        allowWhileIdle: false,
-        message:
-          'You have an appointment at 5 O"clock at' + appointment.data.name,
-        date: new Date(appointment.data.dateTime),
-        subText: 'Medxpert appointment reminder',
-        // bigPictureUrl: 'https://www.example.tld/picture.jpg',
-      });
-    }
-  };
-
-  // set appointment notificaiton
-  if (appointment.data) {
-    setReminder();
-  } else {
-    PushNotification.cancelAllLocalNotifications();
-  }
 
   useEffect(() => {
     createAppointmentChannel();
@@ -373,25 +373,34 @@ const Appointment = ({route, navigation}) => {
                 <View style={styles.reminderAndCancel}>
                   {/* Show Reminder icon if an appointment is scheduled */}
                   {appointment.data.status === 'scheduled' && (
-                    <FontAwesome
-                      name={
-                        appointment.data.reminderStatus
-                          ? 'bell'
-                          : 'bell-slash-o'
-                      }
-                      color={
-                        appointment.data.reminderStatus
-                          ? colors.primary
-                          : colors.gray
-                      }
-                      size={20}
-                      style={{marginRight: 15}}
-                      onPress={() => {
-                        // setIsReminderOn(!isReminderOn);
-                        onReminderPressed();
-                        // ... function to set Reminder to the appointment time
-                      }}
-                    />
+                    <>
+                      <ActivityIndicator
+                        animating={
+                          updateAppointment.isLoading ||
+                          appointment.isRefetching
+                        }
+                        style={{marginRight: 15}}
+                      />
+
+                      {!updateAppointment.isLoading &&
+                        !appointment.isRefetching && (
+                          <FontAwesome
+                            name={
+                              appointment.data.reminderStatus
+                                ? 'bell'
+                                : 'bell-slash-o'
+                            }
+                            color={
+                              appointment.data.reminderStatus
+                                ? colors.primary
+                                : colors.gray
+                            }
+                            size={20}
+                            style={{marginRight: 15}}
+                            onPress={onReminderPressed}
+                          />
+                        )}
+                    </>
                   )}
 
                   {/*Cancel button is shown in 'Your appointment' section if an

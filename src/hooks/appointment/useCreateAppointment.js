@@ -1,15 +1,11 @@
 import {useMutation, useQueryClient} from 'react-query';
-import {
-  createAppointment,
-  fetchAppointment,
-  fetchAppointments,
-} from '../../services/api/appointment';
+import {createAppointment} from '../../services/api/appointment';
 
 const useCreateAppointment = () => {
-  const queryClient = useQueryClient();
+  const queryClient = new useQueryClient();
 
   return useMutation(createAppointment, {
-    onSuccess: async () => {
+    onSuccess: () => {
       queryClient.invalidateQueries(['appointment']);
     },
   });

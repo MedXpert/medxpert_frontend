@@ -116,14 +116,14 @@ window.server = createServer({
   },
 
   seeds(server) {
-    server.create('appointment', {
-      userId: 1,
-      healthCareFacilityID: 1,
-      healthCareFacilityType: 'Clinic',
-      dateTime: new Date('2022-05-30'),
-      status: 'scheduled',
-      reminderStatus: false,
-    });
+    // server.create('appointment', {
+    //   userId: 1,
+    //   healthCareFacilityID: 1,
+    //   healthCareFacilityType: 'Clinic',
+    //   dateTime: new Date('2022-05-30'),
+    //   status: 'scheduled',
+    //   reminderStatus: false,
+    // });
     server.create('appointment', {
       userId: 1,
       healthCareFacilityID: 2,
