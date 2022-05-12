@@ -14,7 +14,7 @@ const useDeleteAppointment = () => {
     },
     {
       onSuccess: () => {
-        queryClient.invalidateQueries(['appointments']);
+        queryClient.invalidateQueries(['appointment']);
       },
     },
   );

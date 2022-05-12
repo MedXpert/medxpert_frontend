@@ -109,6 +109,7 @@ const Appointment = ({route, navigation}) => {
     //send appointment request to the health facility
     sendAppointmentRequest();
     setScheduleAppointmentModalVisibility(false);
+    appointment.refetch();
   };
 
   const onModalCancelYesPressed = () => {
