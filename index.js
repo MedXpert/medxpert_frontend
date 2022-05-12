@@ -8,7 +8,6 @@ import MapboxGL, {Logger} from '@rnmapbox/maps';
 import App from './App';
 import {name as appName} from './app.json';
 import PushNotification from 'react-native-push-notification';
-import './src/services/mirageServer';
 
 MapboxGL.setAccessToken(
   'sk.eyJ1IjoibGl5dW1rIiwiYSI6ImNsMWtteG11NzAyZWgzZG9kOWpyb2x1dWMifQ.X4v8HxdCSmdrvVaCWXVjog',
@@ -31,7 +30,9 @@ Logger.setLogCallback(log => {
 });
 
 PushNotification.configure({
-  onNotification: function (notification) {},
+  onNotification: function (notification) {
+    console.log('NOTIFICATION:', notification);
+  },
   requestPermissions: Platform.OS === 'ios',
 });
 
