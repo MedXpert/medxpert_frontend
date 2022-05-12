@@ -36,7 +36,7 @@ import {white} from 'react-native-paper/lib/typescript/styles/colors';
 const dimensionHeight = Dimensions.get('window').height;
 const dimensionWidth = Dimensions.get('window').width;
 
-const Home = ({navigation}) => {
+const Ambulance = ({navigation}) => {
   var _map;
   var _camera;
   var bsRef = useRef();
@@ -320,13 +320,7 @@ const Home = ({navigation}) => {
 
       {/* Bottom View  */}
       <View style={styles.bottomView}>
-        <View
-          style={{
-            flex: 1,
-            alignItems: 'center',
-            justifyContent: 'center',
-            paddingVertical: 20,
-          }}>
+        <View style={styles.bottomButtonContainer}>
           {/* trinary condition () ? true : false */}
           {ambulanceCalled ? (
             // Display if ambulance called
@@ -353,38 +347,21 @@ const Home = ({navigation}) => {
           )}
         </View>
         {ambulanceCalled && (
-          <View
-            style={{
-              backgroundColor: Colors.whiteSmoke,
-              flex: 1,
-              flexDirection: 'row',
-              height: 120,
-              borderTopLeftRadius: 25,
-              borderTopRightRadius: 25,
-              paddingVertical: 20,
-              paddingHorizontal: 25,
-            }}>
-            <View
-              style={{
-                height: 80,
-                width: 80,
-                backgroundColor: Colors.primary,
-                borderRadius: 100,
-                marginRight: 20,
-              }}>
+          <View style={styles.driveDetailsContainer}>
+            <View style={styles.driverImageContainer}>
               <Image
-                style={{height: 80, width: 80, borderRadius: 100}}
+                style={styles.driverImage}
                 source={{
                   uri: 'https://images.unsplash.com/photo-1633332755192-727a05c4013d?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=580&q=80',
                 }}
               />
             </View>
-            <View style={{flex: 1, flexDirection: 'column', paddingTop: 10}}>
-              <CustomText
+            <View style={styles.driveDescription}>
+              <CustomTextce
                 content="Driver Name"
                 fontSize={20}
                 fontWeight="bold"
-                customStyles={{paddingBottom: 3}}
+                customStyles={styles.nameGap}
               />
               <CustomText
                 content="+251 960021405"
@@ -462,6 +439,40 @@ const styles = StyleSheet.create({
     bottom: 35,
     width: Dimensions.get('window').width,
   },
+  bottomButtonContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 20,
+  },
+  driveDetailsContainer: {
+    backgroundColor: Colors.whiteSmoke,
+    flex: 1,
+    flexDirection: 'row',
+    height: 120,
+    borderTopLeftRadius: 25,
+    borderTopRightRadius: 25,
+    paddingVertical: 20,
+    paddingHorizontal: 25,
+  },
+  driverImageContainer: {
+    height: 80,
+    width: 80,
+    backgroundColor: Colors.primary,
+    borderRadius: 100,
+    marginRight: 20,
+  },
+  driverImage: {
+    height: 80,
+    width: 80,
+    borderRadius: 100,
+  },
+  driveDescription: {
+    flex: 1,
+    flexDirection: 'column',
+    paddingTop: 10,
+  },
+  nameGap: {paddingBottom: 3},
 });
 
-export default Home;
+export default Ambulance;
