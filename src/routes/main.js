@@ -9,6 +9,11 @@ import BottomNavBar from './BottomNavBar';
 import DetailScreen from '../screens/main/Home/Details';
 import NavbarWithSubScreens from './NavbarWithSubScreens';
 import Appointment from '../screens/main/Home/Appointment';
+
+// AsyncStorage to store user ID and other infos after logged in
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {readAsyncStorage} from '../services/readAsyncStorage';
+
 // The main route that evaluates whether the user is logged in or not and decides where to navigate when the app starts.
 const Main = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(true); // User state value from the cache
@@ -24,6 +29,16 @@ const Main = () => {
     } else if (!openingForTheFirstTime && !isLoggedIn) {
       return <AuthStackScreen initialRoute={'Login'} />;
     } else if (isLoggedIn) {
+      // Temporarily used to store static user id
+      const storeData = async () => {
+        try {
+          await AsyncStorage.setItem('@userId', '1');
+        } catch (e) {
+          // saving error
+          console.warn('userId store error:  ', e);
+        }
+      };
+      storeData();
       return <NavbarWithSubScreens />;
     }
   }; // return stacks according to the state of the user.

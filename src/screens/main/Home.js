@@ -28,6 +28,7 @@ import {PermissionModal} from '../../components/permissions/PermissionModal';
 import {IconButton} from 'react-native-paper';
 import {MapTypeModal} from '../../components/home/MapTypeModal';
 import {BottomSheetContent} from '../../components/home/BottomSheetContent';
+import {useHealthCareFacilities} from '../../hooks/healthCareFacility';
 
 import {requestPermissions} from '../../services/permissions/requestPermissions';
 import {LOCATION_PERMISSION_MESSAGE} from '../../constants/string/requestPermissions/requestPermissions';
