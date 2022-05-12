@@ -31,6 +31,7 @@ import {BottomSheetContent} from '../../../components/home/BottomSheetContent';
 
 import {requestPermissions} from '../../../services/permissions/requestPermissions';
 import {LOCATION_PERMISSION_MESSAGE} from '../../../constants/string/requestPermissions/requestPermissions';
+import {white} from 'react-native-paper/lib/typescript/styles/colors';
 
 const dimensionHeight = Dimensions.get('window').height;
 const dimensionWidth = Dimensions.get('window').width;
@@ -57,7 +58,7 @@ const Home = ({navigation}) => {
   const [locationFromMapboxLng, setLocationFromMapboxLng] = useState(); // User's current position tracked from the mapboxGL userLocation - Longitude
   const [locationFromMapboxLat, setLocationFromMapboxLat] = useState(); // User's current position tracked from the mapboxGL userLocation - Latitude
   const [mapTypeVisibility, setMapTypeVisibility] = useState(false); // MapType modal visibility
-  const startValueMoveY = useRef(new Animated.Value(0)).current; // Initial value of move Y animated for the location
+  const startValueMoveY = 0; // Initial value of move Y animated for the location
 
   // turn on and off when ambulance is called
   const [ambulanceCalled, setAmbulanceCalled] = useState(false);
@@ -146,15 +147,6 @@ const Home = ({navigation}) => {
       duration: duration,
       useNativeDriver: true,
     }).start();
-  };
-
-  // Tracks the index of BottomSheet
-  const onSheetChange = index => {
-    if (index === 1) {
-      animatedMove(0, 50);
-    } else if (index === 0) {
-      animatedMove(220, 50);
-    }
   };
 
   useEffect(() => {
@@ -277,15 +269,20 @@ const Home = ({navigation}) => {
         </MapboxGL.MapView>
       </View>
 
-      {/* SearchBar */}
-      <View style={styles.statusBarContainer}>
-        {/* Display arriving status  */}
-        <View style={styles.statusBar}>
-          <Text style={{color: Colors.primary, fontSize: 18, fontWeight: 'bold'}}>
-            Ambulance Arriving in 2 seconds
-          </Text>
+      {/* status bar display only when ambulance is called */}
+      {ambulanceCalled && (
+        <View style={styles.statusBarContainer}>
+          {/* Display arriving status  */}
+          <View style={styles.statusBar}>
+            <CustomText
+              content="Ambulance Arriving in 2 seconds"
+              fontWeight="bold"
+              fontColor={Colors.primary}
+              fontSize={18}
+            />
+          </View>
         </View>
-      </View>
+      )}
 
       {/* Get location button */}
       <Animated.View
@@ -321,15 +318,83 @@ const Home = ({navigation}) => {
         />
       </View>
 
-      {/* Bottom Sheet  */}
-      <BottomSheet
-        enableContentPanningGesture={false}
-        index={1}
-        onChange={onSheetChange}
-        ref={bsRef}
-        snapPoints={['7%', '35%', '100%']}>
-        <BottomSheetContent navigation={navigation} />
-      </BottomSheet>
+      {/* Bottom View  */}
+      <View style={styles.bottomView}>
+        <View
+          style={{
+            flex: 1,
+            alignItems: 'center',
+            justifyContent: 'center',
+            paddingVertical: 20,
+          }}>
+          {/* trinary condition () ? true : false */}
+          {ambulanceCalled ? (
+            // Display if ambulance called
+            <CustomButton
+              onPress={e => {
+                setAmbulanceCalled(false);
+              }}
+              width={Dimensions.get('window').width - 50}
+              backgroundColor={Colors.red}
+              fontColor={Colors.white}
+              title="Cancel Ambulance"
+            />
+          ) : (
+            // Display if ambulance not called
+            <CustomButton
+              onPress={e => {
+                setAmbulanceCalled(true);
+              }}
+              width={Dimensions.get('window').width - 50}
+              backgroundColor={Colors.primary}
+              fontColor={Colors.white}
+              title="Call Ambulance"
+            />
+          )}
+        </View>
+        {ambulanceCalled && (
+          <View
+            style={{
+              backgroundColor: Colors.whiteSmoke,
+              flex: 1,
+              flexDirection: 'row',
+              height: 120,
+              borderTopLeftRadius: 25,
+              borderTopRightRadius: 25,
+              paddingVertical: 20,
+              paddingHorizontal: 25,
+            }}>
+            <View
+              style={{
+                height: 80,
+                width: 80,
+                backgroundColor: Colors.primary,
+                borderRadius: 100,
+                marginRight: 20,
+              }}>
+              <Image
+                style={{height: 80, width: 80, borderRadius: 100}}
+                source={{
+                  uri: 'https://images.unsplash.com/photo-1633332755192-727a05c4013d?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=580&q=80',
+                }}
+              />
+            </View>
+            <View style={{flex: 1, flexDirection: 'column', paddingTop: 10}}>
+              <CustomText
+                content="Driver Name"
+                fontSize={20}
+                fontWeight="bold"
+                customStyles={{paddingBottom: 3}}
+              />
+              <CustomText
+                content="+251 960021405"
+                fontSize={16}
+                fontColor={Colors.gray}
+              />
+            </View>
+          </View>
+        )}
+      </View>
     </View>
   );
 };
@@ -363,7 +428,7 @@ const styles = StyleSheet.create({
   locationButtonContainer: {
     backgroundColor: Colors.primary,
     position: 'absolute',
-    bottom: 310,
+    bottom: 240,
     right: 10,
     borderRadius: 50,
   },
@@ -389,6 +454,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     elevation: 3,
     paddingVertical: 20,
+    width: Dimensions.get('window').width,
+  },
+
+  bottomView: {
+    position: 'absolute',
+    bottom: 35,
     width: Dimensions.get('window').width,
   },
 });
