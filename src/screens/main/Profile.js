@@ -135,5 +135,16 @@ const style = StyleSheet.create({
     height: '100%',
     borderRadius: 100,
   },
+  editProfilePicture: {
+    position: 'absolute',
+    bottom: 0,
+    right: 0,
+    backgroundColor: colors.white,
+    padding: 10,
+    borderRadius: 100,
+    shadowColor: colors.gray,
+    elevation: 3,
+  },
+  
 
 })
