@@ -98,15 +98,23 @@ const Profile = ()=>{
         />
       </View>
 
-
-
-
-
-
-
-
-
     </View>
-  )
+  );
+};
 
-}
+const style = StyleSheet.create({
+  changePassword:{
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    padding: 20,
+  },
+  changePasswordButton:{
+    fontWeight: 'bold',
+    borderRadius: 20,
+    shadowColor: Colors.gray,
+    elevation: 3,
+  },
+
+
+})
