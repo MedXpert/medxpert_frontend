@@ -15,7 +15,16 @@ const Profile = ()=>{
     control,
     handleSubmit,
     formState: {errors},
-  }=
+  } = useForm({
+    defaultValues: {
+      fullName: user.firstName + ' ' + user.lastName,
+      email: user.email,
+      phone: user.phone,
+      username: user.username,
+      sex: user.sex,
+      address: user.address,
+    },
+  });
 
 
 }
