@@ -25,6 +25,52 @@ const Profile = ()=>{
       address: user.address,
     },
   });
+  const onSubmit = data => console.log(data);
+  return(
+    <View>
+      <View style={StyleSheet.changePassword}>
+      <CustomButton
+          title="Change password"
+          backgroundColor={Colors.white}
+          fontColor={Colors.dark}
+          width={165}
+          customStyle={styles.changePasswordButton}
+          fontSize={14}
+          fontWeight="bold"
+          height={35}
+        />
+      </View>
 
+      {/* Profile picture with edit button */}
+      <View style={styles.profilePictureWithEdit}>
+        {/* profile picture here */}
+        <View style={styles.profilePictureBorder}>
+          <Image
+            source={{uri: user.profilePicture}}
+            style={styles.profilePicture}
+          />
+          {/* image icon for changing profile */}
+          <View style={styles.editProfilePicture}>
+            <Pressable
+              onPress={() => {
+                console.log('clicked');
+              }}>
+              <IconAnt name="camera" size={25} color={Colors.lightGray} />
+            </Pressable>
+          </View>
+        </View>
+      </View>
+
+
+
+
+
+
+
+
+
+
+    </View>
+  )
 
 }
