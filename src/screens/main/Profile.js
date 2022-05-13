@@ -115,6 +115,25 @@ const style = StyleSheet.create({
     shadowColor: Colors.gray,
     elevation: 3,
   },
-
+  profilePictureWithEdit: {
+    flexDirection: 'row',
+    paddingTop: 40,
+    alignContent: 'center',
+    justifyContent: 'center',
+  },
+  profilePictureBorder: {
+    width: 125,
+    height: 125,
+    padding: 10,
+    borderRadius: 100,
+    backgroundColor: colors.white,
+    shadowColor: colors.gray,
+    elevation: 3,
+  },
+  profilePicture: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 100,
+  },
 
 })
