@@ -40,4 +40,21 @@ const CustomTextInputValidation = ({
         </View>
     );
 };
-    
+
+const styles = StyleSheet.create({
+    container: {marginBottom: 10},
+    textInput: {
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      backgroundColor: Colors.white,
+      borderRadius: 10,
+      flexDirection: 'row',
+      height: 60,
+      color: Colors.gray,
+      fontSize: 18,
+      paddingHorizontal: 15,
+    },
+  });
+  
+  export {CustomTextInputValidation};
+  
