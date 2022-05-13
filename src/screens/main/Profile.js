@@ -60,7 +60,43 @@ const Profile = ()=>{
           </View>
         </View>
       </View>
-
+      {/* name */}
+      <View style={styles.fullName}>
+        <CustomText
+          content={user.firstName + ' ' + user.lastName}
+          fontSize={25}
+          fontColor={Colors.black}
+        />
+      </View>
+ {/* form here */}
+ <View style={styles.form}>
+        <CustomTextInputValidation
+          label="Full Name"
+          control={control}
+          name="fullName"
+        />
+        <CustomTextInputValidation
+          label="Email"
+          control={control}
+          name="email"
+        />
+        <CustomTextInputValidation
+          label="Phone"
+          control={control}
+          name="phone"
+        />
+        <CustomTextInputValidation
+          label="Username"
+          control={control}
+          name="username"
+        />
+        <CustomButton
+          customStyle={{marginTop: 10}}
+          title="Update Profile"
+          width="100%"
+          onPress={handleSubmit(onSubmit)}
+        />
+      </View>
 
 
 
