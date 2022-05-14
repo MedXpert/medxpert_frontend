@@ -21,7 +21,9 @@ const EmailItem = ({email}) => {
         name={'cancel'}
         color={colors.red}
         size={25}
-        onPress={() => {}}
+        onPress={() => {
+          null;
+        }}
       />
     </View>
   );
