@@ -5,20 +5,20 @@ import {CustomText} from '../../general/CustomText';
 import colors from '../../../constants/colors';
 
 const ToggleAutomation = ({text}) => {
-  const [smsToggle, setSmsToggle] = useState(false);
+  const [toggle, setToggle] = useState(false);
 
   const onSmsToggleChange = () => {
-    setSmsToggle(currentVal => !currentVal);
+    setToggle(currentVal => !currentVal);
   };
 
   return (
-    <View style={styles.smsToggle}>
+    <View style={styles.toggle}>
       <CustomText content={text} fontSize={18} />
       <Switch
         trackColor={{false: colors.lightGray, true: colors.primary}}
-        thumbColor={smsToggle ? colors.secondary : colors.gray}
+        thumbColor={toggle ? colors.secondary : colors.gray}
         onValueChange={onSmsToggleChange}
-        value={smsToggle}
+        value={toggle}
         style={{width: '50%'}}
       />
     </View>
@@ -26,7 +26,7 @@ const ToggleAutomation = ({text}) => {
 };
 
 const styles = StyleSheet.create({
-  smsToggle: {
+  toggle: {
     height: 60,
     marginTop: 10,
     backgroundColor: colors.white,
@@ -38,4 +38,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ToggleAutomation;
+export {ToggleAutomation};

@@ -9,7 +9,7 @@ import BottomNavBar from './BottomNavBar';
 import DetailScreen from '../screens/main/Home/Details';
 import NavbarWithSubScreens from './NavbarWithSubScreens';
 import Appointment from '../screens/main/Home/Appointment';
-import AutomationPhone from '../screens/main/Emergency/AutomationPhone';
+import AutomationEmail from '../screens/main/Emergency/AutomationEmail';
 
 // AsyncStorage to store user ID and other infos after logged in
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -40,7 +40,7 @@ const Main = () => {
         }
       };
       storeData();
-      return <AutomationPhone />;
+      return <AutomationEmail />;
     }
   }; // return stacks according to the state of the user.
 

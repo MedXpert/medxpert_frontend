@@ -47,4 +47,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default PhoneNumber;
+export {PhoneNumber};
