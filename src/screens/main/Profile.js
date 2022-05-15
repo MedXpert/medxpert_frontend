@@ -93,10 +93,11 @@ const Profile = () => {
         <CustomButton
           customStyle={{marginTop: 10}}
           title="Update Profile"
-          width="100%"
+          width='100%'
           onPress={handleSubmit(onSubmit)}
         />
       </View>
+
 
 
 
