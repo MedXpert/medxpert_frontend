@@ -60,11 +60,18 @@ const Profile = () => {
           </View>
         </View>
       </View>
+      {/* name */}
+      <View style={styles.fullName}>
+        <CustomText
+          content={user.firstName + ' ' + user.lastName}
+          fontSize={25}
+          fontColor={Colors.black}
+        />
 
 
 
 
-      
+
     </View>
   );
 };
