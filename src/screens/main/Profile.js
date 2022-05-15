@@ -112,4 +112,22 @@ const styles = StyleSheet.create({
     flex: 1,
   },
 });
+
+const styles = StyleSheet.create({
+  changePassword: {
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    padding: 20,
+  },
+  changePasswordButton: {
+    fontWeight: 'bold',
+    borderRadius: 20,
+    shadowColor: Colors.gray,
+    elevation: 3,
+  },
+
+
+
+
 export default Profile;
