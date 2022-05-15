@@ -41,22 +41,25 @@ const Profile = () => {
         />
       </View>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+      {/* profile picture with edit button */}
+      <View style={styles.profilePictureWithEdit}>
+        {/* profile picture here */}
+        <View style={styles.profilePictureBorder}>
+          <Image
+            source={{uri: user.profilePicture}}
+            style={styles.profilePicture}
+          />
+          {/* image icon for changing profile */}
+          <View style={styles.editProfilePicture}>
+            <Pressable
+              onPress={() => {
+                console.log('clicked');
+              }}>
+              <IconAnt name="camera" size={25} color={Colors.lightGray} />
+            </Pressable>
+          </View>
+        </View>
+      </View>
 
 
 
