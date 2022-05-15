@@ -13,4 +13,29 @@ const CustomTextInputValidation = ({
     name = isRequired(),
     customStyles = {},
   }) => {
-  
+    return (
+        <View style={styles.container}>
+          {label && (
+            <CustomText
+              content={label}
+              fontColor={Colors.lightGray}
+              fontSize={16}
+            />
+          )}
+          <Controller
+            control={control}
+            rules={rules}
+            render={({field: {onChange, onBlur, value}}) => (
+              <TextInput
+                onBlur={onBlur}
+                onChangeText={onChange}
+                value={value}
+                style={[styles.textInput, customStyles]}
+              />
+            )}
+            name={name}
+          />
+        </View>
+      );
+    };
+      
