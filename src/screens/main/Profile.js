@@ -10,7 +10,6 @@ import colors from '../../constants/colors';
 import {useForm} from 'react-hook-form';
 
 const Profile = () => {
-
   const {
     control,
     handleSubmit,
@@ -28,9 +27,42 @@ const Profile = () => {
   const onSubmit = data => console.log(data);
 
   return (
-    
-  
-    
+    <View>
+      <View style={styles.changePassword}>
+        <CustomButton
+          title="Change password"
+          backgroundColor={Colors.white}
+          fontColor={Colors.dark}
+          width={165}
+          customStyle={styles.changePasswordButton}
+          fontSize={14}
+          fontWeight="bold"
+          height={35}
+        />
+      </View>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      
+    </View>
   );
 };
 
