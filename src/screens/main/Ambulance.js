@@ -14,24 +14,16 @@ import React, {useState, useEffect, useCallback, useRef, useMemo} from 'react';
 import MapboxGL from '@rnmapbox/maps';
 import {PERMISSIONS, RESULTS, openSettings} from 'react-native-permissions';
 import Geolocation from 'react-native-geolocation-service';
-import {onChange} from 'react-native-reanimated';
-import BottomSheet from '@gorhom/bottom-sheet';
 
-import IconA from 'react-native-vector-icons/AntDesign';
-import IconM from 'react-native-vector-icons/MaterialCommunityIcons';
-
-import {SearchBar} from '../../../components/general/SearchBar';
-import Colors from '../../../constants/colors';
-import {CustomButton} from '../../../components/general/CustomButton';
-import {CustomText} from '../../../components/general/CustomText';
-import {PermissionModal} from '../../../components/permissions/PermissionModal';
+import Colors from '../../constants/colors';
+import {CustomButton} from '../../components/general/CustomButton';
+import {CustomText} from '../../components/general/CustomText';
+import {PermissionModal} from '../../components/permissions/PermissionModal';
 import {IconButton} from 'react-native-paper';
-import {MapTypeModal} from '../../../components/home/MapTypeModal';
-import {BottomSheetContent} from '../../../components/home/BottomSheetContent';
+import {MapTypeModal} from '../../components/home/MapTypeModal';
 
-import {requestPermissions} from '../../../services/permissions/requestPermissions';
-import {LOCATION_PERMISSION_MESSAGE} from '../../../constants/string/requestPermissions/requestPermissions';
-import {white} from 'react-native-paper/lib/typescript/styles/colors';
+import {requestPermissions} from '../../services/permissions/requestPermissions';
+import {LOCATION_PERMISSION_MESSAGE} from '../../constants/string/requestPermissions/requestPermissions';
 
 const dimensionHeight = Dimensions.get('window').height;
 const dimensionWidth = Dimensions.get('window').width;
@@ -58,10 +50,12 @@ const Ambulance = ({navigation}) => {
   const [locationFromMapboxLng, setLocationFromMapboxLng] = useState(); // User's current position tracked from the mapboxGL userLocation - Longitude
   const [locationFromMapboxLat, setLocationFromMapboxLat] = useState(); // User's current position tracked from the mapboxGL userLocation - Latitude
   const [mapTypeVisibility, setMapTypeVisibility] = useState(false); // MapType modal visibility
-  const startValueMoveY = 0; // Initial value of move Y animated for the location
+  const startValueMoveY = useRef(new Animated.Value(0)).current; // Initial value of move Y animated for the location
+  // const [driverNameVisibility, setDriverNameVisibility] = useState(false);
 
   // turn on and off when ambulance is called
   const [ambulanceCalled, setAmbulanceCalled] = useState(false);
+
   // Exit the app and go to settings. This function is called when the 'Go to settings' button in the permission denied modal is pressed.
   const settings = () => {
     BackHandler.exitApp();
@@ -149,6 +143,17 @@ const Ambulance = ({navigation}) => {
     }).start();
   };
 
+  const onDriverNamePositionChange = ambuCalled => {
+    if (ambuCalled) {
+      animatedMove(-10, 50);
+    } else if (!ambuCalled) {
+      animatedMove(90, 50);
+    }
+  };
+
+  useEffect(() => {
+    onDriverNamePositionChange(ambulanceCalled);
+  });
   useEffect(() => {
     // Call 'checkPermission' every time something in the function is changed.
     checkPermission();
@@ -236,7 +241,7 @@ const Ambulance = ({navigation}) => {
           // ref={c => (_map = c)}
           ref={c => (_map = c)}
           logoEnabled={false}
-          compassViewMargins={{x: 10, y: (40 * dimensionHeight) / 100}}
+          compassViewMargins={{x: 10, y: (23 * dimensionHeight) / 100}}
           style={styles.map}
           surfaceView>
           {/* Display user location */}
@@ -245,10 +250,6 @@ const Ambulance = ({navigation}) => {
             <>
               <MapboxGL.Camera
                 zoomLevel={15}
-                // animationDuration={4000}
-                // followUserLevel={15}
-                // followUserLocation={followUserLocation}
-                // animationMode={'flyTo'}
                 centerCoordinate={[userPositionLng, userPositionLat]}
               />
               <MapboxGL.UserLocation
@@ -260,10 +261,6 @@ const Ambulance = ({navigation}) => {
           <MapboxGL.Camera
             ref={c => (_camera = c)}
             zoomLevel={15}
-            // animationMode={'flyTo'}
-            // animationDuration={4000}
-            // followZoomLevel={15}
-            // followUserLocation={followUserLocation}
             centerCoordinate={[userPositionLng, userPositionLat]}
           />
         </MapboxGL.MapView>
@@ -357,7 +354,7 @@ const Ambulance = ({navigation}) => {
               />
             </View>
             <View style={styles.driveDescription}>
-              <CustomTextce
+              <CustomText
                 content="Driver Name"
                 fontSize={20}
                 fontWeight="bold"
@@ -396,7 +393,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.primary,
     borderRadius: 50,
     position: 'absolute',
-    top: (15 * dimensionHeight) / 100,
+    top: (5 * dimensionHeight) / 100,
     right: 10,
   },
   mapIcon: {
