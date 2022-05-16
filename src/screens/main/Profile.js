@@ -97,21 +97,9 @@ const Profile = () => {
           onPress={handleSubmit(onSubmit)}
         />
       </View>
-
-
-
-
-
-
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-});
 
 const styles = StyleSheet.create({
   changePassword: {
@@ -169,7 +157,17 @@ const styles = StyleSheet.create({
   },
 });
 
+const user = {
+  firstName:"Naod",
+  lastName:'Dame',
+  email:'naol@gmail.com',
+  phone:'9147854968',
+  username:'Naodo',
+  sex:'M',
+  address:'some place, some city, some country',
+  profilePicture:
+  'https://images.unsplash.com/photo-1633332755192-727a05c4013d?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=580&q=80',
 
-
+};
 
 export default Profile;
