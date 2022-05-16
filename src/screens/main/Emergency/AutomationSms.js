@@ -6,12 +6,15 @@ import {CustomText} from '../../../components/general/CustomText';
 import colors from '../../../constants/colors';
 import {ToggleAutomation} from '../../../components/emergency/ToggleAutomation/ToggleAutomation';
 import {PhoneNumber} from '../../../components/emergency/PhoneNumber/PhoneNumber';
+import {AddEmergencyContactModal} from '../../../components/emergency/AppEmerencyContactModal/AddEmergencyContactModal';
 
 import IconFontAwesome from 'react-native-vector-icons/FontAwesome';
 import IconEntypo from 'react-native-vector-icons/Entypo';
 import IconMaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
 const AutomationSms = ({navigation}) => {
+  const [modalVisibility, setModalVisibility] = useState(false);
+
   return (
     <View style={styles.container}>
       <View style={{marginLeft: -10}}>
@@ -23,6 +26,20 @@ const AutomationSms = ({navigation}) => {
       </View>
       {/* SMS toggle section */}
       <ToggleAutomation text={'SMS'} elevation={1} />
+
+      <AddEmergencyContactModal
+        modalText={
+          'Please enter a phone number to add it to emergency contacts list.'
+        }
+        modalVisible={modalVisibility}
+        onRequestClose={() => {}}
+        onPressLeftButton={() => {
+          setModalVisibility(false);
+        }}
+        onPressRightButton={() => {}}
+        placeholder={'Phone number'}
+      />
+
       {/* phone numbers section */}
       <View style={styles.phoneNumbersContainer}>
         {/* add phone number */}
@@ -34,6 +51,9 @@ const AutomationSms = ({navigation}) => {
             color={colors.primary}
             size={30}
             style={styles.phonePlusIcon}
+            onPress={() => {
+              setModalVisibility(true);
+            }}
           />
         </View>
         {/* List of added phone numbers */}
@@ -67,7 +87,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.secondary,
     padding: 10,
-    paddingHorizontal: 20,
+    paddingHorizontal: 15,
   },
 
   phoneNumbersContainer: {

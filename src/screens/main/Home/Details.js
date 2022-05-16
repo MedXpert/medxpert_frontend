@@ -107,8 +107,7 @@ const Details = ({route, navigation}) => {
             <View style={styles.backButton}>
               <BackButton
                 backgroundColor={Colors.primary}
-                height={40}
-                width={40}
+                size={40}
                 onPress={() => {
                   navigation.goBack();
                 }}

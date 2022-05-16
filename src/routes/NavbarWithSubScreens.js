@@ -14,9 +14,9 @@ const NavbarWithSubScreens = () => {
   const config = {
     headerShown: false,
   };
-  const appointmentConfig = {
-    headerShown: true,
-  };
+  // const appointmentConfig = {
+  //   headerShown: true,
+  // };
   return (
     <TabAndSubsStack.Navigator screenOptions={config}>
       <TabAndSubsStack.Screen name="BottomNavBar" component={BottomNavBar} />
@@ -24,7 +24,7 @@ const NavbarWithSubScreens = () => {
       <TabAndSubsStack.Screen
         name="Appointment"
         component={Appointment}
-        options={appointmentConfig}
+        options={config}
       />
       <TabAndSubsStack.Screen
         name="AutomationEmail"

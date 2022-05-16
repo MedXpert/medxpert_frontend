@@ -4,17 +4,23 @@ import React from 'react';
 import IonIcons from 'react-native-vector-icons/Ionicons';
 import colors from '../../../constants/colors';
 
-const BackButton = ({onPress, width = 35, height = 35, backgroundColor}) => {
+const BackButton = ({
+  onPress,
+  width = 35,
+  height = 35,
+  backgroundColor,
+  size = 30,
+}) => {
   return (
     <TouchableOpacity
       style={[
         styles.backButton,
-        {width: width, height: height, backgroundColor: backgroundColor},
+        {width: size + 5, height: size + 5, backgroundColor: backgroundColor},
       ]}
       onPress={onPress}>
       <IonIcons
         name="chevron-back"
-        size={30}
+        size={size}
         color={colors.white}
         style={[
           styles.icon,
@@ -28,8 +34,8 @@ const BackButton = ({onPress, width = 35, height = 35, backgroundColor}) => {
 const styles = StyleSheet.create({
   backButton: {
     borderRadius: 50,
-
     justifyContent: 'center',
+    alignItems: 'center',
   },
   icon: {alignSelf: 'center'},
 });
