@@ -32,5 +32,15 @@ export default function App() {
           </View>
         </View>
         <View>
+        <CustomButton
+          customStyle={styles.turnOnButton}
+          title="Turn on"
+          fontSize={20}
+          fontColor={colors.white}
+        />
+      </View>
+    </View>
+  );
+}
   
 
