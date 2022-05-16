@@ -4,14 +4,14 @@ import React, {useState} from 'react';
 import {BackButton} from '../../../components/general/BackButton';
 import {CustomText} from '../../../components/general/CustomText';
 import colors from '../../../constants/colors';
-import ToggleAutomation from '../../../components/emergency/ToggleAutomation/ToggleAutomation';
-import PhoneNumber from '../../../components/emergency/PhoneNumber/PhoneNumber';
+import {ToggleAutomation} from '../../../components/emergency/ToggleAutomation/ToggleAutomation';
+import {PhoneNumber} from '../../../components/emergency/PhoneNumber/PhoneNumber';
 
 import IconFontAwesome from 'react-native-vector-icons/FontAwesome';
 import IconEntypo from 'react-native-vector-icons/Entypo';
 import IconMaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
-const AutomationPhone = ({navigation}) => {
+const AutomationSms = ({navigation}) => {
   return (
     <View style={styles.container}>
       <View style={{marginLeft: -10}}>
@@ -22,7 +22,7 @@ const AutomationPhone = ({navigation}) => {
         />
       </View>
       {/* SMS toggle section */}
-      <ToggleAutomation text={'SMS'} />
+      <ToggleAutomation text={'SMS'} elevation={1} />
       {/* phone numbers section */}
       <View style={styles.phoneNumbersContainer}>
         {/* add phone number */}
@@ -77,6 +77,7 @@ const styles = StyleSheet.create({
     paddingVertical: 30,
     paddingHorizontal: 20,
     borderRadius: 10,
+    elevation: 1,
   },
   listPhoneNumber: {
     alignItems: 'center',
@@ -109,4 +110,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default AutomationPhone;
+export default AutomationSms;

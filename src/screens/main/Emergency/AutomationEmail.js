@@ -10,7 +10,6 @@ import IconMaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import IconFontAwesome from 'react-native-vector-icons/FontAwesome';
 import IconEntypo from 'react-native-vector-icons/Entypo';
 import {EmailItem} from '../../../components/emergency/EmailItem';
-import {log} from 'react-native-reanimated';
 
 const AutomationEmail = ({navigation}) => {
   return (
