@@ -156,6 +156,18 @@ const styles = StyleSheet.create({
     shadowColor: colors.gray,
     elevation: 3,
   },
+  fullName: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignContent: 'center',
+    paddingTop: 10,
+  },
+  form: {
+    flexDirection: 'column',
+    paddingHorizontal: 30,
+    paddingTop: 20,
+  },
+});
 
 
 
