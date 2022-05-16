@@ -53,5 +53,17 @@ const styles = StyleSheet.create({
       marginTop: 25,
       zIndex: 10,
     },
-  
+    headerText: {marginTop: 30, fontSize: 17},
+    headerText2: {fontSize: 40},
+    icon1: {marginTop: 50, paddingLeft: 160},
+    icon2: {paddingLeft: 35, marginTop: -115},
+    icon3: {paddingLeft: 130, marginTop: -30},
+    turnOnButton: {
+      width: 300,
+      borderRadius: 20,
+      marginTop: 100,
+      marginLeft: 40,
+    },
+  });
+    
 
