@@ -62,7 +62,6 @@ const CustomModal = ({
 
 const styles = StyleSheet.create({
   modalStyle: {
-    alignContent: 'center',
     backgroundColor: 'rgba(0, 0, 0, 0.7)',
     flex: 1,
     justifyContent: 'center',
