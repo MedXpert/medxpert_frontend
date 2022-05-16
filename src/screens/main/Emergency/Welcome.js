@@ -42,5 +42,16 @@ export default function App() {
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+    container: {
+      shadowColor: 'black',
+      flex: 3,
+      alignItems: 'flex-start',
+      marginLeft: 25,
+      marginRight: 25,
+      marginTop: 25,
+      zIndex: 10,
+    },
   
 
