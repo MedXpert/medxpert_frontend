@@ -16,7 +16,7 @@ export default function App() {
           />
           <CustomText
             content="Emergency alert for fall detection"
-            fontSize={40}
+             fontSize={40}
             customStyles={styles.headerText2}
           />
         </View>
