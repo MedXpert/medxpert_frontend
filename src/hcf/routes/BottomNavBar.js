@@ -2,23 +2,22 @@ import {View, Text} from 'react-native';
 import React from 'react';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 
-import Colors from '../constants/colors';
-import Ambulance from '../screens/main/Ambulance';
-import Emergency from '../screens/main/Emergency';
+import Colors from '../../constants/colors';
+import Appointment from '../screens/main/Appointment';
 import Home from '../screens/main/Home';
 import Profile from '../screens/main/Profile';
-import SvgAmbulance from '../assets/svg/bottomNavbar/Ambulance.svg';
-import SvgProfile from '../assets/svg/bottomNavbar/Profile.svg';
-import SvgEmergency from '../assets/svg/bottomNavbar/Emergency.svg';
-import SvgHome from '../assets/svg/bottomNavbar/Home.svg';
-import {CustomText} from '../components/general/CustomText';
+import SvgProfile from '../../assets/svg/bottomNavbar/Profile.svg';
+import SvgAppointment from '../../assets/svg/bottomNavbar/Appointment.svg';
+import SvgActiveAppointment from '../../assets/svg/bottomNavbar/AppointmentActive.svg';
+import SvgHome from '../../assets/svg/bottomNavbar/Home.svg';
+import {CustomText} from '../../components/general/CustomText';
 
 const Tab = createBottomTabNavigator();
 
 const BottomNavBar = ({route}) => {
   return (
     <Tab.Navigator
-      initialRouteName="HomeStack"
+      initialRouteName="Home"
       screenOptions={{
         headerShown: false,
         tabBarShowLabel: false,
@@ -50,35 +49,22 @@ const BottomNavBar = ({route}) => {
         }}
       />
       <Tab.Screen
-        name="Ambulance"
-        component={Ambulance}
+        name="Appointment"
+        component={Appointment}
         options={{
           tabBarIcon: ({focused}) => {
             let activeColor = focused ? Colors.primary : Colors.gray;
             return (
               <View style={{alignItems: 'center'}}>
-                <SvgAmbulance width={30} height={30} fill={activeColor} />
+                {activeColor === Colors.gray && (
+                  <SvgAppointment width={30} height={30} />
+                )}
+                {activeColor === Colors.primary && (
+                  <SvgActiveAppointment width={30} height={30} />
+                )}
+
                 <CustomText
-                  content={'AMBULANCE'}
-                  fontSize={10}
-                  fontColor={activeColor}
-                />
-              </View>
-            );
-          },
-        }}
-      />
-      <Tab.Screen
-        name="Emergency"
-        component={Emergency}
-        options={{
-          tabBarIcon: ({focused}) => {
-            let activeColor = focused ? Colors.primary : Colors.gray;
-            return (
-              <View style={{alignItems: 'center'}}>
-                <SvgEmergency width={30} height={30} fill={activeColor} />
-                <CustomText
-                  content={'EMERGENCY'}
+                  content={'APPOINTMENT'}
                   fontSize={10}
                   fontColor={activeColor}
                 />
