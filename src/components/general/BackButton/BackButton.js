@@ -4,13 +4,7 @@ import React from 'react';
 import IonIcons from 'react-native-vector-icons/Ionicons';
 import colors from '../../../constants/colors';
 
-const BackButton = ({
-  onPress,
-  width = 35,
-  height = 35,
-  backgroundColor,
-  size = 30,
-}) => {
+const BackButton = ({onPress, backgroundColor, size = 30}) => {
   return (
     <TouchableOpacity
       style={[

@@ -15,6 +15,7 @@ const CustomButton = ({
   fontSize = 16,
   fontColor = Colors.black,
   backgroundColor = Colors.primary,
+  disabled = false,
 }) => {
   // Changes the justifyContent property of the Button depending on whether there is an icon in the button or not
   const buttonIconStyle = () => {
@@ -22,6 +23,7 @@ const CustomButton = ({
   };
   return (
     <TouchableOpacity
+      disabled={disabled}
       onPress={onPress}
       style={[
         styles.button,

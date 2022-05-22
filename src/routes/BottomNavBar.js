@@ -20,6 +20,7 @@ const BottomNavBar = ({route}) => {
     <Tab.Navigator
       initialRouteName="HomeStack"
       screenOptions={{
+        // tabBarHideOnKeyboard: true,
         headerShown: false,
         tabBarShowLabel: false,
         tabBarStyle: {

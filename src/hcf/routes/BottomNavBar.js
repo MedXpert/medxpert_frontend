@@ -21,6 +21,7 @@ const BottomNavBar = ({route}) => {
       screenOptions={{
         headerShown: false,
         tabBarShowLabel: false,
+        tabBarHideOnKeyboard: true,
         tabBarStyle: {
           // position: 'absolute',
           height: 70,

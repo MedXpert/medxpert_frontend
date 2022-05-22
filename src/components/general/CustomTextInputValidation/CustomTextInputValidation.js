@@ -1,10 +1,11 @@
 import {View, TextInput, StyleSheet} from 'react-native';
-import {CustomText} from '../CustomText/CustomText';
 import React from 'react';
 
 import Colors from '../../../constants/colors';
 import {isRequired} from 'react-native/Libraries/DeprecatedPropTypes/DeprecatedColorPropType';
+import {CustomText} from '../CustomText/CustomText';
 import {Controller} from 'react-hook-form';
+import colors from '../../../constants/colors';
 
 const CustomTextInputValidation = ({
   label = null,
@@ -12,6 +13,8 @@ const CustomTextInputValidation = ({
   rules = {required: true},
   name = isRequired(),
   customStyles = {},
+  error = null,
+  keyboardType,
 }) => {
   return (
     <View style={styles.container}>
@@ -26,12 +29,16 @@ const CustomTextInputValidation = ({
         control={control}
         rules={rules}
         render={({field: {onChange, onBlur, value}}) => (
-          <TextInput
-            onBlur={onBlur}
-            onChangeText={onChange}
-            value={value}
-            style={[styles.textInput, customStyles]}
-          />
+          <>
+            <TextInput
+              keyboardType={keyboardType}
+              onBlur={onBlur}
+              onChangeText={onChange}
+              value={value}
+              style={[styles.textInput, customStyles]}
+            />
+            {error && <CustomText content={error} fontColor={colors.red} />}
+          </>
         )}
         name={name}
       />
