@@ -13,7 +13,7 @@ const BackButton = ({onPress, backgroundColor, size = 30}) => {
       ]}
       onPress={onPress}>
       <IonIcons
-        name="chevron-back"
+        name="arrow-back"
         size={size}
         color={colors.white}
         style={[
