@@ -1,12 +1,36 @@
-import {View, StyleSheet} from 'react-native';
+import {View, StyleSheet, ScrollView} from 'react-native';
 import React from 'react';
+import {useForm} from 'react-hook-form';
 
 import {CustomText} from '../../../../components/general/CustomText';
 import colors from '../../../../constants/colors';
 import {BackButton} from '../../../../components/general/BackButton';
+import {CustomTextInputValidation} from '../../../../components/general/CustomTextInputValidation';
 import IonIcons from 'react-native-vector-icons/Ionicons';
+import {CustomButton} from '../../../../components/general/CustomButton';
+import {emailRegEx} from '../../../../constants/regEx';
 
 const ClaimRequest = () => {
+  const {
+    control,
+    handleSubmit,
+    formState: {errors},
+  } = useForm({
+    defaultValues: {
+      name: hcf.name,
+      firstName: '',
+      lastName: '',
+      phoneNumber: '',
+      email: '',
+      message: '',
+      attachment: '',
+    },
+  });
+
+  const onSubmit = data => {
+    console.log(data);
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.backButtonPageName}>
@@ -16,7 +40,101 @@ const ClaimRequest = () => {
         </View>
         <CustomText content={'Claim Request'} fontSize={18} fontWeight="600" />
       </View>
-      <View style={styles.innerContainer} />
+      <ScrollView style={styles.innerContainer}>
+        <View style={styles.form}>
+          <CustomTextInputValidation
+            editable={false}
+            customStyles={styles.textInput}
+            control={control}
+            name={'name'}
+            label={'Name'}
+          />
+          <CustomTextInputValidation
+            customStyles={styles.textInput}
+            control={control}
+            name={'firstName'}
+            label={'First Name'}
+            error={errors.firstName?.message}
+            rules={{
+              required: {
+                value: true,
+                message: 'First name is required',
+              },
+            }}
+          />
+          <CustomTextInputValidation
+            customStyles={styles.textInput}
+            control={control}
+            name={'lastName'}
+            label={'Last Name'}
+            error={errors.lastName?.message}
+            rules={{
+              required: {
+                value: true,
+                message: 'Last name is required',
+              },
+            }}
+          />
+          <CustomTextInputValidation
+            customStyles={styles.textInput}
+            control={control}
+            name={'phoneNumber'}
+            label={'Phone Number'}
+            error={errors.phoneNumber?.message}
+            rules={{
+              required: {
+                value: true,
+                message: 'Phone number is required',
+              },
+            }}
+          />
+          <CustomTextInputValidation
+            customStyles={styles.textInput}
+            control={control}
+            name={'email'}
+            label={'Email'}
+            error={errors.email?.message}
+            rules={{
+              required: {
+                value: true,
+                message: 'Email name is required',
+              },
+              pattern: {
+                value: emailRegEx,
+                message: 'Invalid email',
+              },
+            }}
+          />
+
+          <CustomTextInputValidation
+            customStyles={[styles.textInput]}
+            control={control}
+            multiline={true}
+            numberOfLines={10}
+            name={'message'}
+            label={'Message'}
+            error={errors.message?.message}
+            rules={{
+              required: {
+                value: true,
+                message: 'Message is required',
+              },
+            }}
+          />
+
+          <CustomButton
+            title={'Attachment'}
+            width={350}
+            backgroundColor={colors.lightGray}
+          />
+          <View style={{marginTop: 10}} />
+          <CustomButton
+            title={'Submit'}
+            width={350}
+            onPress={handleSubmit(onSubmit)}
+          />
+        </View>
+      </ScrollView>
     </View>
   );
 };
@@ -25,13 +143,13 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.secondary,
-    padding: 10,
+    paddingHorizontal: 10,
     paddingTop: 20,
   },
   innerContainer: {
     backgroundColor: colors.white,
     flex: 1,
-    marginTop: 20,
+    marginTop: 5,
     borderTopRightRadius: 20,
     borderTopLeftRadius: 20,
   },
@@ -42,6 +160,18 @@ const styles = StyleSheet.create({
   backButton: {
     marginRight: 10,
   },
+  form: {
+    paddingHorizontal: 20,
+    paddingTop: 10,
+    marginBottom: 20,
+  },
+  textInput: {
+    backgroundColor: colors.secondary,
+  },
 });
+
+const hcf = {
+  name: 'HealthCare Facility 1',
+};
 
 export default ClaimRequest;

@@ -13,13 +13,14 @@ import NavbarWithSubScreensUser from './NavbarWithSubScreens';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import NavbarWithSubScreensAdmin from '../hcf/routes/NavbarWithSubScreens';
 import {readAsyncStorage} from '../services/readAsyncStorage';
+import ClaimRequest from '../hcf/screens/main/Home/ClaimRequest';
 
 // The main route that evaluates whether the user is logged in or not and decides where to navigate when the app starts.
 const Main = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(true); // User state value from the cache
   const [appIsLoaded, setAppIsLoaded] = useState(true); // whether the app is loading or finished loading.
   const [openingForTheFirstTime, setOpeningForTheFirstTime] = useState(false); // Whether the app is being opened for the first time.
-  const [role, setRole] = useState('user');
+  const [role, setRole] = useState('admin');
 
   // setTimeout(() => setAppIsLoaded(true), 3000);
   // setTimeout(() => setIsLoggedIn(true), 5000);
@@ -45,7 +46,8 @@ const Main = () => {
       if (role === 'user') {
         return <NavbarWithSubScreensUser />;
       } else if (role === 'admin') {
-        return <NavbarWithSubScreensAdmin />;
+        return <ClaimRequest />;
+        // return <NavbarWithSubScreensAdmin />;
       }
     }
   }; // return stacks according to the state of the user.

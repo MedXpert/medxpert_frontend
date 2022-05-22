@@ -15,6 +15,10 @@ const CustomTextInputValidation = ({
   customStyles = {},
   error = null,
   keyboardType,
+  editable,
+  multiline,
+  numberOfLines,
+  textAlignVertical,
 }) => {
   return (
     <View style={styles.container}>
@@ -36,6 +40,10 @@ const CustomTextInputValidation = ({
               onChangeText={onChange}
               value={value}
               style={[styles.textInput, customStyles]}
+              editable={editable}
+              multiline={multiline}
+              numberOfLines={numberOfLines}
+              textAlignVertical={textAlignVertical}
             />
             {error && <CustomText content={error} fontColor={colors.red} />}
           </>
@@ -53,9 +61,9 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.white,
     borderRadius: 10,
     flexDirection: 'row',
-    height: 60,
+    height: 50,
     color: Colors.gray,
-    fontSize: 18,
+    fontSize: 16,
     paddingHorizontal: 15,
   },
 });

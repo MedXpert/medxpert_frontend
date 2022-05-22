@@ -182,7 +182,7 @@ const Details = ({route, navigation}) => {
                 {data.verificationStatus && (
                   <CustomButton
                     title={'Claimed'}
-                    width={250}
+                    width={300}
                     height={50}
                     backgroundColor={colors.gray}
                     fontColor={colors.lightGray}
@@ -192,7 +192,7 @@ const Details = ({route, navigation}) => {
                 {!data.verificationStatus && (
                   <CustomButton
                     title={'Claim'}
-                    width={250}
+                    width={300}
                     height={50}
                     backgroundColor={colors.primary}
                     fontColor={colors.white}
