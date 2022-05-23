@@ -1,48 +1,73 @@
-import {View, Switch, StyleSheet} from 'react-native'
+import {View, Switch, StyleSheet} from 'react-native';
 import React, {useState} from 'react';
 import {CustomText} from '../../components/general/CustomText';
-import { Colors } from 'react-native/Libraries/NewAppScreen';
+import {Colors} from 'react-native/Libraries/NewAppScreen';
+import colors from '../../../constants/colors';
 
+const Emergency = () => {
+  const [isEnabled, setIsEnabled] = useState(false);
 
-const Emergency = ()=>{
-    const[isEnabled, setIsEnabled] = useState(false);
-    
-    const toggleSwitch = ()=>{
-        setIsEnabled(!isEnabled);
-    };
+  const toggleSwitch = () => {
+    setIsEnabled(!isEnabled);
+  };
 
-    return(
-        <View style={StyleSheet.container}>
-            <View style={styles.paddingHr25}>
-                <CustomText fontWeight='bold'
-                content = "Choose contact method incase of emergency"
-                fontColor = {colors.gray}
-                customStyles={styles.textSpacing}
-                    />
-                    
-            </View>
-
+  return (
+    <View style={StyleSheet.container}>
+      <View style={styles.paddingHr25}>
+        <CustomText
+          fontWeight="bold"
+          content="Choose contact method incase of emergency"
+          fontColor={colors.gray}
+          customStyles={styles.textSpacing}
+        />
+        <CustomText
+          fontWeight="bold"
+          content="Choose options"
+          fontSize={35}
+          customStyles={styles.textSpacing}
+        />
+        {/* selected buttons  */}
+        <View style={styles.padding20}>
+          <View style={styles.alignRow}>
+            <CustomButton
+              title="sms"
+              backgroundColor={colors.primary}
+              fontColor={colors.white}
+              fontWeight="bold"
+              width="23%"
+              height={40}
+              customStyle={styles.selectButton}
+            />
+            <CustomButton
+              title="sms"
+              backgroundColor={colors.primary}
+              fontColor={colors.white}
+              fontWeight="bold"
+              width="23%"
+              height={40}
+              customStyle={styles.selectButton}
+            />
+          </View>
         </View>
-    )
-}
-const styles= StyleSheet.create({
-    container:{},
-    selectButton:{},
-    alignRow:{},
-    paddingHr25:{},
-    padding20:{},
-    textSpacing:{},
-    textSpacingBig:{},
-    padding15:{},
-    timeBox:{},
-    switchBox:{},
-    previousButton:{},
-    customText:{},
-    sequence:{},
-    sequenceText:{}
-
-
-})
-
+      </View>
+    </View>
+  );
+};
+const styles = StyleSheet.create({
+  container: {},
+  selectButton: {},
+  alignRow: {},
+  paddingHr25: {},
+  padding20: {},
+  textSpacing: {},
+  textSpacingBig: {},
+  padding15: {},
+  timeBox: {},
+  switchBox: {},
+  previousButton: {},
+  customText: {},
+  sequence: {},
+  sequenceText: {},
+});
 
 export default Emergency;
