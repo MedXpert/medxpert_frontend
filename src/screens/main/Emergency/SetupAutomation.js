@@ -56,6 +56,24 @@ const Emergency = () => {
               height={40}
               customStyle={styles.selectButton}
             />
+            <CustomButton
+              title="Facebook"
+              backgroundColor={colors.white}
+              fontColor={colors.dark}
+              fontWeight="bold"
+              width="45%"
+              height={40}
+              customStyle={styles.selectButton}
+            />
+            <CustomButton
+              title="Telegram"
+              backgroundColor={colors.white}
+              fontColor={colors.dark}
+              fontWeight="bold"
+              width="45%"
+              height={40}
+              customStyle={styles.selectButton}
+            />
           </View>
         </View>
       </View>
