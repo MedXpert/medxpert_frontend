@@ -155,8 +155,6 @@ const Emergency = () => {
           fontSize={18}
         />
       </View>
-
-
     </View>
   );
 };
@@ -169,18 +167,26 @@ const styles = StyleSheet.create({
   },
   selectButton: {
     borderRadius: 40,
-
   },
   alignRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
   },
-  paddingHr25: {paddingHorizontal:25},
-  padding20: {paddingVertical:20},
-  textSpacing: {paddingTop:10},
-  textSpacingBig: {paddingTop:25},
-  padding15: {paddingVertical:15},
-  timeBox: {},
+  paddingHr25: {paddingHorizontal: 25},
+  padding20: {paddingVertical: 20},
+  textSpacing: {paddingTop: 10},
+  textSpacingBig: {paddingTop: 25},
+  padding15: {paddingVertical: 15},
+  timeBox: {
+    width: '30%',
+    height: 40,
+    borderRadius: 5,
+    borderColor: colors.primary,
+    borderWidth: 1,
+    flexDirection: 'row',
+    justifyContent: 'space-evenly',
+    alignContent: 'center',
+  },
   switchBox: {},
   previousButton: {},
   customText: {},
