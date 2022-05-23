@@ -161,9 +161,20 @@ const Emergency = () => {
   );
 };
 const styles = StyleSheet.create({
-  container: {},
-  selectButton: {},
-  alignRow: {},
+  container: {
+    flex: 1,
+    flexDirection: 'column',
+    justifyContent: 'space-between',
+    paddingVertical: 50,
+  },
+  selectButton: {
+    borderRadius: 40,
+
+  },
+  alignRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
   paddingHr25: {},
   padding20: {},
   textSpacing: {},
