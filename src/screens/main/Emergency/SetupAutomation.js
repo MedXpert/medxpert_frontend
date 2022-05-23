@@ -94,23 +94,69 @@ const Emergency = () => {
             />
           </View>
           <View style={styles.textSpacingBig}>
-            <customText
+            <CustomText
               fontWeight="bold"
               content="Setup the automation to fit your need "
               fontColor={colors.gray}
               customStyle={styles.textSpacing}
             />
-            <customText
+            <CustomText
               fontWeight="bold"
               content="Configure Automation"
               fontSize={40}
               customStyle={styles.textSpacing}
             />
           </View>
+        </View>
+        <View style={[styles.alignRow, styles.padding15]}>
+          <CustomText
+            content="Emergency Sequence duration "
+            fontSize={18}
+            customStyle={styles.sequence}
+          />
+          <View style={styles.timeBox}>
+            <CustomTextInput customStyle={styles.customText} />
+            <CustomText
+              content="sec"
+              fontSize={15}
+              customStyle={styles.sequenceText}
+            />
+          </View>
+        </View>
 
-          
+        <View style={[styles.alignRow, styles.padding15]}>
+          <CustomText
+            content="Make emergency sound"
+            fontSize={18}
+            customStyles={styles.emergency}
+          />
+          <View style={styles.switchBox}>
+            <Switch
+              trackColor={{false: colors.lightGray, true: colors.primary}}
+              thumbColor={isEnabled ? colors.white : colors.whiteSmoke}
+              onValueChange={toggleSwitch}
+              value={isEnabled}
+            />
+          </View>
         </View>
       </View>
+      {/* previous and next button */}
+      <View style={styles.alignRow}>
+        <CustomButton
+          title="Previous"
+          backgroundColor={colors.primary}
+          fontColor={colors.white}
+          fontSize={18}
+          customStyle={styles.previousButton}
+        />
+        <CustomButton
+          title="Next"
+          backgroundColor={colors.whiteSmoke}
+          fontSize={18}
+        />
+      </View>
+
+
     </View>
   );
 };
