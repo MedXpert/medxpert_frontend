@@ -39,9 +39,18 @@ const Emergency = () => {
               customStyle={styles.selectButton}
             />
             <CustomButton
-              title="sms"
+              title="Ambulance"
               backgroundColor={colors.primary}
               fontColor={colors.white}
+              fontWeight="bold"
+              width="45%"
+              height={40}
+              customStyle={styles.selectButton}
+            />
+            <CustomButton
+              title="Email"
+              backgroundColor={colors.white}
+              fontColor={colors.dark}
               fontWeight="bold"
               width="23%"
               height={40}
