@@ -74,7 +74,41 @@ const Emergency = () => {
               height={40}
               customStyle={styles.selectButton}
             />
+            <CustomButton
+              title="Instagram"
+              backgroundColor={colors.white}
+              fontColor={colors.dark}
+              fontWeight="bold"
+              width="45%"
+              height={40}
+              customStyle={styles.selectButton}
+            />
+            <CustomButton
+              title="Whatsapp"
+              backgroundColor={colors.white}
+              fontColor={colors.dark}
+              fontWeight="bold"
+              width="45%"
+              height={40}
+              customStyle={styles.selectButton}
+            />
           </View>
+          <View style={styles.textSpacingBig}>
+            <customText
+              fontWeight="bold"
+              content="Setup the automation to fit your need "
+              fontColor={colors.gray}
+              customStyle={styles.textSpacing}
+            />
+            <customText
+              fontWeight="bold"
+              content="Configure Automation"
+              fontSize={40}
+              customStyle={styles.textSpacing}
+            />
+          </View>
+
+          
         </View>
       </View>
     </View>
