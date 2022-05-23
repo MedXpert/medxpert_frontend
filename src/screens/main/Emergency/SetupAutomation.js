@@ -187,11 +187,23 @@ const styles = StyleSheet.create({
     justifyContent: 'space-evenly',
     alignContent: 'center',
   },
-  switchBox: {},
-  previousButton: {},
-  customText: {},
-  sequence: {},
-  sequenceText: {},
+  switchBox: {
+    width: '30%',
+    height: 40,
+    alignContent: 'center',
+  },
+  previousButton: {
+    width: 150,
+    height: 55,
+    borderTopEndRadius: 30,
+    borderBottomEndRadius: 30,
+    borderBottomStartRadius: 0,
+    borderTopStartRadius: 0,
+  },
+  customText: {width: '50'},
+  sequence: {width: '60%'},
+  sequenceText: {paddingTop: 6},
+  emergency: {width: '70%'},
 });
 
 export default Emergency;
