@@ -1,16 +1,24 @@
 import {View, StyleSheet, ScrollView} from 'react-native';
-import React from 'react';
+import React, {useState} from 'react';
 import {useForm} from 'react-hook-form';
+import IconMaterialCommunity from 'react-native-vector-icons/MaterialCommunityIcons';
+import DocumentPicker, {
+  DirectoryPickerResponse,
+  DocumentPickerResponse,
+  isInProgress,
+  types,
+} from 'react-native-document-picker';
 
 import {CustomText} from '../../../../components/general/CustomText';
 import colors from '../../../../constants/colors';
 import {BackButton} from '../../../../components/general/BackButton';
 import {CustomTextInputValidation} from '../../../../components/general/CustomTextInputValidation';
-import IonIcons from 'react-native-vector-icons/Ionicons';
 import {CustomButton} from '../../../../components/general/CustomButton';
 import {emailRegEx} from '../../../../constants/regEx';
 
 const ClaimRequest = () => {
+  const [result, setResult] = useState();
+  // Declare useForm
   const {
     control,
     handleSubmit,
@@ -27,8 +35,43 @@ const ClaimRequest = () => {
     },
   });
 
+  // Document picker error handler
+  const handleDocPickerError = err => {
+    if (DocumentPicker.isCancel(err)) {
+      console.warn('cancelled');
+    } else if (isInProgress(err)) {
+      console.warn(
+        'multiple pickers were opened, only the last will be considered',
+      );
+    } else {
+      throw err;
+    }
+  };
+
+  //Called when DocumentPicker button is clicked
+  const onDocPick = async () => {
+    try {
+      const pickerRes = await DocumentPicker.pick({
+        allowMultiSelection: true, // Multi Doc selection
+        type: [types.images, types.pdf, types.doc, types.docx], // Types allowed
+        presentationStyle: 'fullScreen', // fullscreen selection window
+      });
+      setResult(pickerRes); // Set the value to result state
+      console.log(result);
+    } catch (e) {
+      handleDocPickerError(e);
+    }
+  };
+
+  // Called when submit button is clicked
   const onSubmit = data => {
-    console.log(data);
+    if (result) {
+      // If there is result store the result to the 'attachment' key of the data object from the form
+      data.attachment = result;
+    } else {
+      console.warn('No data selected');
+    }
+    console.log(data); // Api function here
   };
 
   return (
@@ -42,6 +85,7 @@ const ClaimRequest = () => {
       </View>
       <ScrollView style={styles.innerContainer}>
         <View style={styles.form}>
+          {/* HCF Name */}
           <CustomTextInputValidation
             editable={false}
             customStyles={styles.textInput}
@@ -49,6 +93,7 @@ const ClaimRequest = () => {
             name={'name'}
             label={'Name'}
           />
+          {/* First Name */}
           <CustomTextInputValidation
             customStyles={styles.textInput}
             control={control}
@@ -62,6 +107,7 @@ const ClaimRequest = () => {
               },
             }}
           />
+          {/* Last Name */}
           <CustomTextInputValidation
             customStyles={styles.textInput}
             control={control}
@@ -75,9 +121,11 @@ const ClaimRequest = () => {
               },
             }}
           />
+          {/* Phone Number */}
           <CustomTextInputValidation
             customStyles={styles.textInput}
             control={control}
+            keyboardType="numeric"
             name={'phoneNumber'}
             label={'Phone Number'}
             error={errors.phoneNumber?.message}
@@ -88,6 +136,7 @@ const ClaimRequest = () => {
               },
             }}
           />
+          {/* Email */}
           <CustomTextInputValidation
             customStyles={styles.textInput}
             control={control}
@@ -105,15 +154,16 @@ const ClaimRequest = () => {
               },
             }}
           />
-
+          {/* Message */}
           <CustomTextInputValidation
             customStyles={[styles.textInput]}
             control={control}
             multiline={true}
-            numberOfLines={10}
+            numberOfLines={4}
             name={'message'}
             label={'Message'}
             error={errors.message?.message}
+            textAlignVertical={'top'}
             rules={{
               required: {
                 value: true,
@@ -121,13 +171,26 @@ const ClaimRequest = () => {
               },
             }}
           />
-
+          {/* Attachment button */}
+          <View style={{marginTop: 20}} />
           <CustomButton
             title={'Attachment'}
             width={350}
             backgroundColor={colors.lightGray}
+            justifyContent={'center'}
+            onPress={onDocPick}
+            iconRight={true}
+            icon={
+              <IconMaterialCommunity
+                name="attachment"
+                size={30}
+                color={colors.primary}
+                style={{marginLeft: 10}}
+              />
+            }
           />
-          <View style={{marginTop: 10}} />
+          <View style={{marginTop: 15}} />
+          {/* Submit button */}
           <CustomButton
             title={'Submit'}
             width={350}
@@ -150,6 +213,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white,
     flex: 1,
     marginTop: 5,
+    paddingTop: 15,
     borderTopRightRadius: 20,
     borderTopLeftRadius: 20,
   },
@@ -167,6 +231,8 @@ const styles = StyleSheet.create({
   },
   textInput: {
     backgroundColor: colors.secondary,
+    marginTop: 5,
+    elevation: 0.4,
   },
 });
 
