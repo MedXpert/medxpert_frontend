@@ -17,8 +17,7 @@ import {BackButton} from '../../../../components/general/BackButton';
 import {CustomTextInputValidation} from '../../../../components/general/CustomTextInputValidation';
 import {CustomButton} from '../../../../components/general/CustomButton';
 import {emailRegEx} from '../../../../constants/regEx';
-import {FlatList} from 'react-native-gesture-handler';
-import {color} from 'react-native-reanimated';
+import {FlatList, TouchableOpacity} from 'react-native-gesture-handler';
 
 const ClaimRequest = () => {
   const [result, setResult] = useState();
@@ -52,7 +51,7 @@ const ClaimRequest = () => {
     }
   };
 
-  //Called when DocumentPicker button is pressed
+  // Called when DocumentPicker button is pressed
   const onDocPick = async () => {
     try {
       const pickerRes = await DocumentPicker.pick({
@@ -185,16 +184,14 @@ const ClaimRequest = () => {
               {result.map((item, index) => (
                 <View style={styles.docItemStyle}>
                   <View style={styles.docItemText}>
-                    <CustomText content={item.name} />
+                    <CustomText content={item.name} key={item} />
                   </View>
-                  <IconMaterial
-                    name="close"
-                    size={20}
-                    color={colors.red}
+                  <TouchableOpacity
                     onPress={() => {
                       removeSelectedFile(index);
-                    }}
-                  />
+                    }}>
+                    <IconMaterial name="close" size={25} color={colors.red} />
+                  </TouchableOpacity>
                 </View>
               ))}
             </ScrollView>
@@ -224,6 +221,7 @@ const ClaimRequest = () => {
             title={'Submit'}
             width={'100%'}
             onPress={handleSubmit(onSubmit)}
+            customStyle={{marginBottom: 20}}
           />
         </View>
       </ScrollView>
@@ -272,12 +270,12 @@ const styles = StyleSheet.create({
   },
   showSelected: {
     height: 'auto',
-    minHeight: 100,
     width: '100%',
     borderWidth: 1,
     borderStyle: 'dashed',
     borderColor: colors.primary,
     padding: 10,
+    marginTop: 10,
   },
   docItemStyle: {
     flexDirection: 'row',
@@ -285,7 +283,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: colors.secondary,
     paddingVertical: 4,
-    marginBottom: 10,
+    marginVertical: 5,
   },
 });
 

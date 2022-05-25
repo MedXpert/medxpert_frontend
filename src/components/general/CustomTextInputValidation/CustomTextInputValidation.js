@@ -24,7 +24,11 @@ const CustomTextInputValidation = ({
   return (
     <View style={styles.container}>
       {label && (
-        <CustomText content={label} fontColor={Colors.gray} fontSize={15} />
+        <CustomText
+          content={label}
+          fontColor={Colors.lightGray}
+          fontSize={15}
+        />
       )}
       <Controller
         control={control}
@@ -42,6 +46,7 @@ const CustomTextInputValidation = ({
               numberOfLines={numberOfLines}
               textAlignVertical={textAlignVertical}
               placeholder={placeholder}
+              selectionColor={colors.primary}
             />
             {error && <CustomText content={error} fontColor={colors.red} />}
           </>
@@ -60,7 +65,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     flexDirection: 'row',
     // height: 50,
-    color: Colors.dark,
+    color: Colors.black,
     fontSize: 16,
     paddingHorizontal: 15,
   },
