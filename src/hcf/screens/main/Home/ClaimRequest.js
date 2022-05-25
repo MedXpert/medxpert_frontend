@@ -248,7 +248,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.secondary,
     paddingHorizontal: 10,
-    paddingTop: 20,
+    paddingTop: 15,
   },
   attachmentButton: {
     borderWidth: 1,
@@ -257,7 +257,7 @@ const styles = StyleSheet.create({
   innerContainer: {
     backgroundColor: colors.white,
     flex: 1,
-    marginTop: 5,
+    marginTop: 10,
     paddingTop: 15,
     borderTopRightRadius: 20,
     borderTopLeftRadius: 20,
