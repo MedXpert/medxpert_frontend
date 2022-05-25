@@ -46,8 +46,7 @@ const Main = () => {
       if (role === 'user') {
         return <NavbarWithSubScreensUser />;
       } else if (role === 'admin') {
-        return <ClaimRequest />;
-        // return <NavbarWithSubScreensAdmin />;
+        return <NavbarWithSubScreensAdmin />;
       }
     }
   }; // return stacks according to the state of the user.

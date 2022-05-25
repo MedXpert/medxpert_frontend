@@ -98,16 +98,11 @@ const Details = ({route, navigation}) => {
                 style={styles.imageBackground}
               />
             </Pressable>
-            {/* <CustomButton
-          title=""
-          customStyle={styles.backButton}
-          icon={<IconIon name="chevron-back" size={40} color={Colors.white} />}
-          onPress={() => navigation.goBack()}
-        /> */}
+
             <View style={styles.backButton}>
               <BackButton
                 backgroundColor={Colors.primary}
-                size={40}
+                size={35}
                 onPress={() => {
                   navigation.goBack();
                 }}
@@ -182,7 +177,7 @@ const Details = ({route, navigation}) => {
                 {data.verificationStatus && (
                   <CustomButton
                     title={'Claimed'}
-                    width={300}
+                    width={'100%'}
                     height={50}
                     backgroundColor={colors.gray}
                     fontColor={colors.lightGray}
@@ -192,7 +187,7 @@ const Details = ({route, navigation}) => {
                 {!data.verificationStatus && (
                   <CustomButton
                     title={'Claim'}
-                    width={300}
+                    width={'100%'}
                     height={50}
                     backgroundColor={colors.primary}
                     fontColor={colors.white}

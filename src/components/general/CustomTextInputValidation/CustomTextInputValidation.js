@@ -24,11 +24,7 @@ const CustomTextInputValidation = ({
   return (
     <View style={styles.container}>
       {label && (
-        <CustomText
-          content={label}
-          fontColor={Colors.lightGray}
-          fontSize={15}
-        />
+        <CustomText content={label} fontColor={Colors.gray} fontSize={15} />
       )}
       <Controller
         control={control}
@@ -64,8 +60,8 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.white,
     borderRadius: 5,
     flexDirection: 'row',
-    // height: 50,
-    color: Colors.black,
+    height: 50,
+    color: Colors.dark,
     fontSize: 16,
     paddingHorizontal: 15,
   },

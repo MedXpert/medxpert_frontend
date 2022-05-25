@@ -3,6 +3,7 @@ import React, {useState} from 'react';
 import {useForm} from 'react-hook-form';
 import IconMaterialCommunity from 'react-native-vector-icons/MaterialCommunityIcons';
 import IconMaterial from 'react-native-vector-icons/MaterialIcons';
+import {IconButton} from 'react-native-paper';
 
 import DocumentPicker, {
   DirectoryPickerResponse,
@@ -18,8 +19,9 @@ import {CustomTextInputValidation} from '../../../../components/general/CustomTe
 import {CustomButton} from '../../../../components/general/CustomButton';
 import {emailRegEx} from '../../../../constants/regEx';
 import {FlatList, TouchableOpacity} from 'react-native-gesture-handler';
+import {color} from 'react-native-reanimated';
 
-const ClaimRequest = () => {
+const ClaimRequest = ({navigation}) => {
   const [result, setResult] = useState();
   // Declare useForm
   const {
@@ -85,8 +87,12 @@ const ClaimRequest = () => {
     <View style={styles.container}>
       <View style={styles.backButtonPageName}>
         <View style={styles.backButton}>
-          {/* <IonIcons name="arrow-back" size={30} color={colors.primary} /> */}
-          <BackButton size={30} />
+          <BackButton
+            size={35}
+            onPress={() => {
+              navigation.goBack();
+            }}
+          />
         </View>
         <CustomText content={'Claim Request'} fontSize={18} fontWeight="600" />
       </View>
@@ -163,7 +169,7 @@ const ClaimRequest = () => {
           />
           {/* Message */}
           <CustomTextInputValidation
-            customStyles={[styles.textInput]}
+            customStyles={[styles.textInput, styles.textInputMessage]}
             control={control}
             multiline={true}
             numberOfLines={4}
@@ -186,12 +192,20 @@ const ClaimRequest = () => {
                   <View style={styles.docItemText}>
                     <CustomText content={item.name} key={item} />
                   </View>
-                  <TouchableOpacity
+                  <IconButton
+                    icon={'window-close'}
+                    size={25}
+                    onPress={() => {
+                      removeSelectedFile(index);
+                    }}
+                    color={colors.red}
+                  />
+                  {/* <TouchableOpacity
                     onPress={() => {
                       removeSelectedFile(index);
                     }}>
                     <IconMaterial name="close" size={25} color={colors.red} />
-                  </TouchableOpacity>
+                  </TouchableOpacity> */}
                 </View>
               ))}
             </ScrollView>
@@ -263,7 +277,10 @@ const styles = StyleSheet.create({
   textInput: {
     backgroundColor: colors.secondary,
     marginTop: 5,
-    elevation: 0.4,
+    height: 55,
+  },
+  textInputMessage: {
+    height: null,
   },
   docItemText: {
     width: '85%',
@@ -279,8 +296,9 @@ const styles = StyleSheet.create({
   },
   docItemStyle: {
     flexDirection: 'row',
-    justifyContent: 'space-around',
+    justifyContent: 'space-between',
     alignItems: 'center',
+    paddingHorizontal: 10,
     backgroundColor: colors.secondary,
     paddingVertical: 4,
     marginVertical: 5,
