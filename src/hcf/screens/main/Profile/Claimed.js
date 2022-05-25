@@ -10,7 +10,7 @@ const Claimed = () => {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <CustomText content={'Claimed'} fontSize={20} />
+        <CustomText content={'Claimed'} fontSize={18} />
         <CustomButton
           backgroundColor={colors.lightGray}
           fontSize={15}
@@ -37,9 +37,8 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white,
     borderTopLeftRadius: 15,
     borderTopRightRadius: 15,
-    marginTop: 40,
-    paddingTop: 25,
     padding: 15,
+    paddingTop: 30,
   },
   header: {
     flexDirection: 'row',
