@@ -1,29 +1,26 @@
 import {View, StyleSheet, Image, TouchableOpacity} from 'react-native';
 import React from 'react';
-import colors from '../../../constants/colors';
-import {CustomText} from '../../../components/general/CustomText';
+import colors from '../../../../constants/colors';
+import {CustomText} from '../../../../components/general/CustomText';
 import IconEntypo from 'react-native-vector-icons/Entypo';
 import StarRating from 'react-native-star-rating';
 
-const RenderHCF = () => {
+const RenderHCF = ({hcfName, address, rating, images, type, travelTime}) => {
   return (
     <View style={styles.container}>
       {/* HCF name */}
       <CustomText
-        content={'HCF name 0 '}
+        content={hcfName}
         fontWeight="900"
         fontSize={20}
         fontColor={colors.primary}
       />
-      {/* Location and reating section  */}
+      {/* Location and rating section  */}
       <View style={styles.locationAndRating}>
         {/* Location */}
         <View style={styles.location}>
           <IconEntypo name="location-pin" size={20} color={colors.primary} />
-          <CustomText
-            customStyles={styles.marginLeft5}
-            content={'Addis Ababa near to the bank'}
-          />
+          <CustomText content={'Addis Ababa near to the bank'} />
         </View>
       </View>
       {/* Rating */}
@@ -39,26 +36,28 @@ const RenderHCF = () => {
           <CustomText content={4.5} />
         </View>
       </View>
-      {/* Images seciton  */}
+      {/* Images section  */}
       <View style={styles.imagesContainer}>
         <Image
           source={{uri: 'https://mapio.net/images-p/17493410.jpg'}}
           resizeMethod="scale"
           resizeMode="cover"
           style={styles.imageStyle}
-          loadingIndicatorSource={require('../../../assets/img/default_load_image.png')}
+          loadingIndicatorSource={require('../../../../assets/img/default_load_image.png')}
         />
         <Image
           source={{uri: 'https://mapio.net/images-p/3638281.jpg'}}
           resizeMethod="scale"
           resizeMode="cover"
           style={styles.imageStyle}
+          loadingIndicatorSource={require('../../../../assets/img/default_load_image.png')}
         />
         <Image
           source={{uri: 'https://mapio.net/images-p/17493410.jpg'}}
           resizeMethod="scale"
           resizeMode="cover"
           style={styles.imageStyle}
+          loadingIndicatorSource={require('../../../../assets/img/default_load_image.png')}
         />
       </View>
       {/* Type Travel Time and Edit  */}
@@ -81,10 +80,12 @@ const RenderHCF = () => {
         </View>
         {/* Edit button */}
         <View style={styles.editButton}>
-          <TouchableOpacity onPress={() => {}}>
+          <TouchableOpacity
+            onPress={() => {}}
+            style={styles.editButtonTouchable}>
             <CustomText
-              content={'EDIT'}
-              fontColor={colors.primary}
+              content={'Edit'}
+              fontColor={colors.black}
               fontSize={16}
             />
           </TouchableOpacity>
@@ -96,10 +97,12 @@ const RenderHCF = () => {
 
 const styles = StyleSheet.create({
   container: {
-    height: 300,
+    height: 'auto',
     width: '100%',
     backgroundColor: colors.secondary,
     padding: 10,
+    elevation: 2,
+    marginVertical: 10,
   },
   location: {flexDirection: 'row', marginVertical: 5},
   stars: {
@@ -116,14 +119,14 @@ const styles = StyleSheet.create({
   imagesContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    justifyContent: 'space-around',
     marginTop: 10,
   },
   imageStyle: {
     width: 100,
     height: 80,
     borderRadius: 10,
-    borderWidth: 1,
+    borderWidth: 0.5,
     borderColor: colors.primary,
   },
   typeTravelEdit: {
@@ -138,6 +141,13 @@ const styles = StyleSheet.create({
   typeTravel: {
     flexDirection: 'row',
   },
+  editButtonTouchable: {
+    paddingHorizontal: 15,
+    paddingVertical: 2,
+    borderRadius: 5,
+    borderWidth: 1,
+    borderColor: colors.primary,
+  },
 });
 
-export default RenderHCF;
+export {RenderHCF};

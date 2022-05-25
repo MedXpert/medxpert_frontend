@@ -4,7 +4,7 @@ import React from 'react';
 import colors from '../../../../constants/colors';
 import {CustomText} from '../../../../components/general/CustomText';
 import {CustomButton} from '../../../../components/general/CustomButton';
-import RenderHCF from '../../../components/profile/RenderHCF';
+import {RenderHCF} from '../../../components/profile/RenderHCF';
 
 const Claimed = () => {
   return (
@@ -23,7 +23,9 @@ const Claimed = () => {
       </View>
 
       <ScrollView style={styles.hcfSection}>
-        <RenderHCF />
+        {hcfs.map(item => (
+          <RenderHCF hcfName={item.name} key={item.name} />
+        ))}
       </ScrollView>
     </View>
   );
@@ -45,8 +47,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   hcfSection: {
-    marginTop: 40,
+    marginTop: 30,
   },
 });
+
+const hcfs = [
+  {name: 'hcf 0'},
+  {name: 'hcf 1'},
+  {name: 'hcf 2'},
+  {name: 'hcf 3'},
+];
 
 export default Claimed;
