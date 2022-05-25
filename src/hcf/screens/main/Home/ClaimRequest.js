@@ -1,7 +1,9 @@
-import {View, StyleSheet, ScrollView} from 'react-native';
+import {View, StyleSheet, ScrollView, Flatlist} from 'react-native';
 import React, {useState} from 'react';
 import {useForm} from 'react-hook-form';
 import IconMaterialCommunity from 'react-native-vector-icons/MaterialCommunityIcons';
+import IconMaterial from 'react-native-vector-icons/MaterialIcons';
+
 import DocumentPicker, {
   DirectoryPickerResponse,
   DocumentPickerResponse,
@@ -15,6 +17,8 @@ import {BackButton} from '../../../../components/general/BackButton';
 import {CustomTextInputValidation} from '../../../../components/general/CustomTextInputValidation';
 import {CustomButton} from '../../../../components/general/CustomButton';
 import {emailRegEx} from '../../../../constants/regEx';
+import {FlatList} from 'react-native-gesture-handler';
+import {color} from 'react-native-reanimated';
 
 const ClaimRequest = () => {
   const [result, setResult] = useState();
@@ -48,7 +52,7 @@ const ClaimRequest = () => {
     }
   };
 
-  //Called when DocumentPicker button is clicked
+  //Called when DocumentPicker button is pressed
   const onDocPick = async () => {
     try {
       const pickerRes = await DocumentPicker.pick({
@@ -57,13 +61,12 @@ const ClaimRequest = () => {
         presentationStyle: 'fullScreen', // fullscreen selection window
       });
       setResult(pickerRes); // Set the value to result state
-      console.log(result);
     } catch (e) {
       handleDocPickerError(e);
     }
   };
 
-  // Called when submit button is clicked
+  // Called when submit button is pressed
   const onSubmit = data => {
     if (result) {
       // If there is result store the result to the 'attachment' key of the data object from the form
@@ -72,6 +75,11 @@ const ClaimRequest = () => {
       console.warn('No data selected');
     }
     console.log(data); // Api function here
+  };
+
+  // Remove selected file from the list when the close icon is pressed
+  const removeSelectedFile = index => {
+    setResult(result.filter(item => item !== result[index]));
   };
 
   return (
@@ -171,12 +179,33 @@ const ClaimRequest = () => {
               },
             }}
           />
+          {/* if there is doc result display the selected file's name and size */}
+          {result && result.length > 0 && (
+            <ScrollView style={styles.showSelected}>
+              {result.map((item, index) => (
+                <View style={styles.docItemStyle}>
+                  <View style={styles.docItemText}>
+                    <CustomText content={item.name} />
+                  </View>
+                  <IconMaterial
+                    name="close"
+                    size={20}
+                    color={colors.red}
+                    onPress={() => {
+                      removeSelectedFile(index);
+                    }}
+                  />
+                </View>
+              ))}
+            </ScrollView>
+          )}
           {/* Attachment button */}
           <View style={{marginTop: 20}} />
           <CustomButton
             title={'Attachment'}
-            width={350}
-            backgroundColor={colors.lightGray}
+            width={'100%'}
+            customStyle={styles.attachmentButton}
+            backgroundColor={colors.secondary}
             justifyContent={'center'}
             onPress={onDocPick}
             iconRight={true}
@@ -193,7 +222,7 @@ const ClaimRequest = () => {
           {/* Submit button */}
           <CustomButton
             title={'Submit'}
-            width={350}
+            width={'100%'}
             onPress={handleSubmit(onSubmit)}
           />
         </View>
@@ -208,6 +237,10 @@ const styles = StyleSheet.create({
     backgroundColor: colors.secondary,
     paddingHorizontal: 10,
     paddingTop: 20,
+  },
+  attachmentButton: {
+    borderWidth: 1,
+    borderColor: colors.primary,
   },
   innerContainer: {
     backgroundColor: colors.white,
@@ -233,6 +266,26 @@ const styles = StyleSheet.create({
     backgroundColor: colors.secondary,
     marginTop: 5,
     elevation: 0.4,
+  },
+  docItemText: {
+    width: '85%',
+  },
+  showSelected: {
+    height: 'auto',
+    minHeight: 100,
+    width: '100%',
+    borderWidth: 1,
+    borderStyle: 'dashed',
+    borderColor: colors.primary,
+    padding: 10,
+  },
+  docItemStyle: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'center',
+    backgroundColor: colors.secondary,
+    paddingVertical: 4,
+    marginBottom: 10,
   },
 });
 

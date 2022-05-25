@@ -60,7 +60,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     flexDirection: 'row',
     // height: 50,
-    color: Colors.gray,
+    color: Colors.dark,
     fontSize: 16,
     paddingHorizontal: 15,
   },
