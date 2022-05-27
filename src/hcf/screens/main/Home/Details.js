@@ -9,6 +9,7 @@ import {
   Modal,
   Text,
   Dimensions,
+  ScrollView,
 } from 'react-native';
 import StarRating from 'react-native-star-rating';
 import {CustomButton} from '../../../../components/general/CustomButton';
@@ -166,11 +167,13 @@ const Details = ({route, navigation}) => {
                   content="Overview"
                   customStyles={styles.typeAndTravelElement}
                 />
-                <CustomText
-                  content={data.description}
-                  fontColor={Colors.gray}
-                  fontSize={12}
-                />
+                <ScrollView>
+                  <CustomText
+                    content={data.description}
+                    fontColor={Colors.gray}
+                    fontSize={12}
+                  />
+                </ScrollView>
               </View>
 
               <View style={styles.claimButton}>
@@ -248,6 +251,7 @@ const styles = StyleSheet.create({
   },
   main: {
     flex: 2,
+    height: 'auto',
   },
   modalFullScreen: {
     width: '100%',
@@ -271,7 +275,12 @@ const styles = StyleSheet.create({
   type: {flexDirection: 'column', marginRight: 120},
   travel: {flexDirection: 'column'},
   typeTravelElement: {fontWeight: 'bold', marginBottom: 5},
-  overview: {flexDirection: 'column', marginTop: 8},
+  overview: {
+    flexDirection: 'column',
+    marginTop: 5,
+    height: 180,
+    marginBottom: 8,
+  },
   claimButton: {
     justifyContent: 'center',
     alignItems: 'center',

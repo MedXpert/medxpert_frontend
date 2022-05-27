@@ -85,7 +85,7 @@ const ClaimRequest = ({navigation}) => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.backButtonPageName}>
+      {/* <View style={styles.backButtonPageName}>
         <View style={styles.backButton}>
           <BackButton
             size={35}
@@ -95,7 +95,7 @@ const ClaimRequest = ({navigation}) => {
           />
         </View>
         <CustomText content={'Claim Request'} fontSize={18} fontWeight="600" />
-      </View>
+      </View> */}
       <ScrollView style={styles.innerContainer}>
         <View style={styles.form}>
           {/* HCF Name */}
@@ -113,6 +113,7 @@ const ClaimRequest = ({navigation}) => {
             name={'firstName'}
             label={'First Name'}
             error={errors.firstName?.message}
+            changeBorderOnFocus={true}
             rules={{
               required: {
                 value: true,
@@ -127,6 +128,7 @@ const ClaimRequest = ({navigation}) => {
             name={'lastName'}
             label={'Last Name'}
             error={errors.lastName?.message}
+            changeBorderOnFocus={true}
             rules={{
               required: {
                 value: true,
@@ -142,6 +144,7 @@ const ClaimRequest = ({navigation}) => {
             name={'phoneNumber'}
             label={'Phone Number'}
             error={errors.phoneNumber?.message}
+            changeBorderOnFocus={true}
             rules={{
               required: {
                 value: true,
@@ -156,6 +159,7 @@ const ClaimRequest = ({navigation}) => {
             name={'email'}
             label={'Email'}
             error={errors.email?.message}
+            changeBorderOnFocus={true}
             rules={{
               required: {
                 value: true,
@@ -177,6 +181,7 @@ const ClaimRequest = ({navigation}) => {
             label={'Message'}
             error={errors.message?.message}
             textAlignVertical={'top'}
+            changeBorderOnFocus={true}
             rules={{
               required: {
                 value: true,
@@ -215,6 +220,7 @@ const ClaimRequest = ({navigation}) => {
           <CustomButton
             title={'Attachment'}
             width={'100%'}
+            fontColor={colors.black}
             customStyle={styles.attachmentButton}
             backgroundColor={colors.secondary}
             justifyContent={'center'}
@@ -224,7 +230,7 @@ const ClaimRequest = ({navigation}) => {
               <IconMaterialCommunity
                 name="attachment"
                 size={30}
-                color={colors.primary}
+                color={colors.black}
                 style={{marginLeft: 10}}
               />
             }
@@ -246,21 +252,21 @@ const ClaimRequest = ({navigation}) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.secondary,
+    backgroundColor: colors.white,
     paddingHorizontal: 10,
-    paddingTop: 15,
+    // paddingTop: 15,
   },
   attachmentButton: {
     borderWidth: 1,
-    borderColor: colors.primary,
+    borderColor: colors.black,
   },
   innerContainer: {
     backgroundColor: colors.white,
     flex: 1,
-    marginTop: 10,
-    paddingTop: 15,
-    borderTopRightRadius: 20,
-    borderTopLeftRadius: 20,
+    // marginTop: 10,
+    paddingTop: 5,
+    // borderTopRightRadius: 20,
+    // borderTopLeftRadius: 20,
   },
   backButtonPageName: {
     flexDirection: 'row',
@@ -278,6 +284,8 @@ const styles = StyleSheet.create({
     backgroundColor: colors.secondary,
     marginTop: 5,
     height: 55,
+    borderWidth: 0.5,
+    borderColor: colors.lightGray,
   },
   textInputMessage: {
     height: null,

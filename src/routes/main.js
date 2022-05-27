@@ -5,13 +5,14 @@ import React, {useState} from 'react';
 import AuthStackScreen from './Auth';
 import SplashScreen from '../screens/welcome/Splash';
 import BottomNavBar from './BottomNavBar';
-import NavbarWithSubScreensUser from './NavbarWithSubScreens';
+import NavbarWithSubScreensUser from './NavbarWithSubScreensUser';
 // import Appointment from '../screens/main/Home/Appointment';
 // import AutomationEmail from '../screens/main/Emergency/AutomationEmail';
 
 // AsyncStorage to store user ID and other infos after logged in
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import NavbarWithSubScreensAdmin from '../hcf/routes/NavbarWithSubScreens';
+import NavigationStackHCF from '../hcf/routes/NavigationStackHCF';
+
 import {readAsyncStorage} from '../services/readAsyncStorage';
 import ClaimRequest from '../hcf/screens/main/Home/ClaimRequest';
 
@@ -46,7 +47,7 @@ const Main = () => {
       if (role === 'user') {
         return <NavbarWithSubScreensUser />;
       } else if (role === 'admin') {
-        return <NavbarWithSubScreensAdmin />;
+        return <NavigationStackHCF />;
       }
     }
   }; // return stacks according to the state of the user.

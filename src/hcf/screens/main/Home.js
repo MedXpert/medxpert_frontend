@@ -1,5 +1,5 @@
 import {
-  Text,
+  Toxt,
   View,
   StyleSheet,
   Dimensions,
@@ -245,7 +245,7 @@ const Home = ({navigation}) => {
           style={styles.map}
           surfaceView
           onPress={() => {
-            navigation.navigate('Details');
+            navigation.push('Details', {hcfName: 'Health Care Facility 1'});
           }}>
           {/* Display user location */}
           {/* Checks if the user has granted location permission to the app. */}

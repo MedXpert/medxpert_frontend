@@ -1,5 +1,5 @@
 import {View, TextInput, StyleSheet} from 'react-native';
-import React from 'react';
+import React, {useState} from 'react';
 
 import Colors from '../../../constants/colors';
 import {isRequired} from 'react-native/Libraries/DeprecatedPropTypes/DeprecatedColorPropType';
@@ -20,7 +20,9 @@ const CustomTextInputValidation = ({
   numberOfLines,
   textAlignVertical,
   placeholder,
+  changeBorderOnFocus = false,
 }) => {
+  const [focus, setFocus] = useState(false);
   return (
     <View style={styles.container}>
       {label && (
@@ -33,16 +35,29 @@ const CustomTextInputValidation = ({
           <>
             <TextInput
               keyboardType={keyboardType}
-              onBlur={onBlur}
+              onBlur={() => {
+                setFocus(false);
+                onBlur();
+              }}
               onChangeText={onChange}
               value={value}
-              style={[styles.textInput, customStyles]}
+              style={[
+                styles.textInput,
+                customStyles,
+                focus ? {borderWidth: 1, borderColor: colors.primary} : null,
+              ]}
               editable={editable}
               multiline={multiline}
               numberOfLines={numberOfLines}
               textAlignVertical={textAlignVertical}
               placeholder={placeholder}
               selectionColor={colors.primary}
+              changeBorderOnFocus={changeBorderOnFocus}
+              onFocus={() => {
+                if (changeBorderOnFocus) {
+                  setFocus(true);
+                }
+              }}
             />
             {error && <CustomText content={error} fontColor={colors.red} />}
           </>

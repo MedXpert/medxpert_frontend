@@ -6,7 +6,7 @@ import Claimed from './Profile/Claimed';
 import UserProfile from './Profile/UserProfile';
 import colors from '../../../constants/colors';
 
-const Profile = () => {
+const Profile = ({navigation}) => {
   const {height, width} = useWindowDimensions();
 
   const [index, setIndex] = useState(0);
@@ -16,10 +16,15 @@ const Profile = () => {
     {key: 'profile', title: 'Profile'},
   ]);
 
-  const renderScene = SceneMap({
-    claimed: Claimed,
-    profile: UserProfile,
-  });
+  // what to be rendered in each page/screen
+  const renderScene = ({route}) => {
+    switch (route.key) {
+      case 'claimed':
+        return <Claimed navigation={navigation} />;
+      case 'profile':
+        return <UserProfile navigation={navigation} />;
+    }
+  };
 
   // Render TabBar with customization
   const renderTabBar = props => (

@@ -10,7 +10,7 @@ import AutomationSms from '../screens/main/Emergency/AutomationSms';
 
 const TabAndSubsStack = createNativeStackNavigator();
 
-const NavbarWithSubScreens = () => {
+const NavbarWithSubScreensUser = () => {
   const config = {
     headerShown: false,
   };
@@ -35,4 +35,4 @@ const NavbarWithSubScreens = () => {
   );
 };
 
-export default NavbarWithSubScreens;
+export default NavbarWithSubScreensUser;

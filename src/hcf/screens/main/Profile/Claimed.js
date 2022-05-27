@@ -6,10 +6,11 @@ import {CustomText} from '../../../../components/general/CustomText';
 import {CustomButton} from '../../../../components/general/CustomButton';
 import {RenderHCF} from '../../../components/profile/RenderHCF';
 
-const Claimed = () => {
+const Claimed = ({navigation}) => {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
+        {/* Header */}
         <CustomText content={'Claimed'} fontSize={18} />
         <CustomButton
           backgroundColor={colors.lightGray}
@@ -23,8 +24,13 @@ const Claimed = () => {
       </View>
 
       <ScrollView style={styles.hcfSection}>
+        {/* Render Health Care Facility */}
         {hcfs.map(item => (
-          <RenderHCF hcfName={item.name} key={item.name} />
+          <RenderHCF
+            navigation={navigation}
+            hcfName={item.name}
+            key={item.name}
+          />
         ))}
       </ScrollView>
     </View>
@@ -37,8 +43,9 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white,
     borderTopLeftRadius: 15,
     borderTopRightRadius: 15,
-    padding: 15,
+    paddingHorizontal: 15,
     paddingTop: 30,
+    paddingBottom: 0,
   },
   header: {
     flexDirection: 'row',

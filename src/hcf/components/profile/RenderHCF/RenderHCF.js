@@ -4,8 +4,19 @@ import colors from '../../../../constants/colors';
 import {CustomText} from '../../../../components/general/CustomText';
 import IconEntypo from 'react-native-vector-icons/Entypo';
 import StarRating from 'react-native-star-rating';
+import {useNavigation} from '@react-navigation/native';
 
-const RenderHCF = ({hcfName, address, rating, images, type, travelTime}) => {
+const RenderHCF = ({
+  navigation,
+  hcfName,
+  address,
+  rating,
+  images,
+  type,
+  travelTime,
+}) => {
+  // const navigation = useNavigation();
+
   return (
     <View style={styles.container}>
       {/* HCF name */}
@@ -81,7 +92,9 @@ const RenderHCF = ({hcfName, address, rating, images, type, travelTime}) => {
         {/* Edit button */}
         <View style={styles.editButton}>
           <TouchableOpacity
-            onPress={() => {}}
+            onPress={() => {
+              navigation.push('EditHCF');
+            }}
             style={styles.editButtonTouchable}>
             <CustomText
               content={'Edit'}
@@ -142,7 +155,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   editButtonTouchable: {
-    paddingHorizontal: 15,
+    paddingHorizontal: 25,
     paddingVertical: 2,
     borderRadius: 5,
     borderWidth: 1,
