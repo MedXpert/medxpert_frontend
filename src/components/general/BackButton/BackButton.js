@@ -3,25 +3,28 @@ import React from 'react';
 
 import IonIcons from 'react-native-vector-icons/Ionicons';
 import colors from '../../../constants/colors';
+import {CustomText} from '../CustomText';
 
 const BackButton = ({onPress, backgroundColor, size = 30}) => {
   return (
-    <TouchableOpacity
-      style={[
-        styles.backButton,
-        {width: size + 5, height: size + 5, backgroundColor: backgroundColor},
-      ]}
-      onPress={onPress}>
-      <IonIcons
-        name="chevron-back"
-        size={size}
-        color={colors.white}
+    <>
+      <TouchableOpacity
         style={[
-          styles.icon,
-          {color: backgroundColor ? colors.white : colors.primary},
+          styles.backButton,
+          {width: size + 5, height: size + 5, backgroundColor: backgroundColor},
         ]}
-      />
-    </TouchableOpacity>
+        onPress={onPress}>
+        <IonIcons
+          name="chevron-back"
+          size={size}
+          color={colors.white}
+          style={[
+            styles.icon,
+            {color: backgroundColor ? colors.white : colors.primary},
+          ]}
+        />
+      </TouchableOpacity>
+    </>
   );
 };
 

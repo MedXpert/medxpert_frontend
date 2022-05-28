@@ -20,6 +20,7 @@ import {CustomButton} from '../../../../components/general/CustomButton';
 import {emailRegEx} from '../../../../constants/regEx';
 import {FlatList, TouchableOpacity} from 'react-native-gesture-handler';
 import {color} from 'react-native-reanimated';
+import {BackButtonAndText} from '../../../../components/general/BackButtonAndText';
 
 const ClaimRequest = ({navigation}) => {
   const [result, setResult] = useState();
@@ -96,6 +97,7 @@ const ClaimRequest = ({navigation}) => {
         </View>
         <CustomText content={'Claim Request'} fontSize={18} fontWeight="600" />
       </View> */}
+      <BackButtonAndText navigation={navigation} text={'Claim Request'} />
       <ScrollView style={styles.innerContainer}>
         <View style={styles.form}>
           {/* HCF Name */}
@@ -140,11 +142,11 @@ const ClaimRequest = ({navigation}) => {
           <CustomTextInputValidation
             customStyles={styles.textInput}
             control={control}
-            keyboardType="numeric"
             name={'phoneNumber'}
             label={'Phone Number'}
             error={errors.phoneNumber?.message}
             changeBorderOnFocus={true}
+            keyboardType={'phone-pad'}
             rules={{
               required: {
                 value: true,
@@ -163,11 +165,11 @@ const ClaimRequest = ({navigation}) => {
             rules={{
               required: {
                 value: true,
-                message: 'Email name is required',
+                message: 'Email is required',
               },
               pattern: {
                 value: emailRegEx,
-                message: 'Invalid email',
+                message: 'Please enter a valid email address',
               },
             }}
           />
@@ -252,9 +254,8 @@ const ClaimRequest = ({navigation}) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.white,
+    backgroundColor: colors.secondary,
     paddingHorizontal: 10,
-    // paddingTop: 15,
   },
   attachmentButton: {
     borderWidth: 1,
@@ -262,11 +263,9 @@ const styles = StyleSheet.create({
   },
   innerContainer: {
     backgroundColor: colors.white,
-    flex: 1,
-    // marginTop: 10,
     paddingTop: 5,
-    // borderTopRightRadius: 20,
-    // borderTopLeftRadius: 20,
+    borderTopLeftRadius: 10,
+    borderTopRightRadius: 10,
   },
   backButtonPageName: {
     flexDirection: 'row',
@@ -283,7 +282,6 @@ const styles = StyleSheet.create({
   textInput: {
     backgroundColor: colors.secondary,
     marginTop: 5,
-    height: 55,
     borderWidth: 0.5,
     borderColor: colors.lightGray,
   },

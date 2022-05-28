@@ -5,6 +5,7 @@ import {CustomText} from '../../../../components/general/CustomText';
 import IconEntypo from 'react-native-vector-icons/Entypo';
 import StarRating from 'react-native-star-rating';
 import {useNavigation} from '@react-navigation/native';
+import {CustomButton} from '../../../../components/general/CustomButton';
 
 const RenderHCF = ({
   navigation,
@@ -90,18 +91,16 @@ const RenderHCF = ({
           </View>
         </View>
         {/* Edit button */}
-        <View style={styles.editButton}>
-          <TouchableOpacity
+        <View style={styles.editButtonContainer}>
+          <CustomButton
+            title={'Edit'}
+            width={100}
+            backgroundColor={colors.secondary}
             onPress={() => {
               navigation.push('EditHCF');
             }}
-            style={styles.editButtonTouchable}>
-            <CustomText
-              content={'Edit'}
-              fontColor={colors.black}
-              fontSize={16}
-            />
-          </TouchableOpacity>
+            customStyle={styles.editButton}
+          />
         </View>
       </View>
     </View>
@@ -154,12 +153,12 @@ const styles = StyleSheet.create({
   typeTravel: {
     flexDirection: 'row',
   },
-  editButtonTouchable: {
-    paddingHorizontal: 25,
-    paddingVertical: 2,
-    borderRadius: 5,
+
+  editButton: {
     borderWidth: 1,
     borderColor: colors.primary,
+    height: 'auto',
+    paddingVertical: 2,
   },
 });
 

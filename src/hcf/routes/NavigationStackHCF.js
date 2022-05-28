@@ -118,15 +118,11 @@ const NavigationStackHCF = () => {
       />
       <ContStack.Group screenOptions={{headerShown: false}}>
         <ContStack.Screen name="Details" component={Details} />
-        <ContStack.Screen name="EditHCF" component={EditHCF} />
         <ContStack.Screen name="Claimed" component={Claimed} />
         <ContStack.Screen name="UserProfile" component={UserProfile} />
+        <ContStack.Screen name="EditHCF" component={EditHCF} />
+        <ContStack.Screen name="ClaimRequest" component={ClaimRequest} />
       </ContStack.Group>
-      <ContStack.Screen
-        name="ClaimRequest"
-        component={ClaimRequest}
-        options={{title: 'Claim Request'}}
-      />
     </ContStack.Navigator>
   );
 };
