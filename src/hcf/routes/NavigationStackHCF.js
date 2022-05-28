@@ -19,6 +19,7 @@ import EditHCF from '../screens/main/Profile/EditHCF';
 import Claimed from '../screens/main/Profile/Claimed';
 import UserProfile from '../screens/main/Profile/UserProfile';
 import colors from '../../constants/colors';
+import EditImages from '../screens/main/Profile/EditImages';
 
 const navigatorScreenOptions = {
   headerShown: false,
@@ -122,6 +123,7 @@ const NavigationStackHCF = () => {
         <ContStack.Screen name="UserProfile" component={UserProfile} />
         <ContStack.Screen name="EditHCF" component={EditHCF} />
         <ContStack.Screen name="ClaimRequest" component={ClaimRequest} />
+        <ContStack.Screen name="EditImages" component={EditImages} />
       </ContStack.Group>
     </ContStack.Navigator>
   );

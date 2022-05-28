@@ -259,6 +259,9 @@ const EditHCF = ({navigation}) => {
                 width={'100%'}
                 backgroundColor={colors.primary}
                 customStyle={styles.editImageButton}
+                onPress={() => {
+                  navigation.push('EditImages');
+                }}
               />
             </View>
           </View>
