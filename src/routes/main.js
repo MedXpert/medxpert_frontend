@@ -5,7 +5,7 @@ import React, {useState} from 'react';
 import AuthStackScreen from './Auth';
 import SplashScreen from '../screens/welcome/Splash';
 import BottomNavBar from './BottomNavBar';
-import NavbarWithSubScreensUser from './NavbarWithSubScreensUser';
+import NavigationStackUser from './NavigationStackUser';
 // import Appointment from '../screens/main/Home/Appointment';
 // import AutomationEmail from '../screens/main/Emergency/AutomationEmail';
 
@@ -45,7 +45,7 @@ const Main = () => {
 
       // Check role
       if (role === 'user') {
-        return <NavbarWithSubScreensUser />;
+        return <NavigationStackUser />;
       } else if (role === 'admin') {
         return <NavigationStackHCF />;
       }
