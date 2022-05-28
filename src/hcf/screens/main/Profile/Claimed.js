@@ -13,12 +13,12 @@ const Claimed = ({navigation}) => {
         {/* Header */}
         <CustomText content={'Claimed'} fontSize={18} />
         <CustomButton
-          backgroundColor={colors.lightGray}
+          backgroundColor={colors.secondary}
           fontSize={15}
+          fontColor={colors.gray}
           width="auto"
           height="auto"
-          customStyle={{paddingHorizontal: 10, paddingVertical: 5}}
-          onPress={() => {}}
+          customStyle={styles.pendingButton}
           title={'Pending claims'}
         />
       </View>
@@ -54,6 +54,13 @@ const styles = StyleSheet.create({
   },
   hcfSection: {
     marginTop: 30,
+  },
+  pendingButton: {
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderWidth: 1,
+    borderColor: colors.lightGray,
+    borderRadius: 2,
   },
 });
 

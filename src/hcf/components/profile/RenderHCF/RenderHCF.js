@@ -6,6 +6,7 @@ import IconEntypo from 'react-native-vector-icons/Entypo';
 import StarRating from 'react-native-star-rating';
 import {useNavigation} from '@react-navigation/native';
 import {CustomButton} from '../../../../components/general/CustomButton';
+import {IconButton} from 'react-native-paper';
 
 const RenderHCF = ({
   navigation,
@@ -92,14 +93,13 @@ const RenderHCF = ({
         </View>
         {/* Edit button */}
         <View style={styles.editButtonContainer}>
-          <CustomButton
-            title={'Edit'}
-            width={100}
-            backgroundColor={colors.secondary}
+          <IconButton
+            icon={'square-edit-outline'}
+            size={30}
+            color={colors.primary}
             onPress={() => {
               navigation.push('EditHCF');
             }}
-            customStyle={styles.editButton}
           />
         </View>
       </View>
@@ -109,11 +109,12 @@ const RenderHCF = ({
 
 const styles = StyleSheet.create({
   container: {
+    borderRadius: 5,
     height: 'auto',
     width: '100%',
     backgroundColor: colors.secondary,
     padding: 10,
-    elevation: 2,
+    elevation: 1,
     marginVertical: 10,
   },
   location: {flexDirection: 'row', marginVertical: 5},
@@ -152,13 +153,6 @@ const styles = StyleSheet.create({
   },
   typeTravel: {
     flexDirection: 'row',
-  },
-
-  editButton: {
-    borderWidth: 1,
-    borderColor: colors.primary,
-    height: 'auto',
-    paddingVertical: 2,
   },
 });
 
