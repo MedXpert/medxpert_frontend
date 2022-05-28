@@ -33,6 +33,7 @@ const navigatorScreenOptions = {
   },
 };
 
+// Options for Home bottom navbar tab
 const homeScreenOptions = {
   tabBarIcon: ({focused}) => {
     let activeColor = focused ? Colors.primary : Colors.gray;
@@ -43,8 +44,10 @@ const homeScreenOptions = {
       </View>
     );
   },
+  headerShown: false,
 };
 
+// Options for Appointment bottom navbar tab
 const appointmentScreenOptions = {
   tabBarIcon: ({focused}) => {
     let activeColor = focused ? Colors.primary : Colors.gray;
@@ -66,6 +69,7 @@ const appointmentScreenOptions = {
   },
 };
 
+// Options for profile bottom navbar tab
 const profileScreenOptions = {
   tabBarIcon: ({focused}) => {
     let activeColor = focused ? Colors.primary : Colors.gray;
@@ -79,70 +83,51 @@ const profileScreenOptions = {
 };
 
 const Tab = createBottomTabNavigator();
-const HomeStack = createStackNavigator();
-const ProfileStack = createStackNavigator();
-const AppointmentStack = createStackNavigator();
 
-const HomeStackScreen = () => {
-  return (
-    <HomeStack.Navigator>
-      <HomeStack.Group screenOptions={{headerShown: false}}>
-        <HomeStack.Screen name="Home" component={Home} />
-        <HomeStack.Screen name="Details" component={Details} />
-      </HomeStack.Group>
-      <HomeStack.Group screenOptions={{headerShown: true}}>
-        <HomeStack.Screen
-          name="ClaimRequest"
-          component={ClaimRequest}
-          options={{title: 'Claim Request'}}
-        />
-      </HomeStack.Group>
-    </HomeStack.Navigator>
-  );
-};
-
-const AppointmentStackScreen = () => {
-  return (
-    <AppointmentStack.Navigator>
-      <AppointmentStack.Screen name="Appointment" component={Appointment} />
-    </AppointmentStack.Navigator>
-  );
-};
-
-const ProfileStackScreen = () => {
-  return (
-    <ProfileStack.Navigator>
-      <ProfileStack.Group screenOptions={{headerShown: false}}>
-        <ProfileStack.Screen name="Profile" component={Profile} />
-        <ProfileStack.Screen name="EditHCF" component={EditHCF} />
-        <ProfileStack.Screen name="Claimed" component={Claimed} />
-        <ProfileStack.Screen name="UserProfile" component={UserProfile} />
-      </ProfileStack.Group>
-    </ProfileStack.Navigator>
-  );
-};
-
-const NavigationStackHCF = () => {
+const BottomNavbar = () => {
   return (
     <Tab.Navigator
-      initialRouteName="HomeStack"
+      initialRouteName="Home"
       screenOptions={navigatorScreenOptions}>
+      <Tab.Screen name="Home" component={Home} options={homeScreenOptions} />
       <Tab.Screen
-        name="HomeStack"
-        component={HomeStackScreen}
-        options={homeScreenOptions}
-      />
-      <Tab.Screen
-        name="AppointmentStack"
-        component={AppointmentStackScreen}
+        name="Appointment"
+        component={Appointment}
         options={appointmentScreenOptions}
       />
       <Tab.Screen
-        name="ProfileStack"
-        component={ProfileStackScreen}
+        name="Profile"
+        component={Profile}
         options={profileScreenOptions}
       />
     </Tab.Navigator>
+  );
+};
+
+// Container for Bottom Navbar and other screen
+const ContStack = createStackNavigator();
+
+const NavigationStackHCF = () => {
+  return (
+    <ContStack.Navigator>
+      {/* Screens with Bottom Navbar (the main ones) - Home, Appointment, Profile */}
+      <ContStack.Screen
+        name="BottomNavbar"
+        component={BottomNavbar}
+        options={{headerShown: false}}
+      />
+      <ContStack.Group screenOptions={{headerShown: false}}>
+        <ContStack.Screen name="Details" component={Details} />
+        <ContStack.Screen name="EditHCF" component={EditHCF} />
+        <ContStack.Screen name="Claimed" component={Claimed} />
+        <ContStack.Screen name="UserProfile" component={UserProfile} />
+      </ContStack.Group>
+      <ContStack.Screen
+        name="ClaimRequest"
+        component={ClaimRequest}
+        options={{title: 'Claim Request'}}
+      />
+    </ContStack.Navigator>
   );
 };
 
