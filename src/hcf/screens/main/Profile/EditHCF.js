@@ -294,6 +294,7 @@ const styles = StyleSheet.create({
   },
   innerFormContainer: {
     paddingBottom: 140,
+    paddingTop: 10,
   },
   textInput: {
     backgroundColor: colors.secondary,
