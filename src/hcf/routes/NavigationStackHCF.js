@@ -20,6 +20,8 @@ import Claimed from '../screens/main/Profile/Claimed';
 import UserProfile from '../screens/main/Profile/UserProfile';
 import colors from '../../constants/colors';
 import EditImages from '../screens/main/Profile/EditImages';
+import PendingAppointments from '../screens/main/Appointment/PendingAppointments';
+import AvailableDates from '../screens/main/Appointment/AvailableDates';
 
 const navigatorScreenOptions = {
   headerShown: false,
@@ -124,6 +126,11 @@ const NavigationStackHCF = () => {
         <ContStack.Screen name="EditHCF" component={EditHCF} />
         <ContStack.Screen name="ClaimRequest" component={ClaimRequest} />
         <ContStack.Screen name="EditImages" component={EditImages} />
+        <ContStack.Screen name="AvailableDates" component={AvailableDates} />
+        <ContStack.Screen
+          name="PendingAppointments"
+          component={PendingAppointments}
+        />
       </ContStack.Group>
     </ContStack.Navigator>
   );

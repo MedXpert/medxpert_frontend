@@ -1,14 +1,55 @@
-import {View, Text} from 'react-native';
-import React from 'react';
+import {View, useWindowDimensions, StyleSheet} from 'react-native';
+import React, {useState} from 'react';
+import {TabView, SceneMap, TabBar} from 'react-native-tab-view';
 
-import {CustomText} from '../../../components/general/CustomText';
+import AvailableDates from './Appointment/AvailableDates';
+import PendingAppointments from './Appointment/PendingAppointments';
 
-const Appointment = () => {
+import colors from '../../../constants/colors';
+
+const Appointment = ({navigation}) => {
+  const {height, width} = useWindowDimensions();
+
+  const renderScene = SceneMap({
+    pending: PendingAppointments,
+    availableDates: AvailableDates,
+  });
+
+  const [index, setIndex] = useState(0);
+
+  const [routes] = useState([
+    {key: 'pending', title: 'Pending '},
+    {key: 'availableDates', title: 'Available Dates'},
+  ]);
+
+  // Render TabBar with customization
+  const renderTabBar = props => (
+    <TabBar
+      {...props}
+      activeColor={colors.white}
+      inactiveColor={colors.black}
+      indicatorStyle={styles.indicatorStyle}
+      style={styles.tabBarStyle}
+    />
+  );
+
   return (
-    <View>
-      <CustomText content={'Appointment'} />
-    </View>
+    // The main Tab view
+    <TabView
+      renderTabBar={renderTabBar}
+      navigationState={{index, routes}}
+      renderScene={renderScene}
+      onIndexChange={setIndex}
+      initialLayout={{width: width}}
+    />
   );
 };
+
+const styles = StyleSheet.create({
+  tabBarStyle: {
+    backgroundColor: colors.primary,
+  },
+  indicatorStyle: {backgroundColor: colors.white, height: 4},
+});
 
 export default Appointment;
