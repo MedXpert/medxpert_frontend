@@ -6,26 +6,41 @@ import {
   ScrollView,
   FlatList,
 } from 'react-native';
-import React, {useController} from 'react';
+import React, {useState} from 'react';
 
 import {BackButtonAndText} from '../../../../components/general/BackButtonAndText';
 import {IconButton} from 'react-native-paper';
 import colors from '../../../../constants/colors';
-import {useDerivedValue} from 'react-native-reanimated';
 import {CustomButton} from '../../../../components/general/CustomButton';
+import {CustomModal} from '../../../../components/general/CustomModal';
 
 const height = Dimensions.get('window').height;
 const width = Dimensions.get('window').width;
 
 const EditImages = ({navigation}) => {
+  const [currentImageId, setCurrentImageId] = useState(0);
+  const [deleteImageModalVisibility, setDeleteImageModalVisibility] =
+    useState(false);
+
   // when delete image icon is pressed
-  const onDeleteImage = id => {};
+  const onDeleteImage = id => {
+    setCurrentImageId(id);
+    setDeleteImageModalVisibility(true);
+  };
+
+  // use CurrentImageId set by the onDeleteImage function to delete the selected image
+  const onDeleteConfirm = () => {
+    // Delete query here
+  };
 
   // when save button is pressed
-  const onSaveImages = () => {};
+  const onSaveImages = () => {
+    // Save function here
+    navigation.goBack();
+  };
 
   // Render images from api
-  const renderImages = useController(({item}) => {
+  const renderImages = ({item}) => {
     return (
       <View style={styles.imageAndClose}>
         <Image
@@ -44,11 +59,24 @@ const EditImages = ({navigation}) => {
         />
       </View>
     );
-  });
+  };
 
   return (
     <View style={styles.container}>
       <BackButtonAndText text={'Images'} navigation={navigation} />
+      <CustomModal
+        modalTitle={'Delet Image'}
+        modalContent={'Are you sure you want to delete this  image?'}
+        visibility={deleteImageModalVisibility}
+        leftButtonTitle={'Cancel'}
+        onPressLeftButton={() => {
+          setDeleteImageModalVisibility(false);
+        }}
+        rightButtonTitle={'Delete'}
+        onPressRightButton={() => {
+          onDeleteConfirm;
+        }}
+      />
       <View style={styles.innerContainer}>
         <View style={styles.plusIcon}>
           <IconButton icon={'plus'} size={30} color={colors.primary} />
