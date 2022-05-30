@@ -15,7 +15,7 @@ const Appointment = ({navigation}) => {
     availableDates: AvailableDates,
   });
 
-  const [index, setIndex] = useState(0);
+  const [index, setIndex] = React.useState(0);
 
   const [routes] = useState([
     {key: 'pending', title: 'Pending '},
