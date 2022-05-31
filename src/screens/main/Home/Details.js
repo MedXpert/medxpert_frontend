@@ -24,6 +24,7 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {CustomText} from '../../../components/general/CustomText';
 import {BackButton} from '../../../components/general/BackButton';
 import {useHealthCareFacility} from '../../../hooks/healthCareFacility';
+import Spinner from 'react-native-spinkit';
 
 const ImageItem = ({image, onPress}) => (
   <Pressable onPress={onPress}>
@@ -73,14 +74,13 @@ const Details = ({route, navigation}) => {
         </View>
       </Modal>
       {isLoading && (
-        <View style={styles.loadingContainer}>
-          <ContentLoader
-            active
-            pHeight={100}
-            pRows={Math.floor(dimensionsHeight / 100)}
-            title={false}
-            animationDuration={400}
-            pWidth={Math.floor(dimensionsWidth - 20)}
+        <View style={styles.spinnerContainer}>
+          <Spinner
+            isVisible
+            color={Colors.primary}
+            size={70}
+            type="WanderingCubes"
+            style={styles.appointmentsSpinner}
           />
         </View>
       )}
@@ -107,8 +107,7 @@ const Details = ({route, navigation}) => {
             <View style={styles.backButton}>
               <BackButton
                 backgroundColor={Colors.primary}
-                height={40}
-                width={40}
+                size={40}
                 onPress={() => {
                   navigation.goBack();
                 }}
@@ -293,7 +292,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     backgroundColor: Colors.secondary,
   },
-
   modalCloseTag: {position: 'absolute', top: 20, right: 20},
   modalImage: {width: '100%', height: 400},
   mainContainer: {paddingTop: 70, paddingHorizontal: 14},
@@ -322,6 +320,11 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.secondary,
     borderColor: Colors.lightGray,
     borderWidth: 1,
+  },
+  spinnerContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    flex: 1,
   },
 });
 

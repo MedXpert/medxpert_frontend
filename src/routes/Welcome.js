@@ -10,6 +10,7 @@ import Welcome3 from '../screens/welcome/Welcome3';
 const WelcomeStackScreen = () => {
   const config = {
     animation: 'slide_from_right',
+    headerShown: false,
   };
   const WelcomeStack = createNativeStackNavigator();
   return (

@@ -4,7 +4,7 @@ import React, {useState} from 'react';
 import {CustomText} from '../../general/CustomText';
 import colors from '../../../constants/colors';
 
-const ToggleAutomation = ({text}) => {
+const ToggleAutomation = ({text, elevation = 0}) => {
   const [toggle, setToggle] = useState(false);
 
   const onSmsToggleChange = () => {
@@ -12,7 +12,7 @@ const ToggleAutomation = ({text}) => {
   };
 
   return (
-    <View style={styles.toggle}>
+    <View style={[styles.toggle, {elevation: elevation}]}>
       <CustomText content={text} fontSize={18} />
       <Switch
         trackColor={{false: colors.lightGray, true: colors.primary}}
