@@ -1,13 +1,20 @@
-import {View, Image, StyleSheet} from 'react-native';
+import {
+  View,
+  Image,
+  StyleSheet,
+  Pressable,
+  KeyboardAvoidingView,
+  ScrollView,
+} from 'react-native';
 import React from 'react';
 import Colors from '../../constants/colors';
 import {CustomText} from '../../components/general/CustomText';
 import {CustomButton} from '../../components/general/CustomButton';
 import {CustomTextInputValidation} from '../../components/general/CustomTextInputValidation';
-import Pressable from 'react-native/Libraries/Components/Pressable/Pressable';
 import IconAnt from 'react-native-vector-icons/AntDesign';
 import colors from '../../constants/colors';
 import {useForm} from 'react-hook-form';
+import {emailRegEx} from '../../constants/regEx';
 
 const Profile = () => {
   const {
@@ -69,26 +76,59 @@ const Profile = () => {
         />
       </View>
       {/* form here */}
-      <View style={styles.form}>
+      <ScrollView style={styles.form}>
         <CustomTextInputValidation
           label="Full Name"
           control={control}
           name="fullName"
+          error={errors.fullName?.message}
+          rules={{
+            required: {
+              value: true,
+              message: 'Full name is required.',
+            },
+          }}
         />
         <CustomTextInputValidation
           label="Email"
           control={control}
           name="email"
+          error={errors.email?.message}
+          rules={{
+            required: {
+              value: true,
+              message: 'Email is required',
+            },
+            pattern: {
+              value: emailRegEx,
+              message: 'Invalid email',
+            },
+          }}
         />
         <CustomTextInputValidation
           label="Phone"
           control={control}
           name="phone"
+          error={errors.phone?.message}
+          keyboardType="numeric"
+          rules={{
+            required: {
+              value: true,
+              message: 'Phone number is required',
+            },
+          }}
         />
         <CustomTextInputValidation
           label="Username"
           control={control}
           name="username"
+          error={errors.username?.message}
+          rules={{
+            required: {
+              value: true,
+              message: 'Username is required',
+            },
+          }}
         />
         <CustomButton
           customStyle={{marginTop: 10}}
@@ -96,7 +136,7 @@ const Profile = () => {
           width="100%"
           onPress={handleSubmit(onSubmit)}
         />
-      </View>
+      </ScrollView>
     </View>
   );
 };

@@ -118,17 +118,6 @@ const MapTypeModal = ({
     </View>
   );
 };
-// Shadow property
-const shadow = {
-  shadowColor: Colors.black,
-  shadowOffset: {
-    width: 0,
-    height: 2,
-  },
-  shadowOpacity: 0.25,
-  shadowRadius: 4,
-  elevation: 5,
-};
 
 const styles = StyleSheet.create({
   chooseMapModal: {
@@ -141,7 +130,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.white,
     borderColor: Colors.secondary,
     borderWidth: 1,
-    ...shadow,
+    elevation: 5,
   },
 
   mapTypesContainers: {

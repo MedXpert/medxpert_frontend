@@ -10,15 +10,27 @@ const ToggleFeatures = ({
   borderRadius = {borderRadius: 30},
   onToggleChange,
   toggleFeature,
+  disabled = false,
+  largeTextFontColor = colors.black,
+  smallTextFontColor = colors.gray,
 }) => {
   return (
     <View style={[styles.toggleContainer, borderRadius]}>
       <View style={styles.text}>
-        <CustomText content={largeText} fontSize={18} />
-        <CustomText content={smallText} fontSize={12} />
+        <CustomText
+          content={largeText}
+          fontSize={18}
+          fontColor={largeTextFontColor}
+        />
+        <CustomText
+          content={smallText}
+          fontSize={12}
+          fontColor={smallTextFontColor}
+        />
       </View>
       <View style={styles.toggle}>
         <Switch
+          disabled={disabled}
           trackColor={{false: colors.lightGray, true: colors.primary}}
           thumbColor={toggleFeature ? colors.white : colors.gray}
           onValueChange={onToggleChange}
@@ -43,6 +55,7 @@ const styles = StyleSheet.create({
   text: {
     width: '80%',
   },
+  toggle: {},
 });
 
 export {ToggleFeatures};

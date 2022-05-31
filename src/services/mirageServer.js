@@ -21,7 +21,7 @@ window.server = createServer({
       address: 'Ras Mekonen street, Addis Ababa, Ethiopia',
       averageRating: 4.5,
       GPSCoordinates: '',
-      verificationStatus: true,
+      verificationStatus: false,
       website: '',
       email: '',
       phoneNumber: '',
