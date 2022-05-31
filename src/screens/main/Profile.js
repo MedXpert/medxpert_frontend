@@ -1,131 +1,172 @@
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  TextInput,
-} from 'react-native';
+import {View, Image, StyleSheet} from 'react-native';
 import React from 'react';
-
+import Colors from '../../constants/colors';
 import {CustomText} from '../../components/general/CustomText';
-import {Icon} from 'react-native-vector-icons/Icon';
+import {CustomButton} from '../../components/general/CustomButton';
+import {CustomTextInputValidation} from '../../components/general/CustomTextInputValidation';
+import Pressable from 'react-native/Libraries/Components/Pressable/Pressable';
+import IconAnt from 'react-native-vector-icons/AntDesign';
+import colors from '../../constants/colors';
+import {useForm} from 'react-hook-form';
 
 const Profile = () => {
+  const {
+    control,
+    handleSubmit,
+    formState: {errors},
+  } = useForm({
+    defaultValues: {
+      fullName: user.firstName + ' ' + user.lastName,
+      email: user.email,
+      phone: user.phone,
+      username: user.username,
+      sex: user.sex,
+      address: user.address,
+    },
+  });
+  const onSubmit = data => console.log(data);
+
   return (
-    <SafeAreaView style={styles.container}>
-      <CustomText content={'Profile'} />
-      <View style={styles.topbtn}>
-        <TouchableOpacity>
-          <Text>Change Password</Text>
-        </TouchableOpacity>
-      </View>
-      <View style={styles.profilecontainer}>
-        <Image
-          style={styles.headerImage}
-          source={require('../../assets/svg/bottomNavbar/profile.svg')}
+    <View>
+      <View style={styles.changePassword}>
+        <CustomButton
+          title="Change password"
+          backgroundColor={Colors.white}
+          fontColor={Colors.dark}
+          width={165}
+          customStyle={styles.changePasswordButton}
+          fontSize={14}
+          fontWeight="bold"
+          height={35}
         />
       </View>
 
-      <TouchableOpacity style={styles.probtn}>
-        <Icon name="camera" color="gray" size={15} style={{padding: 10}} />
-      </TouchableOpacity>
-
-      <View style={{alignSelf: 'center', marginTop: 10}}>
-        <Text style={{fontSize: 30, alignItems: 'center'}}>John Doe</Text>
+      {/* profile picture with edit button */}
+      <View style={styles.profilePictureWithEdit}>
+        {/* profile picture here */}
+        <View style={styles.profilePictureBorder}>
+          <Image
+            source={{uri: user.profilePicture}}
+            style={styles.profilePicture}
+          />
+          {/* image icon for changing profile */}
+          <View style={styles.editProfilePicture}>
+            <Pressable
+              onPress={() => {
+                console.log('clicked');
+              }}>
+              <IconAnt name="camera" size={25} color={Colors.lightGray} />
+            </Pressable>
+          </View>
+        </View>
       </View>
-      <View style={{alignSelf: 'center', marginTop: 10}}>
-        <Text style={styles.lable}>Full Name</Text>
-        <TextInput placeholder="Name" style={styles.txtstyle}></TextInput>
-
-        <Text style={styles.lable}>E-mail</Text>
-        <TextInput
-          placeholder="Example@gmail.com"
-          style={styles.txtstyle}></TextInput>
-
-        <Text style={styles.lable}>Phone Number</Text>
-        <TextInput
-          placeholder="(+xxx) xxxxx xxxx"
-          textContentType="int"
-          style={styles.txtstyle}></TextInput>
-
-        <Text style={styles.lable}>User Name</Text>
-        <TextInput
-          placeholder="user name"
-          keyboardType="password"
-          style={styles.txtstyle}></TextInput>
+      {/* name */}
+      <View style={styles.fullName}>
+        <CustomText
+          content={user.firstName + ' ' + user.lastName}
+          fontSize={25}
+          fontColor={Colors.black}
+        />
       </View>
-      <TouchableOpacity style={styles.updatebtn}>
-        <Icon color="black" size={20}>
-          Update{' '}
-        </Icon>
-      </TouchableOpacity>
-    </SafeAreaView>
+      {/* form here */}
+      <View style={styles.form}>
+        <CustomTextInputValidation
+          label="Full Name"
+          control={control}
+          name="fullName"
+        />
+        <CustomTextInputValidation
+          label="Email"
+          control={control}
+          name="email"
+        />
+        <CustomTextInputValidation
+          label="Phone"
+          control={control}
+          name="phone"
+        />
+        <CustomTextInputValidation
+          label="Username"
+          control={control}
+          name="username"
+        />
+        <CustomButton
+          customStyle={{marginTop: 10}}
+          title="Update Profile"
+          width="100%"
+          onPress={handleSubmit(onSubmit)}
+        />
+      </View>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    shadowColor: 'black',
+  changePassword: {
     flex: 1,
-    alignItems: 'flex-start',
-    marginLeft: 10,
-    marginRight: 10,
-    marginTop: 25,
-    zIndex: 10,
-  },
-  topbtn: {
-    margin: 5,
-    alignSelf: 'flex-end',
-    alignItems: 'center',
-    backgroundColor: 'white',
-    borderColor: 'black',
-    borderWidth: 0.5,
-    borderRadius: 50,
-    height: 20,
-    width: 100,
-  },
-  profilecontainer: {
     flexDirection: 'row',
-    alignSelf: 'center',
+    justifyContent: 'flex-end',
+    padding: 20,
   },
-  headerImage: {
+  changePasswordButton: {
+    fontWeight: 'bold',
+    borderRadius: 20,
+    shadowColor: Colors.gray,
+    elevation: 3,
+  },
+  profilePictureWithEdit: {
+    flexDirection: 'row',
+    paddingTop: 40,
+    alignContent: 'center',
     justifyContent: 'center',
-    backgroundColor: 'red',
+  },
+  profilePictureBorder: {
+    width: 125,
+    height: 125,
+    padding: 10,
     borderRadius: 100,
-    width: 150,
-    height: 150,
+    backgroundColor: colors.white,
+    shadowColor: colors.gray,
+    elevation: 3,
   },
-  probtn: {
-    backgroundColor: 'white',
-    borderColor: 'black',
-    borderRadius: 50,
-    alignSelf: 'center',
-    marginLeft: 90,
-    marginTop: -30,
-    borderWidth: 1,
+  profilePicture: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 100,
   },
-  lable: {
-    marginLeft: 10,
-    fontSize: 15,
+  editProfilePicture: {
+    position: 'absolute',
+    bottom: 0,
+    right: 0,
+    backgroundColor: colors.white,
+    padding: 10,
+    borderRadius: 100,
+    shadowColor: colors.gray,
+    elevation: 3,
   },
-  txtstyle: {
-    borderWidth: 1,
-    borderColor: 'black',
-    height: 50,
-    margin: 10,
-    width: 300,
-    borderRadius: 5,
-    paddingLeft: 10,
-  },
-  updatebtn: {
-    width: 300,
-    height: 45,
-    margin: 8,
-    borderRadius: 13,
-    backgroundColor: '#5ed4ff',
+  fullName: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignContent: 'center',
     paddingTop: 10,
-    alignSelf: 'center',
-    alignItems: 'center',
+  },
+  form: {
+    flexDirection: 'column',
+    paddingHorizontal: 30,
+    paddingTop: 20,
   },
 });
+
+const user = {
+  firstName: 'Naod',
+  lastName: 'Dame',
+  email: 'naol@gmail.com',
+  phone: '9147854968',
+  username: 'Naodo',
+  sex: 'M',
+  address: 'some place, some city, some country',
+  profilePicture:
+    'https://images.unsplash.com/photo-1633332755192-727a05c4013d?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=580&q=80',
+};
+
 export default Profile;

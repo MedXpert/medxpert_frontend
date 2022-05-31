@@ -3,10 +3,12 @@
  */
 import 'react-native-gesture-handler';
 import {gestureHandlerRootHOC} from 'react-native-gesture-handler';
-import {AppRegistry} from 'react-native';
+import {AppRegistry, Platform} from 'react-native';
 import MapboxGL, {Logger} from '@rnmapbox/maps';
 import App from './App';
 import {name as appName} from './app.json';
+import PushNotification from 'react-native-push-notification';
+import './src/services/mirageServer';
 
 MapboxGL.setAccessToken(
   'sk.eyJ1IjoibGl5dW1rIiwiYSI6ImNsMWtteG11NzAyZWgzZG9kOWpyb2x1dWMifQ.X4v8HxdCSmdrvVaCWXVjog',
@@ -14,6 +16,7 @@ MapboxGL.setAccessToken(
 MapboxGL.setConnected(true); // because we are using localhost
 
 // edit logging messages
+// for mapboxgl
 Logger.setLogCallback(log => {
   const {message} = log;
 
@@ -25,6 +28,11 @@ Logger.setLogCallback(log => {
     return true;
   }
   return false;
+});
+
+PushNotification.configure({
+  onNotification: function (notification) {},
+  requestPermissions: Platform.OS === 'ios',
 });
 
 AppRegistry.registerComponent(appName, () => gestureHandlerRootHOC(App));

@@ -8,7 +8,12 @@ import {
   Pressable,
   Modal,
   Text,
+  Dimensions,
 } from 'react-native';
+import ContentLoader, {
+  FacebookLoader,
+  InstagramLoader,
+} from 'react-native-easy-content-loader';
 import StarRating from 'react-native-star-rating';
 import {CustomButton} from '../../../components/general/CustomButton';
 import Colors from '../../../constants/colors';
@@ -18,6 +23,7 @@ import IconFeather from 'react-native-vector-icons/Feather';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {CustomText} from '../../../components/general/CustomText';
 import {BackButton} from '../../../components/general/BackButton';
+import {useHealthCareFacility} from '../../../hooks/healthCareFacility';
 
 const ImageItem = ({image, onPress}) => (
   <Pressable onPress={onPress}>
@@ -27,17 +33,16 @@ const ImageItem = ({image, onPress}) => (
   </Pressable>
 );
 
+const dimensionsWidth = Dimensions.get('window').width;
+const dimensionsHeight = Dimensions.get('window').height;
+
 const Details = ({route, navigation}) => {
-  const healthFacilityId = route.params.id;
+  const healthCareFacilityId = route.params.id;
 
-  const findById = id => {
-    let hf = healthFacilities.find(hospital => hospital.id === id);
-    return hf;
-  };
+  const {data, isError, isLoading, isSuccess} =
+    useHealthCareFacility(healthCareFacilityId);
 
-  const healthFacility = findById(healthFacilityId);
-
-  const [selectedImage, setSelectedImage] = useState(healthFacility.images[0]);
+  const [selectedImage, setSelectedImage] = useState();
   const [imageModalVisible, setImageModalVisible] = useState(false);
 
   const renderItem = ({item}) => (
@@ -48,6 +53,7 @@ const Details = ({route, navigation}) => {
       }}
     />
   );
+
   return (
     <View style={styles.container}>
       <Modal visible={imageModalVisible}>
@@ -58,156 +64,186 @@ const Details = ({route, navigation}) => {
             <IconIon name="ios-close" size={50} color={Colors.primary} />
           </Pressable>
           <Image
-            source={selectedImage}
+            source={
+              selectedImage ? selectedImage : isSuccess ? data.images[0] : null
+            }
             style={styles.modalImage}
             resizeMode="contain"
           />
         </View>
       </Modal>
-      <View style={styles.head}>
-        <Pressable
-          style={styles.imageBackground}
-          onPress={() => {
-            setImageModalVisible(true);
-          }}>
-          <Image
-            source={selectedImage}
-            resizeMode="cover"
-            style={styles.imageBackground}
+      {isLoading && (
+        <View style={styles.loadingContainer}>
+          <ContentLoader
+            active
+            pHeight={100}
+            pRows={Math.floor(dimensionsHeight / 100)}
+            title={false}
+            animationDuration={400}
+            pWidth={Math.floor(dimensionsWidth - 20)}
           />
-        </Pressable>
-        {/* <CustomButton
+        </View>
+      )}
+      {isSuccess && (
+        <>
+          <View style={styles.head}>
+            <Pressable
+              style={styles.imageBackground}
+              onPress={() => {
+                setImageModalVisible(true);
+              }}>
+              <Image
+                source={selectedImage ? selectedImage : data.images[0]}
+                resizeMode="cover"
+                style={styles.imageBackground}
+              />
+            </Pressable>
+            {/* <CustomButton
           title=""
           customStyle={styles.backButton}
           icon={<IconIon name="chevron-back" size={40} color={Colors.white} />}
           onPress={() => navigation.goBack()}
         /> */}
-        <View style={styles.backButton}>
-          <BackButton
-            backgroundColor={Colors.primary}
-            height={40}
-            width={40}
-            onPress={() => {
-              navigation.goBack();
-            }}
-          />
-        </View>
-      </View>
-      <View style={styles.main}>
-        <View style={styles.mainContainer}>
-          <CustomText
-            fontSize={30}
-            customStyles={styles.bold}
-            content={healthFacility.name}
-          />
-          <View style={styles.location}>
-            <IconEntypo name="location-pin" size={20} color={Colors.primary} />
-            <CustomText
-              customStyles={styles.marginLeft5}
-              content={healthFacility.address}
-            />
-          </View>
-          <View style={styles.stars}>
-            <StarRating
-              disabled={false}
-              maxStars={5}
-              rating={healthFacility.rating}
-              starSize={25}
-              fullStarColor={Colors.golden}
-            />
-          </View>
-          <CustomText
-            customStyles={styles.open}
-            fontColor={Colors.gray}
-            content={healthFacility.availability}
-          />
-          <View style={styles.typeAndTravel}>
-            <View style={styles.type}>
-              <CustomText
-                content="Type"
-                customStyles={styles.typeTravelElement}
-              />
-              <CustomText
-                content={healthFacility.type}
-                fontColor={Colors.gray}
-              />
-            </View>
-            <View style={styles.travel}>
-              <CustomText
-                content="Travel Time"
-                customStyles={styles.typeTravelElement}
-              />
-              <CustomText
-                content={healthFacility.travelTime}
-                fontColor={Colors.gray}
+            <View style={styles.backButton}>
+              <BackButton
+                backgroundColor={Colors.primary}
+                height={40}
+                width={40}
+                onPress={() => {
+                  navigation.goBack();
+                }}
               />
             </View>
           </View>
-
-          <View style={styles.overview}>
-            <CustomText
-              content="Overview"
-              customStyles={styles.typeAndTravelElement}
-            />
-            <CustomText
-              content={healthFacility.description}
-              fontColor={Colors.gray}
-              fontSize={12}
-            />
-          </View>
-
-          <View style={styles.buttons}>
-            <CustomButton
-              title="Direction"
-              fontSize={13}
-              width={110}
-              height={45}
-              customStyle={styles.buttonStyle}
-              icon={
-                <IconEntypo name="direction" size={20} color={Colors.dark} />
-              }
-            />
-
-            <CustomButton
-              title="Appointment"
-              fontSize={13}
-              width={140}
-              height={45}
-              fontColor={Colors.lightGray}
-              customStyle={[styles.buttonStyle, styles.grayButtons]}
-              icon={
-                <MaterialIcons
-                  name="schedule"
+          <View style={styles.main}>
+            <View style={styles.mainContainer}>
+              <CustomText
+                fontSize={30}
+                customStyles={styles.bold}
+                content={data.name}
+              />
+              <View style={styles.location}>
+                <IconEntypo
+                  name="location-pin"
                   size={20}
-                  color={Colors.lightGray}
+                  color={Colors.primary}
                 />
-              }
-              onPress={() => {
-                navigation.navigate('Appointment');
-              }}
-            />
+                <CustomText
+                  customStyles={styles.marginLeft5}
+                  content={data.address}
+                />
+              </View>
+              <View style={styles.stars}>
+                <StarRating
+                  disabled={false}
+                  maxStars={5}
+                  rating={data.averageRating}
+                  starSize={25}
+                  fullStarColor={Colors.golden}
+                />
+              </View>
+              <CustomText
+                customStyles={styles.open}
+                fontColor={Colors.gray}
+                content={data.availability}
+              />
+              <View style={styles.typeAndTravel}>
+                <View style={styles.type}>
+                  <CustomText
+                    content="Type"
+                    customStyles={styles.typeTravelElement}
+                  />
+                  <CustomText content={data.type} fontColor={Colors.gray} />
+                </View>
+                <View style={styles.travel}>
+                  <CustomText
+                    content="Travel Time"
+                    customStyles={styles.typeTravelElement}
+                  />
+                  <CustomText
+                    content={data.travelTime}
+                    fontColor={Colors.gray}
+                  />
+                </View>
+              </View>
 
-            <CustomButton
-              title="Message"
-              fontSize={13}
-              width={110}
-              height={45}
-              fontColor={Colors.lightGray}
-              customStyle={[styles.buttonStyle, styles.grayButtons]}
-              icon={
-                <IconEntypo name="message" size={20} color={Colors.lightGray} />
-              }
-            />
+              <View style={styles.overview}>
+                <CustomText
+                  content="Overview"
+                  customStyles={styles.typeAndTravelElement}
+                />
+                <CustomText
+                  content={data.description}
+                  fontColor={Colors.gray}
+                  fontSize={12}
+                />
+              </View>
+
+              <View style={styles.buttons}>
+                <CustomButton
+                  title="Direction"
+                  fontSize={13}
+                  width={110}
+                  height={45}
+                  customStyle={styles.buttonStyle}
+                  icon={
+                    <IconEntypo
+                      name="direction"
+                      size={20}
+                      color={Colors.dark}
+                    />
+                  }
+                />
+
+                <CustomButton
+                  title="Appointment"
+                  fontSize={13}
+                  width={140}
+                  height={45}
+                  fontColor={Colors.lightGray}
+                  customStyle={[styles.buttonStyle, styles.grayButtons]}
+                  icon={
+                    <MaterialIcons
+                      name="schedule"
+                      size={20}
+                      color={Colors.lightGray}
+                    />
+                  }
+                  onPress={() => {
+                    navigation.navigate('Appointment', {
+                      hcfId: isSuccess ? data.id : false,
+                    });
+                  }}
+                />
+
+                <CustomButton
+                  title="Message"
+                  fontSize={13}
+                  width={110}
+                  height={45}
+                  fontColor={Colors.lightGray}
+                  customStyle={[styles.buttonStyle, styles.grayButtons]}
+                  icon={
+                    <IconEntypo
+                      name="message"
+                      size={20}
+                      color={Colors.lightGray}
+                    />
+                  }
+                />
+              </View>
+            </View>
           </View>
-        </View>
-      </View>
-      <FlatList
-        data={healthFacility.images}
-        renderItem={renderItem}
-        keyExtractor={image => image.id}
-        horizontal={true}
-        style={styles.imageItemsFlatList}
-      />
+
+          <FlatList
+            data={data.images}
+            renderItem={renderItem}
+            keyExtractor={image => image.id}
+            horizontal={true}
+            style={styles.imageItemsFlatList}
+          />
+        </>
+      )}
     </View>
   );
 };
@@ -243,6 +279,9 @@ const styles = StyleSheet.create({
     width: '100%',
     top: 220,
     left: 10,
+  },
+  loadingContainer: {
+    alignItems: 'center',
   },
   main: {
     flex: 2,
@@ -286,74 +325,74 @@ const styles = StyleSheet.create({
   },
 });
 
-const healthFacilities = [
-  {
-    name: 'Yekatit 12 Hospital',
-    images: [
-      {id: 1, uri: 'https://mapio.net/images-p/48157911.jpg'},
-      {id: 2, uri: 'https://mapio.net/images-p/43332058.jpg'},
-      {id: 3, uri: 'https://mapio.net/images-p/48157911.jpg'},
-      {id: 4, uri: 'https://mapio.net/images-p/37190120.jpg'},
-      {id: 5, uri: 'https://mapio.net/images-p/37190120.jpg'},
-    ],
-    id: 1,
-    address: '6 kilo , Addis Ababa, Ethiopia',
-    description:
-      'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
-    street: '123 Main Street',
-    travelTime: '5 min',
-    rating: 4.5,
-    type: 'clinic',
-    availability: 'Open 24 hours',
-  },
-  {
-    name: 'Zewditu Hospital',
-    images: [{id: 1, uri: 'https://mapio.net/images-p/2347273.jpg'}],
-    id: 7,
-    address: '6 kilo , Addis Ababa, Ethiopia',
-    description:
-      'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
-    street: '123 Main Street',
-    travelTime: '30 min',
-    rating: 4,
-    type: 'Hospital',
-    availability: 'Open 24 hours',
-  },
-  {
-    name: 'Tikur Anbesa Hospital',
-    images: [
-      {id: 1, uri: 'https://mapio.net/images-p/17493410.jpg'},
-      {id: 2, uri: 'https://mapio.net/images-p/3638281.jpg'},
-    ],
-    id: 2,
-    address: 'Senga tera',
-    description:
-      'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
-    street: 'Senga tera Street',
-    travelTime: '1 hr',
-    rating: 4.8,
-    type: 'Hospital',
-    availability: 'Open 24 hours',
-  },
-  {
-    name: 'Yekatit 12 Hospital',
-    images: [
-      {id: 1, uri: 'https://mapio.net/images-p/48157911.jpg'},
-      {id: 2, uri: 'https://mapio.net/images-p/43332058.jpg'},
-      {id: 3, uri: 'https://mapio.net/images-p/48157911.jpg'},
-      {id: 4, uri: 'https://mapio.net/images-p/37190120.jpg'},
-      {id: 5, uri: 'https://mapio.net/images-p/37190120.jpg'},
-    ],
-    id: 6,
-    address: '6 kilo , Addis Ababa, Ethiopia',
-    description:
-      'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
-    street: '123 Main Street',
-    travelTime: '5 min',
-    rating: 4.5,
-    type: 'clinic',
-    availability: 'Open 24 hours',
-  },
-];
+// const healthFacilities = [
+//   {
+//     name: 'Yekatit 12 Hospital',
+//     images: [
+//       {id: 1, uri: 'https://mapio.net/images-p/48157911.jpg'},
+//       {id: 2, uri: 'https://mapio.net/images-p/43332058.jpg'},
+//       {id: 3, uri: 'https://mapio.net/images-p/48157911.jpg'},
+//       {id: 4, uri: 'https://mapio.net/images-p/37190120.jpg'},
+//       {id: 5, uri: 'https://mapio.net/images-p/37190120.jpg'},
+//     ],
+//     id: 1,
+//     address: '6 kilo , Addis Ababa, Ethiopia',
+//     description:
+//       'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
+//     street: '123 Main Street',
+//     travelTime: '5 min',
+//     rating: 4.5,
+//     type: 'clinic',
+//     availability: 'Open 24 hours',
+//   },
+//   {
+//     name: 'Zewditu Hospital',
+//     images: [{id: 1, uri: 'https://mapio.net/images-p/2347273.jpg'}],
+//     id: 7,
+//     address: '6 kilo , Addis Ababa, Ethiopia',
+//     description:
+//       'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
+//     street: '123 Main Street',
+//     travelTime: '30 min',
+//     rating: 4,
+//     type: 'Hospital',
+//     availability: 'Open 24 hours',
+//   },
+//   {
+//     name: 'Tikur Anbesa Hospital',
+//     images: [
+//       {id: 1, uri: 'https://mapio.net/images-p/17493410.jpg'},
+//       {id: 2, uri: 'https://mapio.net/images-p/3638281.jpg'},
+//     ],
+//     id: 2,
+//     address: 'Senga tera',
+//     description:
+//       'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
+//     street: 'Senga tera Street',
+//     travelTime: '1 hr',
+//     rating: 4.8,
+//     type: 'Hospital',
+//     availability: 'Open 24 hours',
+//   },
+//   {
+//     name: 'Yekatit 12 Hospital',
+//     images: [
+//       {id: 1, uri: 'https://mapio.net/images-p/48157911.jpg'},
+//       {id: 2, uri: 'https://mapio.net/images-p/43332058.jpg'},
+//       {id: 3, uri: 'https://mapio.net/images-p/48157911.jpg'},
+//       {id: 4, uri: 'https://mapio.net/images-p/37190120.jpg'},
+//       {id: 5, uri: 'https://mapio.net/images-p/37190120.jpg'},
+//     ],
+//     id: 6,
+//     address: '6 kilo , Addis Ababa, Ethiopia',
+//     description:
+//       'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
+//     street: '123 Main Street',
+//     travelTime: '5 min',
+//     rating: 4.5,
+//     type: 'clinic',
+//     availability: 'Open 24 hours',
+//   },
+// ];
 
 export default Details;
