@@ -1,15 +1,16 @@
-import {View, Switch, StyleSheet} from 'react-native';
+import {View, Switch, StyleSheet, Pressable, ScrollView} from 'react-native';
 import React, {useState} from 'react';
 
 import {CustomText} from '../../components/general/CustomText';
 import {ToggleFeatures} from '../../components/emergency/ToggleFeatures';
 import {ToggleAutomation} from '../../components/emergency/ToggleAutomation';
+import IconMaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import colors from '../../constants/colors';
 
-const Emergency = () => {
+const Emergency = ({navigation}) => {
   const [automationToggle, setAutomationToggle] = useState(false);
   const [smsToggle, setSmsToggle] = useState(false);
-  const [phoneToggle, setPhoneToggle] = useState(false);
+  const [EmailToggle, setEmailToggle] = useState(false);
   const [fallDetectionToggle, setFallDetectionToggle] = useState(false);
   const [ambulanceService, setAmbulanceService] = useState(false);
 
@@ -21,8 +22,8 @@ const Emergency = () => {
     setSmsToggle(previousValue => !previousValue);
   };
 
-  const onPhoneToggleChange = () => {
-    setPhoneToggle(previousValue => !previousValue);
+  const onEmailToggleChange = () => {
+    setEmailToggle(previousValue => !previousValue);
   };
 
   const onFallDetectionToggleChange = () => {
@@ -55,49 +56,99 @@ const Emergency = () => {
       </View>
 
       {/* automation configs */}
-      <View style={styles.configAutomation}>
-        {/* Fall detection  */}
-        <View style={styles.fallDetection}>
-          {/* Toggle Fall detection */}
-          <ToggleFeatures
-            largeText={'Fall Detection'}
-            smallText={'Send notifications when a possible fall is detected.'}
-            borderRadius={{
-              borderRadius: 30,
-              borderBottomEndRadius: fallDetectionToggle ? 0 : 30,
-            }}
-            toggleFeature={fallDetectionToggle}
-            onToggleChange={onFallDetectionToggleChange}
-          />
-          {/* configure where where to send emergency notice when possible fall is detected */}
-          {fallDetectionToggle && (
-            <View style={styles.fallDetectionSendTo}>
-              {/* SMS toggle */}
-              <View style={[styles.sendToSection, {borderBottomEndRadius: 0}]}>
-                <CustomText content={'SMS'} />
-                <Switch
-                  trackColor={{false: colors.lightGray, true: colors.primary}}
-                  thumbColor={smsToggle ? colors.white : colors.gray}
-                  onValueChange={onSmsToggleChange}
-                  value={smsToggle}
-                />
+      <ScrollView style={styles.configAutomation}>
+        <View style={{marginBottom: 10}}>
+          {/* Fall detection  */}
+          <View style={styles.fallDetection}>
+            {/* Toggle Fall detection */}
+            <ToggleFeatures
+              disabled={automationToggle}
+              largeText={'Fall Detection'}
+              largeTextFontColor={
+                fallDetectionToggle ? colors.primary : colors.gray
+              }
+              smallText={'Send notifications when a possible fall is detected.'}
+              borderRadius={{
+                borderRadius: 30,
+                borderBottomEndRadius: fallDetectionToggle ? 0 : 30,
+              }}
+              toggleFeature={fallDetectionToggle}
+              onToggleChange={onFallDetectionToggleChange}
+            />
+            {/* configure where where to send emergency notice when possible fall is detected */}
+            {fallDetectionToggle && (
+              <View style={styles.fallDetectionSendTo}>
+                {/* SMS toggle and Pressable */}
+                <Pressable
+                  onPress={() => {
+                    navigation.navigate('AutomationSms');
+                  }}>
+                  <View
+                    style={[styles.sendToSection, {borderBottomEndRadius: 0}]}>
+                    <View style={styles.smsTxtIcon}>
+                      <IconMaterialIcons
+                        name="sms"
+                        color={colors.primary}
+                        style={[
+                          styles.smsAndEmailIcons,
+                          {
+                            color: smsToggle ? colors.primary : colors.gray,
+                          },
+                        ]}
+                        size={20}
+                      />
+                      <CustomText content={'SMS'} />
+                    </View>
+                    <Switch
+                      trackColor={{
+                        false: colors.lightGray,
+                        true: colors.primary,
+                      }}
+                      thumbColor={smsToggle ? colors.white : colors.gray}
+                      onValueChange={onSmsToggleChange}
+                      value={smsToggle}
+                    />
+                  </View>
+                </Pressable>
+                {/* Email toggle  and Pressable*/}
+                <Pressable
+                  onPress={() => {
+                    navigation.navigate('AutomationEmail');
+                  }}>
+                  <View style={styles.sendToSection}>
+                    <View style={styles.emailTxtIcon}>
+                      <IconMaterialIcons
+                        name="email"
+                        color={colors.primary}
+                        style={[
+                          styles.smsAndEmailIcons,
+                          {
+                            color: EmailToggle ? colors.primary : colors.gray,
+                          },
+                        ]}
+                        size={20}
+                      />
+                      <CustomText content={'email'} />
+                    </View>
+                    <Switch
+                      trackColor={{
+                        false: colors.lightGray,
+                        true: colors.primary,
+                      }}
+                      thumbColor={EmailToggle ? colors.white : colors.gray}
+                      onValueChange={onEmailToggleChange}
+                      value={EmailToggle}
+                    />
+                  </View>
+                </Pressable>
+                <View />
               </View>
-              {/* Phone toggle  */}
-              <View style={styles.sendToSection}>
-                <CustomText content={'phone'} />
-                <Switch
-                  trackColor={{false: colors.lightGray, true: colors.primary}}
-                  thumbColor={phoneToggle ? colors.white : colors.gray}
-                  onValueChange={onPhoneToggleChange}
-                  value={phoneToggle}
-                />
-              </View>
-              <View />
-            </View>
-          )}
+            )}
+          </View>
           {/* Ambulance service */}
           <ToggleFeatures
             largeText={'Ambulance Service'}
+            largeTextFontColor={ambulanceService ? colors.primary : colors.gray}
             smallText={
               'An ambulance service for faster access to health care facilities, specially in emergency cases.'
             }
@@ -105,7 +156,7 @@ const Emergency = () => {
             onToggleChange={onAmbulanceToggleChange}
           />
         </View>
-      </View>
+      </ScrollView>
     </View>
   );
 };
@@ -140,6 +191,14 @@ const styles = StyleSheet.create({
     elevation: 0.5,
   },
   fallDetectionSendTo: {},
+  smsTxtIcon: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  emailTxtIcon: {
+    flexDirection: 'row',
+  },
+  smsAndEmailIcons: {marginRight: 10},
 });
 
 export default Emergency;

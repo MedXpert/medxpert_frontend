@@ -1,13 +1,13 @@
 import {View, StyleSheet, Modal, ActivityIndicator} from 'react-native';
 import React, {useState, useEffect, useCallback, useMemo} from 'react';
 import {Calendar, CalendarList, Agenda} from 'react-native-calendars';
+import Spinner from 'react-native-spinkit';
 
 import {CustomText} from '../../../components/general/CustomText';
 import colors from '../../../constants/colors';
 import IconEntypo from 'react-native-vector-icons/Entypo';
 import IonIcons from 'react-native-vector-icons/Ionicons';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import shadow from '../../../constants/shadow';
 import {CustomButton} from '../../../components/general/CustomButton';
 import {BackButton} from '../../../components/general/BackButton';
 import {CustomModal} from '../../../components/general/CustomModal/CustomModal';
@@ -238,17 +238,23 @@ const Appointment = ({route, navigation}) => {
   };
 
   useEffect(() => {
+    //Create a notification channeli
     createAppointmentChannel();
   }, []);
 
   return (
     <View style={styles.container}>
+      {/* Loading spinner */}
       {(appointment.isLoading || healthCareFacility.isLoading) && (
-        <ActivityIndicator
-          size="large"
-          color={colors.primary}
-          style={{justifyContent: 'center', flex: 1}}
-        />
+        <View style={styles.spinnerContainer}>
+          <Spinner
+            isVisible
+            color={colors.primary}
+            size={70}
+            type="WanderingCubes"
+            style={styles.appointmentsSpinner}
+          />
+        </View>
       )}
 
       {appointment.isError && (
@@ -269,7 +275,16 @@ const Appointment = ({route, navigation}) => {
           <View style={styles.healthFacilityInfo}>
             {/* Health facility and back button */}
             <View style={styles.nameAndBackButton}>
-              {/* <BackButton /> */}
+              {/* BackButton */}
+              <View style={styles.backButton}>
+                <BackButton
+                  onPress={() => {
+                    navigation.goBack();
+                  }}
+                  size={40}
+                />
+              </View>
+              {/* HCF name */}
               <CustomText
                 content={healthCareFacility.data.name}
                 customStyles={styles.healthFacilityNameFont}
@@ -487,9 +502,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.secondary,
-    paddingTop: 20,
     paddingHorizontal: 20,
-    paddingBottom: 20,
+    paddingVertical: 15,
   },
   chooseAppointment: {
     marginTop: 20,
@@ -509,6 +523,7 @@ const styles = StyleSheet.create({
   blueCircleLegend: {
     backgroundColor: colors.primary,
   },
+  backButton: {marginLeft: -10, marginTop: -4},
   healthFacilityInfo: {},
   healthFacilityNameFont: {
     fontSize: 24,
@@ -534,6 +549,11 @@ const styles = StyleSheet.create({
   },
   reminderAndCancel: {
     flexDirection: 'row',
+  },
+  spinnerContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 
   titleAndCancelButton: {

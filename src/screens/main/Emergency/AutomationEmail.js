@@ -10,9 +10,10 @@ import IconMaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import IconFontAwesome from 'react-native-vector-icons/FontAwesome';
 import IconEntypo from 'react-native-vector-icons/Entypo';
 import {EmailItem} from '../../../components/emergency/EmailItem';
-import {log} from 'react-native-reanimated';
+import {AddEmergencyContactModal} from '../../../components/emergency/AddEmergencyContactModal';
 
 const AutomationEmail = ({navigation}) => {
+  const [modalVisibility, setModalVisibility] = useState(false);
   return (
     <View style={styles.container}>
       <View style={{marginLeft: -10}}>
@@ -24,6 +25,18 @@ const AutomationEmail = ({navigation}) => {
       </View>
       {/* SMS toggle section */}
       <ToggleAutomation text={'Email'} />
+      <AddEmergencyContactModal
+        modalText={
+          'Please enter an email to add it to emergency contacts list.'
+        }
+        modalVisible={modalVisibility}
+        onRequestClose={() => {}}
+        onPressLeftButton={() => {
+          setModalVisibility(false);
+        }}
+        onPressRightButton={() => {}}
+        placeholder={'Email'}
+      />
       {/* phone numbers section */}
       <View style={styles.emailsContainer}>
         {/* add phone number */}
@@ -35,6 +48,9 @@ const AutomationEmail = ({navigation}) => {
             color={colors.primary}
             size={30}
             style={styles.phonePlusIcon}
+            onPress={() => {
+              setModalVisibility(true);
+            }}
           />
         </View>
         {/* List of added phone numbers */}
@@ -63,7 +79,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.secondary,
     padding: 10,
-    paddingHorizontal: 20,
+    paddingHorizontal: 15,
   },
 
   emailsContainer: {

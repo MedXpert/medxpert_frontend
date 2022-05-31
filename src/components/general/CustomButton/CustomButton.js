@@ -12,16 +12,20 @@ const CustomButton = ({
   height = 50,
   customStyle,
   icon,
+  iconRight = false,
   fontSize = 16,
   fontColor = Colors.black,
   backgroundColor = Colors.primary,
+  disabled = false,
+  justifyContent = 'space-evenly',
 }) => {
   // Changes the justifyContent property of the Button depending on whether there is an icon in the button or not
   const buttonIconStyle = () => {
-    return icon ? {justifyContent: 'space-evenly'} : null;
+    return icon ? {justifyContent: justifyContent} : null;
   };
   return (
     <TouchableOpacity
+      disabled={disabled}
       onPress={onPress}
       style={[
         styles.button,
@@ -29,8 +33,9 @@ const CustomButton = ({
         customStyle,
         buttonIconStyle(),
       ]}>
-      <View style={styles.buttonIconContainer}>{icon}</View>
+      {!iconRight && <View style={styles.buttonIconContainer}>{icon}</View>}
       <CustomText content={title} fontSize={fontSize} fontColor={fontColor} />
+      {iconRight && <View style={styles.buttonIconContainer}>{icon}</View>}
     </TouchableOpacity>
   );
 };
