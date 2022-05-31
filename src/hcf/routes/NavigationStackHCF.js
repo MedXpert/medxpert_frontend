@@ -127,6 +127,7 @@ const NavigationStackHCF = () => {
         <ContStack.Screen name="ClaimRequest" component={ClaimRequest} />
         <ContStack.Screen name="EditImages" component={EditImages} />
         <ContStack.Screen name="AvailableDates" component={AvailableDates} />
+        <ContStack.Screen name="Pending" component={PendingAppointments} />
         <ContStack.Screen
           name="PendingAppointments"
           component={PendingAppointments}
