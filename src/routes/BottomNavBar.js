@@ -6,7 +6,6 @@ import Colors from '../constants/colors';
 import Ambulance from '../screens/main/Ambulance';
 import Emergency from '../screens/main/Emergency';
 import Home from '../screens/main/Home';
-import HomeStack from './Home.js';
 import Profile from '../screens/main/Profile';
 import SvgAmbulance from '../assets/svg/bottomNavbar/Ambulance.svg';
 import SvgProfile from '../assets/svg/bottomNavbar/Profile.svg';
@@ -24,11 +23,8 @@ const BottomNavBar = ({route}) => {
         headerShown: false,
         tabBarShowLabel: false,
         tabBarStyle: {
-          // position: 'absolute',
           height: 70,
           borderTopWidth: 0,
-          // borderTopRightRadius: 30,
-          // borderTopLeftRadius: 30,
         },
       }}>
       <Tab.Screen

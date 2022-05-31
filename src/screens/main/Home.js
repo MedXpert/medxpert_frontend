@@ -17,8 +17,8 @@ import Geolocation from 'react-native-geolocation-service';
 import {onChange} from 'react-native-reanimated';
 import BottomSheet from '@gorhom/bottom-sheet';
 
-import IconA from 'react-native-vector-icons/AntDesign';
-import IconM from 'react-native-vector-icons/MaterialCommunityIcons';
+import IconAntDesign from 'react-native-vector-icons/AntDesign';
+import IconMaterialCommunity from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import {SearchBar} from '../../components/general/SearchBar';
 import Colors from '../../constants/colors';

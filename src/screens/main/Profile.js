@@ -1,13 +1,20 @@
-import {View, Image, StyleSheet} from 'react-native';
+import {
+  View,
+  Image,
+  StyleSheet,
+  Pressable,
+  KeyboardAvoidingView,
+  ScrollView,
+} from 'react-native';
 import React from 'react';
 import Colors from '../../constants/colors';
 import {CustomText} from '../../components/general/CustomText';
 import {CustomButton} from '../../components/general/CustomButton';
 import {CustomTextInputValidation} from '../../components/general/CustomTextInputValidation';
-import Pressable from 'react-native/Libraries/Components/Pressable/Pressable';
 import IconAnt from 'react-native-vector-icons/AntDesign';
 import colors from '../../constants/colors';
 import {useForm} from 'react-hook-form';
+import {emailRegEx} from '../../constants/regEx';
 
 const Profile = () => {
   const {
@@ -67,36 +74,69 @@ const Profile = () => {
           fontSize={25}
           fontColor={Colors.black}
         />
-        </View>
-        {/* form here */}
-      <View style={styles.form}>
+      </View>
+      {/* form here */}
+      <ScrollView style={styles.form}>
         <CustomTextInputValidation
           label="Full Name"
           control={control}
           name="fullName"
+          error={errors.fullName?.message}
+          rules={{
+            required: {
+              value: true,
+              message: 'Full name is required.',
+            },
+          }}
         />
         <CustomTextInputValidation
           label="Email"
           control={control}
           name="email"
+          error={errors.email?.message}
+          rules={{
+            required: {
+              value: true,
+              message: 'Email is required',
+            },
+            pattern: {
+              value: emailRegEx,
+              message: 'Invalid email',
+            },
+          }}
         />
         <CustomTextInputValidation
           label="Phone"
           control={control}
           name="phone"
+          error={errors.phone?.message}
+          keyboardType="numeric"
+          rules={{
+            required: {
+              value: true,
+              message: 'Phone number is required',
+            },
+          }}
         />
         <CustomTextInputValidation
           label="Username"
           control={control}
           name="username"
+          error={errors.username?.message}
+          rules={{
+            required: {
+              value: true,
+              message: 'Username is required',
+            },
+          }}
         />
         <CustomButton
           customStyle={{marginTop: 10}}
           title="Update Profile"
-          width='100%'
+          width="100%"
           onPress={handleSubmit(onSubmit)}
         />
-      </View>
+      </ScrollView>
     </View>
   );
 };
@@ -158,16 +198,15 @@ const styles = StyleSheet.create({
 });
 
 const user = {
-  firstName:"Naod",
-  lastName:'Dame',
-  email:'naol@gmail.com',
-  phone:'9147854968',
-  username:'Naodo',
-  sex:'M',
-  address:'some place, some city, some country',
+  firstName: 'Naod',
+  lastName: 'Dame',
+  email: 'naol@gmail.com',
+  phone: '9147854968',
+  username: 'Naodo',
+  sex: 'M',
+  address: 'some place, some city, some country',
   profilePicture:
-  'https://images.unsplash.com/photo-1633332755192-727a05c4013d?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=580&q=80',
-
+    'https://images.unsplash.com/photo-1633332755192-727a05c4013d?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=580&q=80',
 };
 
 export default Profile;

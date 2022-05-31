@@ -17,7 +17,6 @@ import Spinner from 'react-native-spinkit';
 
 import {CustomText} from '../../general/CustomText';
 import Colors from '../../../constants/colors';
-import shadow from '../../../constants/shadow';
 import colors from '../../../constants/colors';
 import {useHealthCareFacilities} from '../../../hooks/healthCareFacility';
 
