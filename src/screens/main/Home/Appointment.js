@@ -503,7 +503,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.secondary,
     paddingHorizontal: 20,
-    paddingVertical: 25,
+    paddingVertical: 15,
   },
   chooseAppointment: {
     marginTop: 20,

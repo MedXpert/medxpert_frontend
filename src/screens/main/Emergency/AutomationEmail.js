@@ -10,7 +10,7 @@ import IconMaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import IconFontAwesome from 'react-native-vector-icons/FontAwesome';
 import IconEntypo from 'react-native-vector-icons/Entypo';
 import {EmailItem} from '../../../components/emergency/EmailItem';
-import {AddEmergencyContactModal} from '../../../components/emergency/AppEmerencyContactModal';
+import {AddEmergencyContactModal} from '../../../components/emergency/AddEmergencyContactModal';
 
 const AutomationEmail = ({navigation}) => {
   const [modalVisibility, setModalVisibility] = useState(false);

@@ -216,15 +216,15 @@ const Details = ({route, navigation}) => {
                 />
 
                 <CustomButton
-                  title="Message"
+                  title="Call"
                   fontSize={13}
-                  width={110}
+                  width={100}
                   height={45}
                   fontColor={Colors.lightGray}
                   customStyle={[styles.buttonStyle, styles.grayButtons]}
                   icon={
                     <IconEntypo
-                      name="message"
+                      name="phone"
                       size={20}
                       color={Colors.lightGray}
                     />

@@ -12,6 +12,8 @@ target 'medxpert_frontend' do
     :hermes_enabled => false
   )
 
+  pod 'react-native-spinkit', :path => '../node_modules/react-native-spinkit'
+
   target 'medxpert_frontendTests' do
     inherit! :complete
     # Pods for testing

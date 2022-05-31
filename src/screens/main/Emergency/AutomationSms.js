@@ -6,7 +6,7 @@ import {CustomText} from '../../../components/general/CustomText';
 import colors from '../../../constants/colors';
 import {ToggleAutomation} from '../../../components/emergency/ToggleAutomation/ToggleAutomation';
 import {PhoneNumber} from '../../../components/emergency/PhoneNumber/PhoneNumber';
-import {AddEmergencyContactModal} from '../../../components/emergency/AppEmerencyContactModal/AddEmergencyContactModal';
+import {AddEmergencyContactModal} from '../../../components/emergency/AddEmergencyContactModal';
 
 import IconFontAwesome from 'react-native-vector-icons/FontAwesome';
 import IconEntypo from 'react-native-vector-icons/Entypo';

@@ -21,7 +21,7 @@ const Main = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(true); // User state value from the cache
   const [appIsLoaded, setAppIsLoaded] = useState(true); // whether the app is loading or finished loading.
   const [openingForTheFirstTime, setOpeningForTheFirstTime] = useState(false); // Whether the app is being opened for the first time.
-  const [role, setRole] = useState('admin');
+  const [role, setRole] = useState('user');
 
   // setTimeout(() => setAppIsLoaded(true), 3000);
   // setTimeout(() => setIsLoggedIn(true), 5000);
