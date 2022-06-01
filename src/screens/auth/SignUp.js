@@ -1,17 +1,33 @@
-import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
-import React from 'react';
+import {
+  View,
+  StyleSheet,
+  TouchableOpacity,
+  useWindowDimensions,
+} from 'react-native';
+import React, {useContext} from 'react';
 import Icon from 'react-native-vector-icons/Ionicons';
+import {AuthContext} from '../../components/general/Context';
 
 import Colors from '../../constants/colors';
 import {CustomText} from '../../components/general/CustomText';
 import SignUpSvg from '../../assets/svg/auth/signUp.svg';
 import {CustomButton} from '../../components/general/CustomButton';
+import {storeToken} from '../../services/storeToken/storeToken';
 
 const SignUp = ({navigation}) => {
+  const {height, width} = useWindowDimensions();
+  const {loginStatus} = useContext(AuthContext);
+
+  // sign up function
+  const onSignUp = token => {
+    storeToken(token);
+    loginStatus();
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.signUpSvgContainer}>
-        <SignUpSvg width={400} height={280} />
+        <SignUpSvg width={width} height={height / 4} />
       </View>
       <View style={styles.signUpFormContainer}>
         <View style={styles.signUpText}>
@@ -25,7 +41,6 @@ const SignUp = ({navigation}) => {
         </View>
         <View style={styles.inputContainer}>
           <CustomText content={'Password'} fontColor={Colors.gray} />
-
           {/* To be rendered conditionally. should be pressable/button. Toggles between show password and hide password. */}
           <Icon name="eye-outline" size={20} color={Colors.gray} />
           {/* <Icon name="eye-off-outline" size={20} color={Colors.gray} /> */}
@@ -40,6 +55,9 @@ const SignUp = ({navigation}) => {
             height={60}
             title={'signUp'}
             customStyle={styles.signUpButtonStyle}
+            onPress={() => {
+              onSignUp('staticToken');
+            }}
           />
           <View style={styles.registerContainer}>
             <CustomText content={'Joined us before?'} />

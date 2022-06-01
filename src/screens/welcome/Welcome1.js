@@ -32,17 +32,12 @@ const Welcome1 = ({navigation}) => {
       <View style={styles.bottomSection}>
         <Button
           onPress={() => {
+            console.log('next clicked');
             navigation.navigate('Welcome2');
           }}
           title={'Next'}
         />
-        <Button
-          onPress={() => {
-            navigation.navigate('Login');
-          }}
-          backgroundVisible={false}
-          title={'Skip'}
-        />
+        <Button onPress={() => {}} backgroundVisible={false} title={'Skip'} />
       </View>
     </View>
   );

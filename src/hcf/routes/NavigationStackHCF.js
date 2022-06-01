@@ -18,7 +18,6 @@ import ClaimRequest from '../screens/main/Home/ClaimRequest';
 import EditHCF from '../screens/main/Profile/EditHCF';
 import Claimed from '../screens/main/Profile/Claimed';
 import UserProfile from '../screens/main/Profile/UserProfile';
-import colors from '../../constants/colors';
 import EditImages from '../screens/main/Profile/EditImages';
 import PendingAppointments from '../screens/main/Appointment/PendingAppointments';
 import AvailableDates from '../screens/main/Appointment/AvailableDates';

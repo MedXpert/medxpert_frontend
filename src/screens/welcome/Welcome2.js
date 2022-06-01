@@ -36,13 +36,7 @@ const Welcome1 = ({navigation}) => {
           }}
           title={'Next'}
         />
-        <Button
-          onPress={() => {
-            navigation.navigate('Login');
-          }}
-          backgroundVisible={false}
-          title={'Skip'}
-        />
+        <Button onPress={() => {}} backgroundVisible={false} title={'Skip'} />
       </View>
     </View>
   );

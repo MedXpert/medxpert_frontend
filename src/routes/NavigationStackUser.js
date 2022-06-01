@@ -1,5 +1,6 @@
 import {View, Text} from 'react-native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import {createStackNavigator} from '@react-navigation/stack';
 import React from 'react';
 
 import BottomNavBar from './BottomNavBar';
@@ -7,8 +8,9 @@ import Details from '../screens/main/Home/Details';
 import Appointment from '../screens/main/Home/Appointment';
 import AutomationEmail from '../screens/main/Emergency/AutomationEmail';
 import AutomationSms from '../screens/main/Emergency/AutomationSms';
+import AuthStackScreen from './Auth';
 
-const TabAndSubsStack = createNativeStackNavigator();
+const Tab = createStackNavigator();
 
 const NavigationStackUser = () => {
   const config = {
@@ -18,20 +20,13 @@ const NavigationStackUser = () => {
   //   headerShown: true,
   // };
   return (
-    <TabAndSubsStack.Navigator screenOptions={config}>
-      <TabAndSubsStack.Screen name="BottomNavBar" component={BottomNavBar} />
-      <TabAndSubsStack.Screen name="Details" component={Details} />
-      <TabAndSubsStack.Screen
-        name="Appointment"
-        component={Appointment}
-        options={config}
-      />
-      <TabAndSubsStack.Screen
-        name="AutomationEmail"
-        component={AutomationEmail}
-      />
-      <TabAndSubsStack.Screen name="AutomationSms" component={AutomationSms} />
-    </TabAndSubsStack.Navigator>
+    <Tab.Navigator screenOptions={config}>
+      <Tab.Screen name="BottomNavBar" component={BottomNavBar} />
+      <Tab.Screen name="Details" component={Details} />
+      <Tab.Screen name="Appointment" component={Appointment} options={config} />
+      <Tab.Screen name="AutomationEmail" component={AutomationEmail} />
+      <Tab.Screen name="AutomationSms" component={AutomationSms} />
+    </Tab.Navigator>
   );
 };
 

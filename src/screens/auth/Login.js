@@ -1,20 +1,36 @@
-import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
-import React from 'react';
+import {
+  View,
+  ScrollView,
+  StyleSheet,
+  TouchableOpacity,
+  useWindowDimensions,
+} from 'react-native';
+import React, {useContext} from 'react';
 import Icon from 'react-native-vector-icons/Ionicons';
 
 import Colors from '../../constants/colors';
 import {CustomText} from '../../components/general/CustomText';
 import LoginSvg from '../../assets/svg/auth/login.svg';
 import {CustomButton} from '../../components/general/CustomButton';
-import {Or} from '../../components/login/Or';
+import {AuthContext} from '../../components/general/Context';
+import {storeToken} from '../../services/storeToken/storeToken';
 
 const Login = ({navigation}) => {
+  const {height, width} = useWindowDimensions();
+  const {loginStatus} = useContext(AuthContext);
+  // Login function
+  const onLogin = token => {
+    storeToken(token);
+    loginStatus();
+  };
   return (
     <View style={styles.container}>
       <View style={styles.loginSvgContainer}>
-        <LoginSvg width={4000} height={280} />
+        <LoginSvg width={width} height={height / 3} />
       </View>
-      <View style={styles.loginFormContainer}>
+      <ScrollView
+        style={styles.loginFormContainer}
+        contentContainerStyle={{alignItems: 'center'}}>
         <View style={styles.loginText}>
           <CustomText content={'Login'} fontSize={28} />
         </View>
@@ -37,17 +53,11 @@ const Login = ({navigation}) => {
             height={60}
             title={'Login'}
             customStyle={styles.loginButtonStyle}
+            onPress={() => {
+              onLogin('staticToken');
+            }}
           />
-          <View style={styles.orContainer}>
-            <Or />
-          </View>
-          <CustomButton
-            width={350}
-            height={60}
-            title={'Login with Google'}
-            customStyle={styles.loginWithGoogleStyle}
-            icon={<Icon name="logo-google" size={30} />}
-          />
+
           <View style={styles.registerContainer}>
             <CustomText content={'New to MedXpert?'} />
             <TouchableOpacity
@@ -59,7 +69,7 @@ const Login = ({navigation}) => {
           </View>
         </View>
         <View />
-      </View>
+      </ScrollView>
     </View>
   );
 };
@@ -77,8 +87,6 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-end',
   },
   loginFormContainer: {
-    alignItems: 'center',
-    flex: 1,
     padding: 30,
     paddingTop: 0,
   },

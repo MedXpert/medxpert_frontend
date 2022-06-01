@@ -12,9 +12,10 @@ const WelcomeStackScreen = () => {
     animation: 'slide_from_right',
     headerShown: false,
   };
+
   const WelcomeStack = createNativeStackNavigator();
   return (
-    <WelcomeStack.Navigator screenOptions={{}}>
+    <WelcomeStack.Navigator screenOptions={config}>
       <WelcomeStack.Screen
         options={config}
         name="Welcome1"

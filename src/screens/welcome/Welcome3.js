@@ -1,5 +1,6 @@
 import {View, Text, StyleSheet} from 'react-native';
-import React from 'react';
+import React, {useContext} from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import {CustomText} from '../../components/general/CustomText';
 import {PageIndicator} from '../../components/welcome/PageIndicator';
@@ -7,8 +8,21 @@ import Colors from '../../constants/colors';
 import LocateSvg from '../../assets/svg/welcome/alarm.svg';
 import {Button} from '../../components/welcome/Button';
 import {WELCOME3_STRINGS} from '../../constants/string/welcome';
+import {WelcomeContext} from '../../components/general/Context';
 
 const Welcome1 = ({navigation}) => {
+  const {setOpeningForTheFirstTimeValue} = useContext(WelcomeContext);
+  // Set the value of the value of OpeningForTheFirstTime to 'false' in the asyncStorage.
+  const storeOpeningForTheFirstTimeValue = async () => {
+    try {
+      await AsyncStorage.setItem('@OpeningForTheFirstTime', 'false');
+    } catch (e) {
+      // saving error
+      console.warn('OpeningForTheFirstTime store error:  ', e);
+    }
+    await setOpeningForTheFirstTimeValue();
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.containerTop}>
@@ -32,9 +46,7 @@ const Welcome1 = ({navigation}) => {
       <View style={styles.bottomSection}>
         <Button
           customStyle={styles.buttonCustomStyle}
-          onPress={() => {
-            navigation.navigate('Login');
-          }}
+          onPress={storeOpeningForTheFirstTimeValue}
           title={'Get Started'}
         />
       </View>
