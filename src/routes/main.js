@@ -8,24 +8,31 @@ import React, {
   useMemo,
 } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage'; // AsyncStorage to store user ID and other infos after logged in
+import {FallDetectionEmitter, start} from 'react-native-fall-detection-module';
+import {LogBox} from 'react-native';
 
 import SplashScreen from '../screens/welcome/Splash';
 import NavigationStackUser from './NavigationStackUser';
 import NavigationStackHCF from '../hcf/routes/NavigationStackHCF';
 import WelcomeStackScreen from './Welcome';
 import AuthStackScreen from './Auth';
-import {AuthContext, WelcomeContext} from '../components/general/Context';
+import {
+  AuthContext,
+  WelcomeContext,
+  FallContext,
+} from '../components/general/Context';
+import FallDetected from '../screens/main/Emergency/FallDetected';
+
+// Ignore new NativeEmitter error
+LogBox.ignoreLogs(['new NativeEventEmitter']);
 
 // The main route that evaluates whether the user is logged in or not and decides where to navigate when the app starts.
 const Main = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false); // User state value from the cache  -- check if a login token exists
+  const [isLoggedIn, setIsLoggedIn] = useState(); // User state value from the cache  -- check if a login token exists
   const [appIsLoading, setAppIsLoading] = useState(true); // whether the app is loading or finished loading.
   const [openingForTheFirstTime, setOpeningForTheFirstTime] = useState(true); // Whether the app is being opened for the first time.
   const [role, setRole] = useState('user');
-
-  // setTimeout(() => setAppIsLoading(false), 3000);
-  // setTimeout(() => setIsLoggedIn(true), 5000);
-  // setTimeout(() => setOpeningForTheFirstTime(false), 5000);
+  const [fallDetected, setFallDetected] = useState(false);
 
   // Checks if the app is being opened for the first time; when the app finishes checking this, the appIsLoading state will be set to false;
   const setOpeningForTheFirstTimeValueFunc = useCallback(async () => {
@@ -38,7 +45,6 @@ const Main = () => {
       console.log('openingForTheFirstTime: ', value);
     }
     // Set AppIsLoading false (Splash screen won't be displayed)
-    setAppIsLoading(false);
   }, []);
 
   const checkLoginStatus = useCallback(async () => {
@@ -50,24 +56,70 @@ const Main = () => {
     }
   }, []);
 
-  // value passed to the WelcomeContext
+  const checkFallDetected = useCallback(async () => {
+    const fall = await AsyncStorage.getItem('@fallDetected');
+    if (fall == null) {
+      setFallDetected(false);
+    } else if (fall) {
+      setFallDetected(true);
+    }
+  }, []);
+
+  // Welcome context value
   const welcomeContext = useMemo(() => {
     return {
       setOpeningForTheFirstTimeValue: setOpeningForTheFirstTimeValueFunc,
     };
   }, [setOpeningForTheFirstTimeValueFunc]);
 
-  // check if there is a logged in user
+  // auth context value
   const authContext = useMemo(() => {
     return {
       loginStatus: checkLoginStatus,
     };
   }, [checkLoginStatus]);
 
+  // fall detection context value
+  const fallContext = useMemo(() => {
+    return {
+      fallStatus: checkFallDetected,
+    };
+  }, [checkFallDetected]);
+
+  // Start listening to the fall detection events
   useEffect(() => {
-    setOpeningForTheFirstTimeValueFunc();
-    checkLoginStatus();
-  }, [setOpeningForTheFirstTimeValueFunc, checkLoginStatus]);
+    start();
+  }, []);
+
+  // Listen to the fall detection events
+  useEffect(() => {
+    let isMounted = true;
+    FallDetectionEmitter.addListener('fall', async newData => {
+      console.log(newData);
+      await AsyncStorage.setItem('@fallDetected', 'true');
+      // put your data processing step here
+      setFallDetected(true);
+    });
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  // Listen to the fall detection events
+  useEffect(() => {
+    let isMounted = true;
+    const check = async () => {
+      await setOpeningForTheFirstTimeValueFunc();
+      checkLoginStatus();
+      await checkFallDetected();
+      setAppIsLoading(false);
+    };
+    check();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [setOpeningForTheFirstTimeValueFunc, checkLoginStatus, checkFallDetected]);
 
   const homeOrLogin = () => {
     if (openingForTheFirstTime && !isLoggedIn) {
@@ -96,7 +148,15 @@ const Main = () => {
 
       // Check role
       if (role === 'user') {
-        return <NavigationStackUser />;
+        if (fallDetected) {
+          return (
+            <FallContext.Provider value={fallContext}>
+              <FallDetected />
+            </FallContext.Provider>
+          );
+        } else {
+          return <NavigationStackUser />;
+        }
       } else if (role === 'admin') {
         return <NavigationStackHCF />;
       }
