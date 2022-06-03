@@ -7,7 +7,7 @@ import {
   Dimensions,
 } from 'react-native';
 import React from 'react';
-import Colors from '../../../constants/colors';
+import colors from '../../../constants/colors';
 import {CustomButton} from '../../../components/general/CustomButton';
 import {CustomText} from '../../../components/general/CustomText';
 
@@ -15,40 +15,43 @@ const PermissionModal = ({
   modalVisibility,
   TextContent,
   buttonFontSize = 14,
-  buttonWidth = 140,
+  buttonWidth = 130,
   buttonHeight = 45,
   buttonLeftTitle,
   buttonRightTitle,
   buttonLeftOnPress,
   buttonOnRightOnPress,
+  onRequestClose = () => {
+    BackHandler.exitApp();
+  },
 }) => {
   return (
     <Modal
       transparent
       animationType="fade"
       visible={modalVisibility}
-      onRequestClose={() => {
-        BackHandler.exitApp();
-      }}>
+      onRequestClose={onRequestClose}>
       <View style={styles.modalView}>
-        <View>
-          <CustomText content={TextContent} />
-        </View>
-        <View style={styles.buttonsContainer}>
-          <CustomButton
-            fontSize={buttonFontSize}
-            width={buttonWidth}
-            height={buttonHeight}
-            title={buttonLeftTitle}
-            onPress={buttonLeftOnPress}
-          />
-          <CustomButton
-            fontSize={buttonFontSize}
-            width={buttonWidth}
-            height={buttonHeight}
-            title={buttonRightTitle}
-            onPress={buttonOnRightOnPress}
-          />
+        <View style={styles.innerModal}>
+          <View>
+            <CustomText content={TextContent} />
+          </View>
+          <View style={styles.buttonsContainer}>
+            <CustomButton
+              fontSize={buttonFontSize}
+              width={buttonWidth}
+              height={buttonHeight}
+              title={buttonLeftTitle}
+              onPress={buttonLeftOnPress}
+            />
+            <CustomButton
+              fontSize={buttonFontSize}
+              width={buttonWidth}
+              height={buttonHeight}
+              title={buttonRightTitle}
+              onPress={buttonOnRightOnPress}
+            />
+          </View>
         </View>
       </View>
     </Modal>
@@ -58,26 +61,25 @@ const PermissionModal = ({
 const styles = StyleSheet.create({
   buttonsContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'space-evenly',
     marginTop: 20,
+    width: '100%',
   },
   modalView: {
-    alignSelf: 'center',
-    backgroundColor: Colors.secondary,
-    marginTop: 300,
-    paddingHorizontal: 15,
-    borderRadius: 15,
-    paddingVertical: 20,
-
-    width: Dimensions.get('window').width - 50,
-    shadowColor: Colors.black,
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  innerModal: {
+    backgroundColor: colors.white,
+    borderRadius: 20,
+    height: 170,
+    margin: 20,
+    padding: 20,
+    alignContent: 'center',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
 

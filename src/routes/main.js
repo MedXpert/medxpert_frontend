@@ -94,12 +94,16 @@ const Main = () => {
   // Listen to the fall detection events
   useEffect(() => {
     let isMounted = true;
-    FallDetectionEmitter.addListener('fall', async newData => {
-      console.log(newData);
-      await AsyncStorage.setItem('@fallDetected', 'true');
-      // put your data processing step here
-      setFallDetected(true);
-    });
+
+    if (isMounted) {
+      FallDetectionEmitter.addListener('fall', async newData => {
+        console.log(newData);
+        await AsyncStorage.setItem('@fallDetected', 'true');
+        // put your data processing step here
+        setFallDetected(true);
+      });
+    }
+
     return () => {
       isMounted = false;
     };

@@ -1,5 +1,11 @@
 import {View, StyleSheet} from 'react-native';
-import React, {useState, useEffect, useMemo, useContext} from 'react';
+import React, {
+  useState,
+  useCallback,
+  useEffect,
+  useMemo,
+  useContext,
+} from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import CountDown from 'react-native-countdown-component';
 
@@ -7,7 +13,7 @@ import {CustomText} from '../../../components/general/CustomText';
 import colors from '../../../constants/colors';
 import {FallContext} from '../../../components/general/Context';
 import {CustomButton} from '../../../components/general/CustomButton';
-import {log} from 'react-native-reanimated';
+import {requestPermissions} from '../../../services/permissions/requestPermissions';
 
 const FallDetected = () => {
   const [timer, setTimer] = useState(0);
@@ -25,7 +31,7 @@ const FallDetected = () => {
       <View>
         <CountDown
           until={15}
-          onFinish={() => null}
+          onFinish={() => onStop()}
           // onPress={() => alert('hello')}
           size={50}
           timeToShow={['S']}

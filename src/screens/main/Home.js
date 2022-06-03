@@ -46,7 +46,6 @@ const Home = ({navigation}) => {
   const lightStyleURL = MapboxGL.StyleURL.Light;
   const darkStyleURL = MapboxGL.StyleURL.Dark;
   const [styleUrl, setStyleUrl] = useState(streetStyleURL); // MapboxGL map style url
-  const permissionName = PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION; // location permission name
   const [locationPermissionGranted, setLocationPermissionGranted] =
     useState(false); // Whether the location permission is granted
   const [locationPermissionDenied, setLocationPermissionDenied] =
@@ -59,6 +58,7 @@ const Home = ({navigation}) => {
   const [locationFromMapboxLat, setLocationFromMapboxLat] = useState(); // User's current position tracked from the mapboxGL userLocation - Latitude
   const [mapTypeVisibility, setMapTypeVisibility] = useState(false); // MapType modal visibility
   const startValueMoveY = useRef(new Animated.Value(0)).current; // Initial value of move Y animated for the location
+  const locationPermission = PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION; // location permission name
 
   // Exit the app and go to settings. This function is called when the 'Go to settings' button in the permission denied modal is pressed.
   const settings = () => {
@@ -68,8 +68,7 @@ const Home = ({navigation}) => {
 
   // Checks permission
   const checkPermission = useCallback(async () => {
-    const result = await requestPermissions(permissionName); // call requestPermissions function with the permissionName argument and wait for the result;
-
+    const result = await requestPermissions(locationPermission); // call requestPermissions function with the permissionName argument and wait for the result;
     //Set the values of location permission according to the result from 'requestPermissions' function
     if (result === RESULTS.GRANTED) {
       setLocationPermissionBlocked(false);
@@ -84,7 +83,7 @@ const Home = ({navigation}) => {
       setLocationPermissionDenied(false);
       setLocationPermissionBlocked(true);
     }
-  }, [permissionName]);
+  }, [locationPermission]);
 
   // Will be called when the user location is updated/changed
   const userLocationUpdate = async location => {
