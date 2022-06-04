@@ -4,7 +4,7 @@ import {
   TouchableOpacity,
   useWindowDimensions,
 } from 'react-native';
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { AuthContext } from '../../components/general/Context';
 
@@ -20,7 +20,6 @@ import { useSignUp } from '../../hooks/authentication/useSignUp';
 const SignUp = ({ navigation }) => {
   const { height, width } = useWindowDimensions();
   const { loginStatus } = useContext(AuthContext);
-
   // sign up function
   const onSignUp = token => {
     storeToken(token);
@@ -28,6 +27,7 @@ const SignUp = ({ navigation }) => {
   };
   const register = useSignUp();
   const onSubmit = data => {
+   
     const fullName = data.fullName.split(' ')
     const newUser = {
       firstName: fullName[0],
@@ -40,16 +40,20 @@ const SignUp = ({ navigation }) => {
 
   const { control, handleSubmit, formState: { errors } } = useForm({
     defaultValues: {
-      fullName: "michael belete",
-      email: "mike@random.com",
-      password: "mike123"
+      fullName: "",
+      email: "",
+      password: "",
     }
   });
 
+
+  if(register.isSuccess) {
+    navigation.navigate('Login');
+  }
   return (
     <View style={styles.container}>
       <View style={styles.signUpSvgContainer}>
-        <SignUpSvg width={width} height={height / 4} />
+        <SignUpSvg width={width} height={height / 5} />
       </View>
       <View style={styles.signUpFormContainer}>
         <View style={styles.signUpText}>
@@ -57,8 +61,10 @@ const SignUp = ({ navigation }) => {
         </View>
         <View style={styles.inputContainer}>
           <CustomTextInputValidation
+            customStyles={styles.inputs}
             label="Full Name"
             control={control}
+            editable={!register.isLoading}
             name="fullName"
             error={errors.fullName?.message}
             rules={{
@@ -72,8 +78,10 @@ const SignUp = ({ navigation }) => {
         </View>
         <View style={styles.inputContainer}>
           <CustomTextInputValidation
+            customStyles={styles.inputs}
             label="Email"
             control={control}
+            editable={!register.isLoading}
             name="email"
             error={errors.email?.message}
             rules={{
@@ -86,8 +94,11 @@ const SignUp = ({ navigation }) => {
         </View>
         <View style={styles.inputContainer}>
           <CustomTextInputValidation
+            customStyles={styles.inputs}
+            secureTextEntry={true}
             label="Password"
             control={control}
+            editable={!register.isLoading}
             name="password"
             error={errors.password?.message}
             rules={{
@@ -98,26 +109,30 @@ const SignUp = ({ navigation }) => {
             }}
           />
         </View>
-
+{/* 
         <View style={styles.inputContainer}>
           <CustomTextInputValidation
+            customStyles={styles.inputs}
             label="Confirm Password"
+            secureTextEntry={true}
             control={control}
+            editable={!register.isLoading}
             name="confirmPassword"
             error={errors.confirmPassword?.message}
             rules={{
               required: {
                 value: true,
-                message: 'Full name is required.',
+                message: 'Confirm password is required.',
               },
             }}
           />
-        </View>
+        </View> */}
+        {register.isError && (<CustomText content={register.error.message} fontColor={Colors.red} />)}
         <View style={styles.buttonsContainer}>
           <CustomButton
             width={350}
             height={60}
-            title={register.isLoading ? 'Creating account...':'Create Account'}
+            title={register.isLoading ? 'Please wait...' : 'Create Account'}
             customStyle={styles.signUpButtonStyle}
             onPress={handleSubmit(onSubmit)}
           />
@@ -127,7 +142,7 @@ const SignUp = ({ navigation }) => {
               onPress={() => {
                 navigation.navigate('Login');
               }}>
-              <CustomText content={' Login'} fontColor={Colors.primary} />
+              <CustomText content={'Login'} fontColor={Colors.primary} />
             </TouchableOpacity>
           </View>
         </View>
@@ -143,7 +158,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.secondary,
   },
   buttonsContainer: {
-    marginTop: 10,
+    marginTop: 0,
     alignItems: 'center',
   },
   signUpFormContainer: {
@@ -166,17 +181,19 @@ const styles = StyleSheet.create({
   inputContainer: {
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: Colors.white,
     borderRadius: 10,
     flexDirection: 'row',
     height: 60,
-    marginBottom: 20,
-    width: 350,
     paddingHorizontal: 15,
+    marginVertical: 20,
+  },
+  inputs: {
+    width: 350,
+    height: 60,
   },
   registerContainer: {
     flexDirection: 'row',
-    marginTop: 20,
+    marginTop: 10,
   },
 });
 
