@@ -16,6 +16,7 @@ import { storeToken } from '../../services/storeToken/storeToken';
 import { useForm } from 'react-hook-form';
 import { CustomTextInputValidation } from '../../components/general/CustomTextInputValidation';
 import { useSignUp } from '../../hooks/authentication/useSignUp';
+import colors from '../../constants/colors';
 
 const SignUp = ({ navigation }) => {
   const { height, width } = useWindowDimensions();
@@ -27,7 +28,7 @@ const SignUp = ({ navigation }) => {
   };
   const register = useSignUp();
   const onSubmit = data => {
-   
+
     const fullName = data.fullName.split(' ')
     const newUser = {
       firstName: fullName[0],
@@ -46,70 +47,71 @@ const SignUp = ({ navigation }) => {
     }
   });
 
-
-  if(register.isSuccess) {
-    navigation.navigate('Login');
-  }
   return (
     <View style={styles.container}>
       <View style={styles.signUpSvgContainer}>
         <SignUpSvg width={width} height={height / 5} />
       </View>
-      <View style={styles.signUpFormContainer}>
-        <View style={styles.signUpText}>
-          <CustomText content={'Create Account'} fontSize={28} />
-        </View>
-        <View style={styles.inputContainer}>
-          <CustomTextInputValidation
-            customStyles={styles.inputs}
-            label="Full Name"
-            control={control}
-            editable={!register.isLoading}
-            name="fullName"
-            error={errors.fullName?.message}
-            rules={{
-              required: {
-                value: true,
-                message: 'Full name is required.',
-              },
-            }}
-          />
-          {/* <CustomText content={'Full Name'} fontColor={Colors.gray} /> */}
-        </View>
-        <View style={styles.inputContainer}>
-          <CustomTextInputValidation
-            customStyles={styles.inputs}
-            label="Email"
-            control={control}
-            editable={!register.isLoading}
-            name="email"
-            error={errors.email?.message}
-            rules={{
-              required: {
-                value: true,
-                message: 'Email is required.',
-              },
-            }}
-          />
-        </View>
-        <View style={styles.inputContainer}>
-          <CustomTextInputValidation
-            customStyles={styles.inputs}
-            secureTextEntry={true}
-            label="Password"
-            control={control}
-            editable={!register.isLoading}
-            name="password"
-            error={errors.password?.message}
-            rules={{
-              required: {
-                value: true,
-                message: 'Password is required.',
-              },
-            }}
-          />
-        </View>
-{/* 
+      {register.isSuccess ? (<View style={styles.successMessage}>
+        <CustomText content="Welcome to MedXpert" fontSize={28} fontWeight="bold" customStyles={styles.welcomeText} />
+        <CustomText content="Signed up successfully" fontSize={20} customStyles={styles.successText} />
+        <CustomButton width={200}
+          height={50} backgroundColor={colors.primary} title="Login" onPress={() => navigation.navigate('Login')} />
+      </View>) : (
+        <View style={styles.signUpFormContainer}>
+          <View style={styles.signUpText}>
+            <CustomText content={'Create Account'} fontSize={28} />
+          </View>
+          <View style={styles.inputContainer}>
+            <CustomTextInputValidation
+              customStyles={styles.inputs}
+              label="Full Name"
+              control={control}
+              editable={!register.isLoading}
+              name="fullName"
+              error={errors.fullName?.message}
+              rules={{
+                required: {
+                  value: true,
+                  message: 'Full name is required.',
+                },
+              }}
+            />
+          </View>
+          <View style={styles.inputContainer}>
+            <CustomTextInputValidation
+              customStyles={styles.inputs}
+              label="Email"
+              control={control}
+              editable={!register.isLoading}
+              name="email"
+              error={errors.email?.message}
+              rules={{
+                required: {
+                  value: true,
+                  message: 'Email is required.',
+                },
+              }}
+            />
+          </View>
+          <View style={styles.inputContainer}>
+            <CustomTextInputValidation
+              customStyles={styles.inputs}
+              secureTextEntry={true}
+              label="Password"
+              control={control}
+              editable={!register.isLoading}
+              name="password"
+              error={errors.password?.message}
+              rules={{
+                required: {
+                  value: true,
+                  message: 'Password is required.',
+                },
+              }}
+            />
+          </View>
+          {/* 
         <View style={styles.inputContainer}>
           <CustomTextInputValidation
             customStyles={styles.inputs}
@@ -127,27 +129,26 @@ const SignUp = ({ navigation }) => {
             }}
           />
         </View> */}
-        {register.isError && (<CustomText content={register.error.message} fontColor={Colors.red} />)}
-        <View style={styles.buttonsContainer}>
-          <CustomButton
-            width={350}
-            height={60}
-            title={register.isLoading ? 'Please wait...' : 'Create Account'}
-            customStyle={styles.signUpButtonStyle}
-            onPress={handleSubmit(onSubmit)}
-          />
-          <View style={styles.registerContainer}>
-            <CustomText content={'Joined us before?'} />
-            <TouchableOpacity
-              onPress={() => {
-                navigation.navigate('Login');
-              }}>
-              <CustomText content={'Login'} fontColor={Colors.primary} />
-            </TouchableOpacity>
+          {register.isError && (<CustomText content={register.error.message} fontColor={Colors.red} />)}
+          <View style={styles.buttonsContainer}>
+            <CustomButton
+              width={350}
+              height={60}
+              title={register.isLoading ? 'Please wait...' : 'Create Account'}
+              customStyle={styles.signUpButtonStyle}
+              onPress={handleSubmit(onSubmit)}
+            />
+            <View style={styles.registerContainer}>
+              <CustomText content={'Joined us before?'} />
+              <TouchableOpacity
+                onPress={() => {
+                  navigation.navigate('Login');
+                }}>
+                <CustomText content={'Login'} fontColor={Colors.primary} />
+              </TouchableOpacity>
+            </View>
           </View>
-        </View>
-        <View />
-      </View>
+        </View>)}
     </View>
   );
 };
@@ -157,6 +158,9 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: Colors.secondary,
   },
+  successMessage: { flex: 1, alignItems: 'center', justifyContent: 'center' },
+  welcomeText: { marginVertical: 5 },
+  successText: { marginBottom: 20 },
   buttonsContainer: {
     marginTop: 0,
     alignItems: 'center',
