@@ -5,32 +5,37 @@ import {
   TouchableOpacity,
   useWindowDimensions,
 } from 'react-native';
-import React, {useContext} from 'react';
+import React, { useContext, useEffect} from 'react';
 import Icon from 'react-native-vector-icons/Ionicons';
 
 import Colors from '../../constants/colors';
-import {CustomText} from '../../components/general/CustomText';
+import { CustomText } from '../../components/general/CustomText';
 import LoginSvg from '../../assets/svg/auth/login.svg';
-import {CustomButton} from '../../components/general/CustomButton';
-import {AuthContext} from '../../components/general/Context';
-import {storeToken} from '../../services/storeToken/storeToken';
+import { CustomButton } from '../../components/general/CustomButton';
+import { AuthContext } from '../../components/general/Context';
+import { storeToken } from '../../services/storeToken/storeToken';
+import {useFetchTodo} from '../../hooks/authentication/index'
+import { fetchTodo } from '../../services/api/authentication';
+import axios from "axios";
+const Login = ({ navigation }) => {
 
-const Login = ({navigation}) => {
-  const {height, width} = useWindowDimensions();
-  const {loginStatus} = useContext(AuthContext);
+  const { height, width } = useWindowDimensions();
+  const { loginStatus } = useContext(AuthContext);
   // Login function
   const onLogin = token => {
     storeToken(token);
     loginStatus();
   };
-  return (
+
+
+ return (
     <View style={styles.container}>
       <View style={styles.loginSvgContainer}>
         <LoginSvg width={width} height={height / 3} />
       </View>
       <ScrollView
         style={styles.loginFormContainer}
-        contentContainerStyle={{alignItems: 'center'}}>
+        contentContainerStyle={{ alignItems: 'center' }}>
         <View style={styles.loginText}>
           <CustomText content={'Login'} fontSize={28} />
         </View>

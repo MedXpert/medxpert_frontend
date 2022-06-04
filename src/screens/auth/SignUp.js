@@ -4,25 +4,47 @@ import {
   TouchableOpacity,
   useWindowDimensions,
 } from 'react-native';
-import React, {useContext} from 'react';
+import React, { useContext } from 'react';
 import Icon from 'react-native-vector-icons/Ionicons';
-import {AuthContext} from '../../components/general/Context';
+import { AuthContext } from '../../components/general/Context';
 
 import Colors from '../../constants/colors';
-import {CustomText} from '../../components/general/CustomText';
+import { CustomText } from '../../components/general/CustomText';
 import SignUpSvg from '../../assets/svg/auth/signUp.svg';
-import {CustomButton} from '../../components/general/CustomButton';
-import {storeToken} from '../../services/storeToken/storeToken';
+import { CustomButton } from '../../components/general/CustomButton';
+import { storeToken } from '../../services/storeToken/storeToken';
+import { useForm } from 'react-hook-form';
+import { CustomTextInputValidation } from '../../components/general/CustomTextInputValidation';
+import { useSignUp } from '../../hooks/authentication/useSignUp';
 
-const SignUp = ({navigation}) => {
-  const {height, width} = useWindowDimensions();
-  const {loginStatus} = useContext(AuthContext);
+const SignUp = ({ navigation }) => {
+  const { height, width } = useWindowDimensions();
+  const { loginStatus } = useContext(AuthContext);
 
   // sign up function
   const onSignUp = token => {
     storeToken(token);
     loginStatus();
   };
+  const register = useSignUp();
+  const onSubmit = data => {
+    const fullName = data.fullName.split(' ')
+    const newUser = {
+      firstName: fullName[0],
+      lastName: fullName[1] ? fullName[1] : '',
+      email: data.email,
+      password: data.password,
+    }
+    register.mutate({ ...newUser });
+  };
+
+  const { control, handleSubmit, formState: { errors } } = useForm({
+    defaultValues: {
+      fullName: "michael belete",
+      email: "mike@random.com",
+      password: "mike123"
+    }
+  });
 
   return (
     <View style={styles.container}>
@@ -31,33 +53,73 @@ const SignUp = ({navigation}) => {
       </View>
       <View style={styles.signUpFormContainer}>
         <View style={styles.signUpText}>
-          <CustomText content={'signUp'} fontSize={28} />
+          <CustomText content={'Create Account'} fontSize={28} />
         </View>
         <View style={styles.inputContainer}>
-          <CustomText content={'Full Name'} fontColor={Colors.gray} />
+          <CustomTextInputValidation
+            label="Full Name"
+            control={control}
+            name="fullName"
+            error={errors.fullName?.message}
+            rules={{
+              required: {
+                value: true,
+                message: 'Full name is required.',
+              },
+            }}
+          />
+          {/* <CustomText content={'Full Name'} fontColor={Colors.gray} /> */}
         </View>
         <View style={styles.inputContainer}>
-          <CustomText content={'Email'} fontColor={Colors.gray} />
+          <CustomTextInputValidation
+            label="Email"
+            control={control}
+            name="email"
+            error={errors.email?.message}
+            rules={{
+              required: {
+                value: true,
+                message: 'Email is required.',
+              },
+            }}
+          />
         </View>
         <View style={styles.inputContainer}>
-          <CustomText content={'Password'} fontColor={Colors.gray} />
-          {/* To be rendered conditionally. should be pressable/button. Toggles between show password and hide password. */}
-          <Icon name="eye-outline" size={20} color={Colors.gray} />
-          {/* <Icon name="eye-off-outline" size={20} color={Colors.gray} /> */}
+          <CustomTextInputValidation
+            label="Password"
+            control={control}
+            name="password"
+            error={errors.password?.message}
+            rules={{
+              required: {
+                value: true,
+                message: 'Password is required.',
+              },
+            }}
+          />
         </View>
 
         <View style={styles.inputContainer}>
-          <CustomText content={'Confirm Password'} fontColor={Colors.gray} />
+          <CustomTextInputValidation
+            label="Confirm Password"
+            control={control}
+            name="confirmPassword"
+            error={errors.confirmPassword?.message}
+            rules={{
+              required: {
+                value: true,
+                message: 'Full name is required.',
+              },
+            }}
+          />
         </View>
         <View style={styles.buttonsContainer}>
           <CustomButton
             width={350}
             height={60}
-            title={'signUp'}
+            title={register.isLoading ? 'Creating account...':'Create Account'}
             customStyle={styles.signUpButtonStyle}
-            onPress={() => {
-              onSignUp('staticToken');
-            }}
+            onPress={handleSubmit(onSubmit)}
           />
           <View style={styles.registerContainer}>
             <CustomText content={'Joined us before?'} />

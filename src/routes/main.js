@@ -1,5 +1,5 @@
-import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import {View, Text} from 'react-native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { View, Text } from 'react-native';
 import React, {
   useState,
   useEffect,
@@ -14,7 +14,7 @@ import NavigationStackUser from './NavigationStackUser';
 import NavigationStackHCF from '../hcf/routes/NavigationStackHCF';
 import WelcomeStackScreen from './Welcome';
 import AuthStackScreen from './Auth';
-import {AuthContext, WelcomeContext} from '../components/general/Context';
+import { AuthContext, WelcomeContext } from '../components/general/Context';
 
 // The main route that evaluates whether the user is logged in or not and decides where to navigate when the app starts.
 const Main = () => {
@@ -96,7 +96,11 @@ const Main = () => {
 
       // Check role
       if (role === 'user') {
-        return <NavigationStackUser />;
+        return(
+        <AuthContext.Provider value={authContext}>
+          <NavigationStackUser />
+        </AuthContext.Provider>
+        );
       } else if (role === 'admin') {
         return <NavigationStackHCF />;
       }
