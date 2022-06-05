@@ -22,6 +22,7 @@ import {
   FallContext,
 } from '../components/general/Context';
 import FallDetected from '../screens/main/Emergency/FallDetected';
+import {backgroundService} from '../services/backgroundService/backgroundService';
 
 // Ignore new NativeEmitter error
 LogBox.ignoreLogs(['new NativeEventEmitter']);
@@ -100,12 +101,14 @@ const Main = () => {
         console.log(newData);
         await AsyncStorage.setItem('@fallDetected', 'true');
         // put your data processing step here
-        setFallDetected(true);
+        // setFallDetected(true);
+        await backgroundService();
       });
     }
 
-    return () => {
+    return async () => {
       isMounted = false;
+      await AsyncStorage.removeItem('@fallDetected');
     };
   }, []);
 

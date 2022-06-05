@@ -13,24 +13,14 @@ import colors from '../../../constants/colors';
 import {FallContext} from '../../../components/general/Context';
 import {CustomButton} from '../../../components/general/CustomButton';
 import {requestPermissions} from '../../../services/permissions/requestPermissions';
-import {sendSms} from '../../../services/sendEmergency/sendSms';
-import {sendEmail} from '../../../services/sendEmergency/sendEmail';
-import EmailSender from 'react-native-smtp';
 
 const FallDetected = () => {
   const [timer, setTimer] = useState(0);
 
   const {fallStatus} = useContext(FallContext);
 
-  const {phoneNumber, message} = {
-    phoneNumber: '',
-    message:
-      'A possible fall has been detected from useNameHere phone, please check them.',
-  };
-
   const onFinish = async () => {
     // Send sms message to emergency contacts
-    sendSms(phoneNumber, message);
 
     // Send email to emergency contacts
 
