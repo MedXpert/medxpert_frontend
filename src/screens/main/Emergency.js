@@ -26,7 +26,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 const Emergency = ({navigation}) => {
   const [automationToggle, setAutomationToggle] = useState(false);
   const [smsToggle, setSmsToggle] = useState(false);
-  const [EmailToggle, setEmailToggle] = useState(false);
+  const [emailToggle, setEmailToggle] = useState(false);
   const [fallDetectionToggle, setFallDetectionToggle] = useState(false);
   const [fallDetectionToggleDisabled, setFallDetectionToggleDisabled] =
     useState(false);
@@ -116,13 +116,19 @@ const Emergency = ({navigation}) => {
   ]);
 
   useEffect(() => {
-    const fallDetectionToggleChange = async () => {
-      await checkPermission();
-      if (sendSmsPermissionBlocked) {
-        setFallDetectionToggleDisabled(true);
-      }
+    var isMounted = true;
+    if (isMounted) {
+      const fallDetectionToggleChange = async () => {
+        await checkPermission();
+        if (sendSmsPermissionBlocked) {
+          setFallDetectionToggleDisabled(true);
+        }
+      };
+      fallDetectionToggleChange();
+    }
+    return () => {
+      isMounted = false;
     };
-    fallDetectionToggleChange();
   }, [checkPermission, fallDetectionToggleDisabled, sendSmsPermissionBlocked]);
 
   useEffect(() => {
@@ -132,7 +138,7 @@ const Emergency = ({navigation}) => {
         JSON.stringify(automationToggle),
       );
       await AsyncStorage.setItem('@smsToggle', JSON.stringify(smsToggle));
-      await AsyncStorage.setItem('@EmailToggle', JSON.stringify(EmailToggle));
+      await AsyncStorage.setItem('@emailToggle', JSON.stringify(emailToggle));
       await AsyncStorage.setItem(
         '@fallDetectionToggle',
         JSON.stringify(fallDetectionToggle),
@@ -144,33 +150,12 @@ const Emergency = ({navigation}) => {
     };
     storeToggleValues();
   }, [
-    EmailToggle,
+    emailToggle,
     ambulanceServiceToggle,
     automationToggle,
     fallDetectionToggle,
     smsToggle,
   ]);
-
-  // useEffect(() => {
-
-  //     if (fallDetectionToggle) {
-  //       setFallDetectionToggleDisabled(true);
-  //       await checkPermission();
-  //       setFallDetectionToggleDisabled(false);
-  //       // if (sendSmsPermissionGranted) {
-  //       //   setFallDetectionToggle(true);
-  //       // } else {
-  //       //   setFallDetectionToggle(false);
-  //       // }
-  //     }
-  //   };
-  //   fallDetectionToggleChange();
-  // }, [
-  //   fallDetectionToggle,
-  //   checkPermission,
-  //   fallDetectionToggleDisabled,
-  //   sendSmsPermissionGranted,
-  // ]);
 
   return (
     <View style={styles.container}>
@@ -293,7 +278,7 @@ const Emergency = ({navigation}) => {
                         style={[
                           styles.smsAndEmailIcons,
                           {
-                            color: EmailToggle ? colors.primary : colors.gray,
+                            color: emailToggle ? colors.primary : colors.gray,
                           },
                         ]}
                         size={20}
@@ -305,9 +290,9 @@ const Emergency = ({navigation}) => {
                         false: colors.lightGray,
                         true: colors.primary,
                       }}
-                      thumbColor={EmailToggle ? colors.white : colors.gray}
+                      thumbColor={emailToggle ? colors.white : colors.gray}
                       onValueChange={onEmailToggleChange}
-                      value={EmailToggle}
+                      value={emailToggle}
                     />
                   </View>
                 </Pressable>

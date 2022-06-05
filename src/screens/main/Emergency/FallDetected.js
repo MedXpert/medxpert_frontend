@@ -8,19 +8,37 @@ import React, {
 } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import CountDown from 'react-native-countdown-component';
-
 import {CustomText} from '../../../components/general/CustomText';
 import colors from '../../../constants/colors';
 import {FallContext} from '../../../components/general/Context';
 import {CustomButton} from '../../../components/general/CustomButton';
 import {requestPermissions} from '../../../services/permissions/requestPermissions';
+import {sendSms} from '../../../services/sendEmergency/sendSms';
+import {sendEmail} from '../../../services/sendEmergency/sendEmail';
+import EmailSender from 'react-native-smtp';
 
 const FallDetected = () => {
   const [timer, setTimer] = useState(0);
 
   const {fallStatus} = useContext(FallContext);
 
-  const onStop = async () => {
+  const {phoneNumber, message} = {
+    phoneNumber: '',
+    message:
+      'A possible fall has been detected from useNameHere phone, please check them.',
+  };
+
+  const onFinish = async () => {
+    // Send sms message to emergency contacts
+    sendSms(phoneNumber, message);
+
+    // Send email to emergency contacts
+
+    await AsyncStorage.removeItem('@fallDetected');
+    fallStatus();
+  };
+
+  const onIAmOkay = async () => {
     await AsyncStorage.removeItem('@fallDetected');
     fallStatus();
   };
@@ -31,7 +49,7 @@ const FallDetected = () => {
       <View>
         <CountDown
           until={15}
-          onFinish={() => onStop()}
+          onFinish={() => onFinish()}
           // onPress={() => alert('hello')}
           size={50}
           timeToShow={['S']}
@@ -52,7 +70,7 @@ const FallDetected = () => {
             fontColor={colors.white}
             width={150}
             onPress={() => {
-              onStop();
+              onIAmOkay();
             }}
           />
           <CustomButton
@@ -61,7 +79,9 @@ const FallDetected = () => {
             fontColor={colors.red}
             title={'I need help'}
             width={150}
-            onPress={() => {}}
+            onPress={() => {
+              onFinish();
+            }}
           />
         </View>
       </View>
