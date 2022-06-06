@@ -21,11 +21,7 @@ import colors from '../../constants/colors';
 const SignUp = ({ navigation }) => {
   const { height, width } = useWindowDimensions();
   const { loginStatus } = useContext(AuthContext);
-  // sign up function
-  const onSignUp = token => {
-    storeToken(token);
-    loginStatus();
-  };
+  
   const register = useSignUp();
   const onSubmit = data => {
 
