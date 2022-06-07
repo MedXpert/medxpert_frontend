@@ -21,7 +21,7 @@ const Main = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(); // User state value from the cache  -- check if a login token exists
   const [appIsLoading, setAppIsLoading] = useState(true); // whether the app is loading or finished loading.
   const [openingForTheFirstTime, setOpeningForTheFirstTime] = useState(true); // Whether the app is being opened for the first time.
-  const [role, setRole] = useState('user');
+  const [role, setRole] = useState();
 
   // setTimeout(() => setAppIsLoading(false), 3000);
   // setTimeout(() => setIsLoggedIn(true), 5000);
@@ -35,7 +35,6 @@ const Main = () => {
     }
     if (value === 'false') {
       setOpeningForTheFirstTime(false);
-      console.log('openingForTheFirstTime: ', value);
     }
     // Set AppIsLoading false (Splash screen won't be displayed)
     setAppIsLoading(false);
@@ -46,8 +45,8 @@ const Main = () => {
     if (token == null) {
       setIsLoggedIn(false);
     } else if (token) {
-      const role = await AsyncStorage.getItem('@role');
-      setRole(role)
+      const userRole = await AsyncStorage.getItem('@role');
+      setRole(userRole)
       setIsLoggedIn(true);
     }
   }, []);
@@ -81,7 +80,7 @@ const Main = () => {
       isMounted = false;
     };
   }, [setOpeningForTheFirstTimeValueFunc, checkLoginStatus]);
-
+  console.log("role", role)
   const homeOrLogin = () => {
     if (openingForTheFirstTime && !isLoggedIn) {
       return (
@@ -96,15 +95,15 @@ const Main = () => {
         </AuthContext.Provider>
       );
     } else if (isLoggedIn) {
-           // Check role
+      // Check role
       if (role === 'u') {
-        return(
-        <AuthContext.Provider value={authContext}>
-          <NavigationStackUser />
-        </AuthContext.Provider>
+        return (
+          <AuthContext.Provider value={authContext}>
+            <NavigationStackUser />
+          </AuthContext.Provider>
         );
       } else if (role === 'h') {
-        return <NavigationStackHCF />;
+        return <AuthContext.Provider value={authContext}><NavigationStackHCF /></AuthContext.Provider>;
       }
     }
   }; // return stacks according to the state of the user.
