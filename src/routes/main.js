@@ -13,6 +13,7 @@ import SplashScreen from '../screens/welcome/Splash';
 import NavigationStackUser from './NavigationStackUser';
 import NavigationStackHCF from '../hcf/routes/NavigationStackHCF';
 import WelcomeStackScreen from './Welcome';
+import Loading from '../screens/welcome/Loading';
 import AuthStackScreen from './Auth';
 import { AuthContext, WelcomeContext } from '../components/general/Context';
 
@@ -82,19 +83,7 @@ const Main = () => {
   }, [setOpeningForTheFirstTimeValueFunc, checkLoginStatus]);
   console.log("role", role)
   const homeOrLogin = () => {
-    if (openingForTheFirstTime && !isLoggedIn) {
-      return (
-        <WelcomeContext.Provider value={welcomeContext}>
-          <WelcomeStackScreen />
-        </WelcomeContext.Provider>
-      );
-    } else if (!openingForTheFirstTime && !isLoggedIn) {
-      return (
-        <AuthContext.Provider value={authContext}>
-          <AuthStackScreen />
-        </AuthContext.Provider>
-      );
-    } else if (isLoggedIn) {
+    if (isLoggedIn) {
       // Check role
       if (role === 'u') {
         return (
@@ -104,6 +93,22 @@ const Main = () => {
         );
       } else if (role === 'h') {
         return <AuthContext.Provider value={authContext}><NavigationStackHCF /></AuthContext.Provider>;
+      } else {
+        return <AuthContext.Provider value={authContext}><Loading /></AuthContext.Provider>;
+      }
+    } else {
+      if (openingForTheFirstTime) {
+        return (
+          <WelcomeContext.Provider value={welcomeContext}>
+            <WelcomeStackScreen />
+          </WelcomeContext.Provider>
+        );
+      } else {
+        return (
+          <AuthContext.Provider value={authContext}>
+            <AuthStackScreen />
+          </AuthContext.Provider>
+        );
       }
     }
   }; // return stacks according to the state of the user.

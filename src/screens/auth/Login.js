@@ -39,7 +39,6 @@ const Login = ({ navigation }) => {
   };
 
   if(login.isSuccess) {
-    console.log(login.data.data)
     storeToken(
       {
         access: login.data?.data.access, 
