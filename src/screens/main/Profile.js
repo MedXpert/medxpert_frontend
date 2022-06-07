@@ -5,7 +5,7 @@ import {
   Pressable,
   ScrollView,
 } from 'react-native';
-import React, { useContext } from 'react';
+import React, { useContext, useEffect } from 'react';
 import Colors from '../../constants/colors';
 import { CustomText } from '../../components/general/CustomText';
 import { CustomButton } from '../../components/general/CustomButton';
@@ -15,10 +15,14 @@ import colors from '../../constants/colors';
 import { useForm } from 'react-hook-form';
 import { emailRegEx } from '../../constants/regEx';
 import { AuthContext } from '../../components/general/Context';
+import { useGetToken } from '../../hooks/authentication/useGetTokens';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+
 const Profile = () => {
 
   const { loginStatus } = useContext(AuthContext);
+
+  const user = useGetToken();
 
   const {
     control,
@@ -37,10 +41,17 @@ const Profile = () => {
   const onSubmit = data => console.log(data);
 
   const handleLogout = async () => {
-    await AsyncStorage.removeItem('@token');
+    await AsyncStorage.removeItem('@accessToken');
+    await AsyncStorage.removeItem('@refreshToken');
+    await AsyncStorage.removeItem('@role');
+    await AsyncStorage.removeItem('@userId');
     loginStatus();
     
   }
+
+  useEffect(() => {
+    user.then((res) => console.log(res))
+  })
   return (
     <View>
       <View style={styles.changePassword}>

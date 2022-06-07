@@ -42,7 +42,7 @@ const Main = () => {
   }, []);
 
   const checkLoginStatus = useCallback(async () => {
-    const token = await AsyncStorage.getItem('@token');
+    const token = await AsyncStorage.getItem('@accessToken');
     if (token == null) {
       setIsLoggedIn(false);
     } else if (token) {

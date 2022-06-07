@@ -33,21 +33,32 @@ const Login = ({ navigation }) => {
 
   // Login function
   const onLogin = data => {
-    console.log(data)
     // storeToken(token);
     // loginStatus();
     login.mutate({...data});
   };
 
-  useEffect(() => {
-   console.log(login)
-  }, [login])
+  if(login.isSuccess) {
+    console.log(login.data.data)
+    storeToken(
+      {
+        access: login.data?.data.access, 
+        refresh: login.data?.data.refresh, 
+        uid: login.data?.data.authenticatedUser.uid, 
+        role: login.data?.data.authenticatedUser.role, 
+      }
+    );
+    loginStatus();
+  }
+
+  if(login.isError) {
+    console.log(login.error)
+  }
 
   return (
     <View style={styles.container}>
       <View style={styles.loginSvgContainer}>
         <LoginSvg width={width} height={height / 4} />
-        {login.isSuccess && JSON.stringify(login.data) }
       </View>
       <ScrollView
         style={styles.loginFormContainer}
