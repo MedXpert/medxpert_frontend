@@ -1,6 +1,7 @@
 import BackgroundService from 'react-native-background-actions';
 import {sendSms} from '../sendEmergency/sendSms';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {sendEmail} from '../sendEmergency/sendEmail';
 
 export const backgroundService = async () => {
   // You can do anything in your task such as network requests, timers and so on,
@@ -15,6 +16,12 @@ export const backgroundService = async () => {
     phoneNumber: '0916112143',
     message:
       'A possible fall has been detected from useNameHere phone, please check them.',
+  };
+
+  const {to, subject, body} = {
+    to: 'it.liyu.mesfin@gmail.com, liunique10@gmail.com',
+    subject: 'A possible fall detected',
+    body: 'A possible fall has been detected from userNameHere phone, please check them.',
   };
 
   const veryIntensiveTask = async taskDataArguments => {
@@ -33,6 +40,7 @@ export const backgroundService = async () => {
       }
       if (counting > 10) {
         sendSms(phoneNumber, message);
+        sendEmail();
         console.log('Message sent');
         BackgroundService.stop();
       }
