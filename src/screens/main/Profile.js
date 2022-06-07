@@ -17,13 +17,14 @@ import { emailRegEx } from '../../constants/regEx';
 import { AuthContext } from '../../components/general/Context';
 import { useGetToken } from '../../hooks/authentication/useGetTokens';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useLoggedInUser } from '../../hooks/authentication';
 
 const Profile = () => {
 
   const { loginStatus } = useContext(AuthContext);
 
   const user = useGetToken();
-
+  const loggedInUser = useLoggedInUser();
   const {
     control,
     handleSubmit,
@@ -49,9 +50,17 @@ const Profile = () => {
     
   }
 
-  useEffect(() => {
-    user.then((res) => console.log(res))
-  })
+  if(loggedInUser.isSuccess) {
+    console.log('logged in user', loggedInUser.data);
+  }
+
+  if(loggedInUser.isError) {
+    console.log('logged in user error', loggedInUser.error);
+  }
+  // useEffect(() => {
+  //   // user.then((res) => console.log(res))
+    
+  // })
   return (
     <View>
       <View style={styles.changePassword}>

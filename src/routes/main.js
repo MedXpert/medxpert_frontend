@@ -18,7 +18,7 @@ import { AuthContext, WelcomeContext } from '../components/general/Context';
 
 // The main route that evaluates whether the user is logged in or not and decides where to navigate when the app starts.
 const Main = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false); // User state value from the cache  -- check if a login token exists
+  const [isLoggedIn, setIsLoggedIn] = useState(); // User state value from the cache  -- check if a login token exists
   const [appIsLoading, setAppIsLoading] = useState(true); // whether the app is loading or finished loading.
   const [openingForTheFirstTime, setOpeningForTheFirstTime] = useState(true); // Whether the app is being opened for the first time.
   const [role, setRole] = useState('user');
@@ -67,8 +67,19 @@ const Main = () => {
   }, [checkLoginStatus]);
 
   useEffect(() => {
-    setOpeningForTheFirstTimeValueFunc();
-    checkLoginStatus();
+    let isMounted = true;
+    const check = async () => {
+      await setOpeningForTheFirstTimeValueFunc();
+      checkLoginStatus();
+      // await checkFallDetected();
+      setAppIsLoading(false);
+    };
+
+    check();
+
+    return () => {
+      isMounted = false;
+    };
   }, [setOpeningForTheFirstTimeValueFunc, checkLoginStatus]);
 
   const homeOrLogin = () => {
@@ -92,7 +103,7 @@ const Main = () => {
           <NavigationStackUser />
         </AuthContext.Provider>
         );
-      } else if (role === 'a') {
+      } else if (role === 'h') {
         return <NavigationStackHCF />;
       }
     }
