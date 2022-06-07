@@ -1,17 +1,6 @@
-import axios from 'axios';
-import { baseUrl } from '../../../constants/api';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-const url = baseUrl + 'auth/user'
-
+import httpClient from "../../auth/httpClient";
 const fetchLoggedInUser = async () => {
-    const token = await AsyncStorage.getItem('@accessToken');
-    console.log('token', token);
-    return await axios.get(url, {
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-        }
-    });
+    return await httpClient.get('/auth/user');
 };
 
 export { fetchLoggedInUser };

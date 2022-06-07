@@ -57,10 +57,7 @@ const Profile = () => {
   if(loggedInUser.isError) {
     console.log('logged in user error', loggedInUser.error);
   }
-  // useEffect(() => {
-  //   // user.then((res) => console.log(res))
-    
-  // })
+
   return (
     <View>
       <View style={styles.changePassword}>
