@@ -46,6 +46,8 @@ const Main = () => {
     if (token == null) {
       setIsLoggedIn(false);
     } else if (token) {
+      const role = await AsyncStorage.getItem('@role');
+      setRole(role)
       setIsLoggedIn(true);
     }
   }, []);
@@ -83,25 +85,14 @@ const Main = () => {
         </AuthContext.Provider>
       );
     } else if (isLoggedIn) {
-      // Temporarily used to store static user id
-      const storeData = async () => {
-        try {
-          await AsyncStorage.setItem('@userId', '1');
-        } catch (e) {
-          // saving error
-          console.warn('userId store error:  ', e);
-        }
-      };
-      storeData();
-
-      // Check role
-      if (role === 'user') {
+           // Check role
+      if (role === 'u') {
         return(
         <AuthContext.Provider value={authContext}>
           <NavigationStackUser />
         </AuthContext.Provider>
         );
-      } else if (role === 'admin') {
+      } else if (role === 'a') {
         return <NavigationStackHCF />;
       }
     }
