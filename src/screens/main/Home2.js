@@ -16,6 +16,7 @@ const Home2 = () => {
   const [orderLongitude, setOrderLongitude] = useState(0);
   const [orderLatitude, setOrderLatitude] = useState(0);
   const [route, setRoute] = useState(null);
+  var _map;
 
   const getDirections = async (startLoc, destLoc) => {
     const reqOptions = {
@@ -35,15 +36,15 @@ const Home2 = () => {
 
   useEffect(() => {
     const {routeDestination} = {
-      routeDestination: {longitude: '33.981982', latitude: '-6.851599'},
+      routeDestination: {longitude: 33.981982, latitude: -6.851599},
     };
-    MapboxGL.setAccessToken(accessToken);
-    MapboxGL.setConnected(true);
-    MapboxGL.setTelemetryEnabled(true);
+    // MapboxGL.setAccessToken(accessToken);
+    // MapboxGL.setConnected(true);
+    // MapboxGL.setTelemetryEnabled(true);
 
     let latitude, longitude;
     getDirections(
-      [-6.873795, 33.990777],
+      [-6.873795, 5.990777],
       [routeDestination.longitude, routeDestination.latitude],
     );
 
@@ -93,20 +94,20 @@ const Home2 = () => {
   return (
     <View style={{flex: 1}}>
       <MapboxGL.MapView
-        ref={c => (this._map = c)}
+        ref={c => (_map = c)}
         style={{flex: 1, zIndex: -10}}
-        styleURL={MapboxGL.StyleURL.Street}
+        // styleURL={MapboxGL.StyleURL.Street}
         zoomLevel={10}
         showUserLocation={true}
-        userTrackingMode={1}
-        centerCoordinate={[longitude, latitude]}
+        // userTrackingMode={1}
+        centerCoordinate={[30, 40]}
         logoEnabled={true}>
         {renderRoadDirections()}
         <MapboxGL.Camera
           zoomLevel={10}
-          centerCoordinate={[longitude, latitude]}
-          animationMode="flyTo"
-          animationDuration={1200}
+          centerCoordinate={[33.981982, -6.851599]}
+          // animationMode="flyTo"
+          // animationDuration={1200}
         />
       </MapboxGL.MapView>
     </View>

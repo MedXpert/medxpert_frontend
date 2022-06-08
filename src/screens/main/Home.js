@@ -36,6 +36,9 @@ import {LOCATION_PERMISSION_MESSAGE} from '../../constants/string/requestPermiss
 const dimensionHeight = Dimensions.get('window').height;
 const dimensionWidth = Dimensions.get('window').width;
 
+import MapboxDirectionsFactory from '@mapbox/mapbox-sdk/services/directions';
+import {lineString as makeLineString} from '@turf/helpers';
+
 const Home = ({navigation}) => {
   var _map;
   var _camera;
@@ -60,11 +63,41 @@ const Home = ({navigation}) => {
   const startValueMoveY = useRef(new Animated.Value(0)).current; // Initial value of move Y animated for the location
   const locationPermission = PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION; // location permission name
 
+  const [longitude, setLongitude] = useState(0);
+  const [latitude, setLatitude] = useState(0);
+  const [orderLongitude, setOrderLongitude] = useState(0);
+  const [orderLatitude, setOrderLatitude] = useState(0);
+  const [route, setRoute] = useState(null);
+
+  const accessToken =
+    'sk.eyJ1IjoibGl5dW1rIiwiYSI6ImNsMWtteG11NzAyZWgzZG9kOWpyb2x1dWMifQ.X4v8HxdCSmdrvVaCWXVjog';
+  const directionsClient = MapboxDirectionsFactory({accessToken});
+
   // Exit the app and go to settings. This function is called when the 'Go to settings' button in the permission denied modal is pressed.
   const settings = () => {
     BackHandler.exitApp();
     openSettings().catch(() => console.warn('Can not open settings'));
   };
+  // Get direction from starting point to destination
+  const getDirections = useCallback(
+    async (startLoc, destLoc) => {
+      const reqOptions = {
+        waypoints: [{coordinates: startLoc}, {coordinates: destLoc}],
+        profile: 'driving',
+        geometries: 'geojson',
+      };
+      const res = await directionsClient.getDirections(reqOptions).send();
+      //const route = makeLineString(res.body.routes[0].geometry.coordinates)
+      console.log(res);
+      const routeLineString = makeLineString(
+        res.body.routes[0].geometry.coordinates,
+      );
+      // console.log('Route: ', JSON.stringify(route));
+      // this.setState({route: route});
+      setRoute(routeLineString);
+    },
+    [directionsClient],
+  );
 
   // Checks permission
   const checkPermission = useCallback(async () => {
@@ -155,6 +188,25 @@ const Home = ({navigation}) => {
     }
   };
 
+  // Render a route using source and destination coordinates
+  const renderRoadDirections = () => {
+    return route ? (
+      <MapboxGL.ShapeSource id="routeSource" shape={route.geometry}>
+        <MapboxGL.LineLayer
+          id="routeFill"
+          // aboveLayerID="customerAnnotation"
+          style={{
+            lineColor: '#ff8109',
+            lineWidth: 3.2,
+            lineCap: MapboxGL.LineJoin.Round,
+            lineOpacity: 1.84,
+          }}
+          setStyleUrl={styleUrl}
+        />
+      </MapboxGL.ShapeSource>
+    ) : null;
+  };
+
   useEffect(() => {
     // Call 'checkPermission' every time something in the function is changed.
     checkPermission();
@@ -175,6 +227,19 @@ const Home = ({navigation}) => {
       );
     }
   }, [checkPermission, locationPermissionGranted]);
+
+  useEffect(() => {
+    const {routeDestination} = {
+      routeDestination: {longitude: 33.981982, latitude: -60.851599},
+    };
+
+    MapboxGL.setTelemetryEnabled(true);
+
+    getDirections(
+      [locationFromMapboxLng, locationFromMapboxLat],
+      [routeDestination.longitude, routeDestination.latitude],
+    );
+  }, [getDirections, locationFromMapboxLat, locationFromMapboxLng]);
 
   return (
     <View style={styles.container}>
@@ -249,6 +314,7 @@ const Home = ({navigation}) => {
           {/* Checks if the user has granted location permission to the app. */}
           {locationPermissionGranted && (
             <>
+              {renderRoadDirections()}
               <MapboxGL.Camera
                 zoomLevel={15}
                 // animationDuration={4000}

@@ -23,6 +23,7 @@ import {
 } from '../components/general/Context';
 import FallDetected from '../screens/main/Emergency/FallDetected';
 import {backgroundService} from '../services/backgroundService/backgroundService';
+import Home2 from '../screens/main/Home2';
 
 // Ignore new NativeEmitter error
 LogBox.ignoreLogs(['new NativeEventEmitter']);
