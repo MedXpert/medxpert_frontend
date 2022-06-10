@@ -2,7 +2,7 @@ import {View, Text, StyleSheet} from 'react-native';
 import React, {useEffect, useContext} from 'react';
 
 import Colors from '../../constants/colors';
-import { CustomSpinner } from '../../components/general/CustomSpinner/Spinner';
+import { CustomSpinner } from '../../components/general/CustomSpinner';
 import { AuthContext } from '../../components/general/Context';
 const Splash = () => {
   const { loginStatus } = useContext(AuthContext);

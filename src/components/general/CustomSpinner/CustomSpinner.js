@@ -6,24 +6,16 @@ import { isRequired } from 'react-native/Libraries/DeprecatedPropTypes/Deprecate
 
 const CustomSpinner = ({
     isVisible = isRequired(),
+    type = "WanderingCubes"
 }) => {
     return (
-        <View style={styles.spinnerContainer}>
-            <Spinner
-                isVisible={isVisible}
-                color={Colors.primary}
-                size={70}
-                type="WanderingCubes"
-            />
-        </View>
+        <Spinner
+            isVisible={isVisible}
+            color={Colors.primary}
+            size={70}
+            type={type}
+        />
     );
 };
-const styles = StyleSheet.create({
-    spinnerContainer: {
-        alignItems: 'center',
-        justifyContent: 'center',
-        flex: 1,
-    },
-});
 
 export { CustomSpinner };
