@@ -11,9 +11,10 @@ import PushNotification from 'react-native-push-notification';
 import './src/services/mirageServer';
 
 MapboxGL.setAccessToken(
-  'sk.eyJ1IjoibGl5dW1rIiwiYSI6ImNsMWtteG11NzAyZWgzZG9kOWpyb2x1dWMifQ.X4v8HxdCSmdrvVaCWXVjog',
+  // 'sk.eyJ1IjoibGl5dW1rIiwiYSI6ImNsMWtteG11NzAyZWgzZG9kOWpyb2x1dWMifQ.X4v8HxdCSmdrvVaCWXVjog',
+  'sk.eyJ1IjoibGl5dW1rIiwiYSI6ImNsNDhxNHZpajBmMjYza3IyeTMza3BrOWgifQ.yuAXEOs-8nQJIu_hyu2qIQ',
 );
-MapboxGL.setConnected(true); // because we are using localhost
+// MapboxGL.setConnected(true); // because we are using localhost
 
 // edit logging messages
 // for mapboxgl
