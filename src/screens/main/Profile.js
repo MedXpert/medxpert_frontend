@@ -15,41 +15,14 @@ import colors from '../../constants/colors';
 import { useForm } from 'react-hook-form';
 import { emailRegEx } from '../../constants/regEx';
 import { AuthContext } from '../../components/general/Context';
-import { useGetToken } from '../../hooks/authentication/useGetTokens';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useLoggedInUser, useUpdateProfile } from '../../hooks/authentication';
 import { CustomSpinner } from '../../components/general/CustomSpinner/CustomSpinner';
-import { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
-import IconFontisto from 'react-native-vector-icons/Fontisto';
 const Profile = () => {
 
   const { loginStatus } = useContext(AuthContext);
-  const [birthDate, setBirthDate] = useState('');
-  const [date, setDate] = useState(new Date());
-  // birthdays functions
 
   const updateUserProfile = useUpdateProfile();
-
-  const onChange = (event, selectedDate) => {
-    const currentDate = selectedDate;
-    // setDate(currentDate);
-    setBirthDate(currentDate);
-  };
-
-  const showMode = (currentMode) => {
-    DateTimePickerAndroid.open({
-      value: date,
-      onChange,
-      mode: currentMode,
-      minimumDate: new Date(1930, 1, 1),
-      maximumDate: new Date(2008, 1, 1),
-    })
-  };
-
-  const showDatepicker = () => {
-    showMode('date');
-  };
-
 
   const loggedInUser = useLoggedInUser();
   const {
@@ -76,7 +49,7 @@ const Profile = () => {
     }
 
     console.log(userInfo)
-    updateUserProfile.mutate({...userInfo})
+    updateUserProfile.mutate({ ...userInfo })
   };
 
   const handleLogout = async () => {
@@ -91,10 +64,10 @@ const Profile = () => {
     const user = loggedInUser.data.data.user;
     setValue('fullName', user.firstName + ' ' + user.lastName)
     setValue('email', user.email)
-    setValue('phone', user.phone)
+    setValue('phone', user.phoneNumber)
   }
 
-  if(updateUserProfile.isSuccess) {
+  if (updateUserProfile.isSuccess) {
     console.log(updateUserProfile.data)
   }
   return (
@@ -206,9 +179,21 @@ const Profile = () => {
                 }
               }}
             />
-            <View>
+            {/* <View>
               <CustomText content={'Birth Date(month-day-year)'} fontSize={15} fontColor={Colors.gray} />
-              <Pressable onPress={showDatepicker}>
+              <Pressable onPress={() => setOpen(true)}>
+                <DatePicker
+                  modal
+                  open={open}
+                  date={birthDate}
+                  onConfirm={(date) => {
+                    setOpen(false)
+                    setBirthDate(date)
+                  }}
+                  onCancel={() => {
+                    setOpen(false)
+                  }}
+                />
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: 350, backgroundColor: colors.white, borderRadius: 5, paddingVertical: 13, paddingHorizontal: 10 }}>
                   {birthDate === '' ? <CustomText content="Pick your birthday" customStyles={{ width: "75%" }} /> : (<CustomText content={birthDate.toLocaleDateString()} customStyles={{ width: "75%" }} />)}
                   <View style={{ background: Colors.primary }}>
@@ -216,9 +201,9 @@ const Profile = () => {
                   </View>
                 </View>
               </Pressable>
-            </View>
+            </View> */}
             <CustomButton
-              customStyle={{ marginTop: 10 }}
+              customStyle={{ marginTop: 20 }}
               title="Update Profile"
               width="100%"
               onPress={handleSubmit(updateProfile)}
