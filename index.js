@@ -14,6 +14,7 @@ MapboxGL.setAccessToken(
   'sk.eyJ1IjoibGl5dW1rIiwiYSI6ImNsMWtteG11NzAyZWgzZG9kOWpyb2x1dWMifQ.X4v8HxdCSmdrvVaCWXVjog',
 );
 MapboxGL.setConnected(true); // because we are using localhost
+// MapboxGL.setTelemetryEnabled(true);
 
 // edit logging messages
 // for mapboxgl
