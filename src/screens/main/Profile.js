@@ -17,7 +17,7 @@ import { emailRegEx } from '../../constants/regEx';
 import { AuthContext } from '../../components/general/Context';
 import { useGetToken } from '../../hooks/authentication/useGetTokens';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useLoggedInUser } from '../../hooks/authentication';
+import { useLoggedInUser, useUpdateProfile } from '../../hooks/authentication';
 import { CustomSpinner } from '../../components/general/CustomSpinner/CustomSpinner';
 import { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
 import IconFontisto from 'react-native-vector-icons/Fontisto';
@@ -27,6 +27,8 @@ const Profile = () => {
   const [birthDate, setBirthDate] = useState('');
   const [date, setDate] = useState(new Date());
   // birthdays functions
+
+  const updateUserProfile = useUpdateProfile();
 
   const onChange = (event, selectedDate) => {
     const currentDate = selectedDate;
@@ -70,8 +72,11 @@ const Profile = () => {
       lastName: fullName[1],
       dateOfBirth: '2000-09-02',
       phoneNumber: data.phone,
-      sex: 'male'
+      sex: 'm'
     }
+
+    console.log(userInfo)
+    updateUserProfile.mutate({...userInfo})
   };
 
   const handleLogout = async () => {
@@ -89,10 +94,12 @@ const Profile = () => {
     setValue('phone', user.phone)
   }
 
-
+  if(updateUserProfile.isSuccess) {
+    console.log(updateUserProfile.data)
+  }
   return (
     <View>
-      {loggedInUser.isLoading && (
+      {(loggedInUser.isLoading || updateUserProfile.isLoading) && (
         <View style={styles.isLoading}>
           <CustomSpinner isVisible={loggedInUser.isLoading} type="WanderingCubes" />
         </View>)}
