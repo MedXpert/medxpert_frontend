@@ -39,6 +39,7 @@ const dimensionsHeight = Dimensions.get('window').height;
 
 const Details = ({route, navigation}) => {
   const healthCareFacilityId = route.params.id;
+  const coordinates = route.params.coordinates;
 
   const {data, isError, isLoading, isSuccess} =
     useHealthCareFacility(healthCareFacilityId);
@@ -185,6 +186,9 @@ const Details = ({route, navigation}) => {
                   width={110}
                   height={45}
                   customStyle={styles.buttonStyle}
+                  onPress={() => {
+                    navigation.navigate('Home', {coordinates});
+                  }}
                   icon={
                     <IconEntypo
                       name="direction"

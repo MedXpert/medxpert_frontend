@@ -38,8 +38,9 @@ const dimensionWidth = Dimensions.get('window').width;
 
 import MapboxDirectionsFactory from '@mapbox/mapbox-sdk/services/directions';
 import {lineString as makeLineString} from '@turf/helpers';
+import colors from '../../constants/colors';
 
-const Home = ({navigation}) => {
+const Home = ({route, navigation}) => {
   var _map;
   var _camera;
   var bsRef = useRef();
@@ -67,7 +68,10 @@ const Home = ({navigation}) => {
   const [latitude, setLatitude] = useState(0);
   const [orderLongitude, setOrderLongitude] = useState(0);
   const [orderLatitude, setOrderLatitude] = useState(0);
-  const [route, setRoute] = useState(null);
+  const [routeFound, setRouteFound] = useState(null);
+  const [destination, setDestination] = useState(null);
+
+  const coordinatesPassed = route.params?.coordinates;
 
   const accessToken =
     'sk.eyJ1IjoibGl5dW1rIiwiYSI6ImNsMWtteG11NzAyZWgzZG9kOWpyb2x1dWMifQ.X4v8HxdCSmdrvVaCWXVjog';
@@ -88,16 +92,28 @@ const Home = ({navigation}) => {
       };
       const res = await directionsClient.getDirections(reqOptions).send();
       //const route = makeLineString(res.body.routes[0].geometry.coordinates)
-      console.log(res);
+      // console.log(res);
       const routeLineString = makeLineString(
         res.body.routes[0].geometry.coordinates,
       );
       // console.log('Route: ', JSON.stringify(route));
       // this.setState({route: route});
-      setRoute(routeLineString);
+      setRouteFound(routeLineString);
     },
     [directionsClient],
   );
+
+  // When an annotation is pressed
+  const onAnnotationSelected = geoInfo => {
+    const coordinates = geoInfo.geometry.coordinates;
+
+    navigation.push('Details', {id: 1, coordinates: coordinates});
+  };
+
+  // when a point on map is pressed
+  const onMapPress = () => {
+    setDestination(null);
+  };
 
   // Checks permission
   const checkPermission = useCallback(async () => {
@@ -190,16 +206,16 @@ const Home = ({navigation}) => {
 
   // Render a route using source and destination coordinates
   const renderRoadDirections = () => {
-    return route ? (
-      <MapboxGL.ShapeSource id="routeSource" shape={route.geometry}>
+    return routeFound ? (
+      <MapboxGL.ShapeSource id="routeSource" shape={routeFound.geometry}>
         <MapboxGL.LineLayer
           id="routeFill"
           // aboveLayerID="customerAnnotation"
           style={{
-            lineColor: '#ff8109',
-            lineWidth: 3.2,
+            lineColor: colors.green,
+            lineWidth: 4,
             lineCap: MapboxGL.LineJoin.Round,
-            lineOpacity: 1.84,
+            lineOpacity: 2,
           }}
           setStyleUrl={styleUrl}
         />
@@ -229,17 +245,24 @@ const Home = ({navigation}) => {
   }, [checkPermission, locationPermissionGranted]);
 
   useEffect(() => {
-    const {routeDestination} = {
-      routeDestination: {longitude: 33.981982, latitude: -60.851599},
-    };
+    // const {routeDestination} = {
+    //   routeDestination: {longitude: 33.981982, latitude: -6.851599},
+    // };
 
     MapboxGL.setTelemetryEnabled(true);
 
-    getDirections(
-      [locationFromMapboxLng, locationFromMapboxLat],
-      [routeDestination.longitude, routeDestination.latitude],
-    );
-  }, [getDirections, locationFromMapboxLat, locationFromMapboxLng]);
+    if (userPositionLat && userPositionLng && destination) {
+      getDirections([userPositionLng, userPositionLat], destination);
+    } else if (userPositionLat && userPositionLng && coordinatesPassed) {
+      getDirections([userPositionLng, userPositionLat], coordinatesPassed);
+    }
+  }, [
+    getDirections,
+    userPositionLat,
+    userPositionLng,
+    destination,
+    coordinatesPassed,
+  ]);
 
   return (
     <View style={styles.container}>
@@ -309,12 +332,13 @@ const Home = ({navigation}) => {
           logoEnabled={false}
           compassViewMargins={{x: 10, y: (30 * dimensionHeight) / 100}}
           style={styles.map}
+          onPress={onMapPress}
           surfaceView>
           {/* Display user location */}
           {/* Checks if the user has granted location permission to the app. */}
           {locationPermissionGranted && (
             <>
-              {renderRoadDirections()}
+              {destination && renderRoadDirections()}
               <MapboxGL.Camera
                 zoomLevel={15}
                 // animationDuration={4000}
@@ -338,6 +362,13 @@ const Home = ({navigation}) => {
             // followUserLocation={followUserLocation}
             centerCoordinate={[userPositionLng, userPositionLat]}
           />
+          {userPositionLat && userPositionLng ? (
+            <MapboxGL.PointAnnotation
+              id={'testAnnotation'}
+              coordinate={[userPositionLng + 0.1, userPositionLat - 0.12]}
+              onSelected={onAnnotationSelected}
+            />
+          ) : null}
         </MapboxGL.MapView>
       </View>
 
