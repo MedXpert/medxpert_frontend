@@ -18,6 +18,7 @@ import { AuthContext } from '../../components/general/Context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useLoggedInUser, useUpdateProfile } from '../../hooks/authentication';
 import { CustomSpinner } from '../../components/general/CustomSpinner/CustomSpinner';
+import Toast from 'react-native-toast-message';
 const Profile = () => {
 
   const { loginStatus } = useContext(AuthContext);
@@ -25,6 +26,15 @@ const Profile = () => {
   const updateUserProfile = useUpdateProfile();
 
   const loggedInUser = useLoggedInUser();
+
+  const showToast = () => {
+    Toast.show({
+      type: 'success',
+      text1: 'Hello',
+      text2: 'This is some something 👋'
+    });
+  }
+
   const {
     control,
     handleSubmit,
@@ -47,8 +57,6 @@ const Profile = () => {
       phoneNumber: data.phone,
       sex: 'm'
     }
-
-    console.log(userInfo)
     updateUserProfile.mutate({ ...userInfo })
   };
 
@@ -67,12 +75,18 @@ const Profile = () => {
     setValue('phone', user.phoneNumber)
   }
 
+
   if (updateUserProfile.isSuccess) {
-    console.log(updateUserProfile.data)
+    Toast.show({
+      type: 'success',
+      text1: "Updated Successfully",
+      position: 'bottom'
+    })
   }
+
   return (
     <View>
-      {(loggedInUser.isLoading || updateUserProfile.isLoading) && (
+      {loggedInUser.isLoading && (
         <View style={styles.isLoading}>
           <CustomSpinner isVisible={loggedInUser.isLoading} type="WanderingCubes" />
         </View>)}
@@ -204,12 +218,14 @@ const Profile = () => {
             </View> */}
             <CustomButton
               customStyle={{ marginTop: 20 }}
-              title="Update Profile"
+              title={updateUserProfile.isLoading ?"Updating...":"Update Profile"}
               width="100%"
               onPress={handleSubmit(updateProfile)}
             />
           </ScrollView>
         </View>)}
+        
+      <Toast />
     </View>
   );
 };
