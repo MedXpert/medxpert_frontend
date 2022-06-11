@@ -39,9 +39,12 @@ const dimensionsHeight = Dimensions.get('window').height;
 
 const Details = ({route, navigation}) => {
   const healthCareFacilityId = route.params.id;
-
   const {data, isError, isLoading, isSuccess} =
     useHealthCareFacility(healthCareFacilityId);
+
+  if(isSuccess) {
+    console.log(data);
+  }
 
   const [selectedImage, setSelectedImage] = useState();
   const [imageModalVisible, setImageModalVisible] = useState(false);

@@ -323,7 +323,7 @@ const Home = ({navigation}) => {
         onChange={onSheetChange}
         ref={bsRef}
         snapPoints={['7%', '35%', '100%']}>
-        <BottomSheetContent navigation={navigation} />
+        <BottomSheetContent navigation={navigation} currentLocation={`${locationFromMapboxLng},${locationFromMapboxLat}`} />
       </BottomSheet>
     </View>
   );

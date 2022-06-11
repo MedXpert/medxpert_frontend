@@ -23,15 +23,15 @@ import { useFetchNearByHealthCareFacilities } from '../../../hooks/healthCareFac
 const dimensionHeight = Dimensions.get('window').height;
 const dimensionWidth = Dimensions.get('window').width;
 
-const BottomSheetContent = ({ navigation }) => {
+const BottomSheetContent = ({ navigation, currentLocation }) => {
   const { data, isSuccess, isError, isLoading, status } =
     useFetchNearByHealthCareFacilities({
-      location: '38.76111384105613,9.043677387443639',
+      location: currentLocation,
       limit: 10,
     });
 
   const defaultHospitalImage = "https://img.freepik.com/free-vector/people-walking-sitting-hospital-building-city-clinic-glass-exterior-flat-vector-illustration-medical-help-emergency-architecture-healthcare-concept_74855-10130.jpg?w=1060&t=st=1654985818~exp=1654986418~hmac=2e9753ea68dc4553e073744559aeb8a6ccc1e6bd305a989018a60e31674bcdfc"
-
+  
   // Render Health Facilities function
   const renderHealthFacilities = ({ item }) => {
     return (
