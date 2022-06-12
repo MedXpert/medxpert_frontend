@@ -16,7 +16,6 @@ import {PERMISSIONS, RESULTS, openSettings} from 'react-native-permissions';
 import Geolocation from 'react-native-geolocation-service';
 import {onChange} from 'react-native-reanimated';
 import BottomSheet from '@gorhom/bottom-sheet';
-
 import IconAntDesign from 'react-native-vector-icons/AntDesign';
 import IconMaterialCommunity from 'react-native-vector-icons/MaterialCommunityIcons';
 
@@ -29,6 +28,7 @@ import {IconButton} from 'react-native-paper';
 import {MapTypeModal} from '../../components/home/MapTypeModal';
 import {BottomSheetContent} from '../../components/home/BottomSheetContent';
 import {useHealthCareFacilities} from '../../hooks/healthCareFacility';
+import {HcfDirection} from '../../components/home/HcfDirection';
 
 import {requestPermissions} from '../../services/permissions/requestPermissions';
 import {LOCATION_PERMISSION_MESSAGE} from '../../constants/string/requestPermissions/requestPermissions';
@@ -71,7 +71,9 @@ const Home = ({route, navigation}) => {
   const [routeFound, setRouteFound] = useState(null);
   const [destination, setDestination] = useState(null);
 
-  const coordinatesPassed = route.params?.coordinates;
+  const [coordinatesPassed, setCoordinatesPassed] = useState(
+    route.params?.coordinates,
+  );
 
   const accessToken =
     'sk.eyJ1IjoibGl5dW1rIiwiYSI6ImNsMWtteG11NzAyZWgzZG9kOWpyb2x1dWMifQ.X4v8HxdCSmdrvVaCWXVjog';
@@ -113,6 +115,7 @@ const Home = ({route, navigation}) => {
   // when a point on map is pressed
   const onMapPress = () => {
     setDestination(null);
+    setCoordinatesPassed(null);
   };
 
   // Checks permission
@@ -245,6 +248,12 @@ const Home = ({route, navigation}) => {
   }, [checkPermission, locationPermissionGranted]);
 
   useEffect(() => {
+    if (!destination && coordinatesPassed) {
+      setDestination(coordinatesPassed);
+    }
+  }, [coordinatesPassed, destination]);
+
+  useEffect(() => {
     // const {routeDestination} = {
     //   routeDestination: {longitude: 33.981982, latitude: -6.851599},
     // };
@@ -253,8 +262,6 @@ const Home = ({route, navigation}) => {
 
     if (userPositionLat && userPositionLng && destination) {
       getDirections([userPositionLng, userPositionLat], destination);
-    } else if (userPositionLat && userPositionLng && coordinatesPassed) {
-      getDirections([userPositionLng, userPositionLat], coordinatesPassed);
     }
   }, [
     getDirections,
@@ -326,7 +333,7 @@ const Home = ({route, navigation}) => {
       {/* MapBoxGL */}
       <View style={styles.mapContainer}>
         <MapboxGL.MapView
-          styleURL={styleUrl}
+          // styleURL={styleUrl}
           // ref={c => (_map = c)}
           ref={c => (_map = c)}
           logoEnabled={false}
@@ -377,6 +384,9 @@ const Home = ({route, navigation}) => {
         {/* Display Search bar  */}
         <SearchBar fontSize={16} marginHorizontal={20} />
       </View>
+
+      {/* Health care facility small detail and direction */}
+      {destination ? <HcfDirection /> : null}
 
       {/* Get location button */}
       <Animated.View
