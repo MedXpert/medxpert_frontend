@@ -63,7 +63,6 @@ const Home = ({route, navigation}) => {
   const [mapTypeVisibility, setMapTypeVisibility] = useState(false); // MapType modal visibility
   const startValueMoveY = useRef(new Animated.Value(0)).current; // Initial value of move Y animated for the location
   const locationPermission = PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION; // location permission name
-
   const [longitude, setLongitude] = useState(0);
   const [latitude, setLatitude] = useState(0);
   const [orderLongitude, setOrderLongitude] = useState(0);
@@ -155,6 +154,8 @@ const Home = ({route, navigation}) => {
         let lng = position.coords.longitude;
         let lat = position.coords.latitude;
 
+        // if location is already obtained from userLocationUpdate function set the user position to that,
+        // if not, use the Geolocation library to get the user's location.
         if (locationFromMapboxLat && locationFromMapboxLng) {
           setUserPositionLng(locationFromMapboxLng);
           setUserPositionLat(locationFromMapboxLat);
@@ -247,6 +248,7 @@ const Home = ({route, navigation}) => {
     }
   }, [checkPermission, locationPermissionGranted]);
 
+  // If destination is not null, getDirections
   useEffect(() => {
     if (!destination && coordinatesPassed) {
       setDestination(coordinatesPassed);
@@ -281,6 +283,7 @@ const Home = ({route, navigation}) => {
         }}
         chooseDarkMapType={() => {
           chooseMapType(darkStyleURL);
+          ('');
         }}
         chooseStreetMapType={() => {
           chooseMapType(streetStyleURL);
@@ -480,6 +483,12 @@ const styles = StyleSheet.create({
   searchBarContainer: {
     position: 'absolute',
     top: 30,
+  },
+  drawLine: {
+    lineColor: colors.green,
+    lineWidth: 3.2,
+    lineCap: MapboxGL.LineJoin.Round,
+    lineOpacity: 1.84,
   },
 });
 

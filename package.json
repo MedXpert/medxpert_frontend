@@ -21,7 +21,6 @@
     "@rnmapbox/maps": "github:rnmapbox/maps#main",
     "@turf/helpers": "^6.5.0",
     "axios": "^0.26.1",
-    "qs": "^6.10.3",
     "react": "17.0.2",
     "react-hook-form": "^7.28.1",
     "react-native": "0.67.3",

@@ -15,6 +15,7 @@ MapboxGL.setAccessToken(
 );
 
 MapboxGL.setConnected(true); // because we are using localhost
+// MapboxGL.setTelemetryEnabled(true);
 
 // edit logging messages
 // for mapboxgl
