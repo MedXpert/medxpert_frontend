@@ -16,9 +16,9 @@ import {PERMISSIONS, RESULTS, openSettings} from 'react-native-permissions';
 import Geolocation from 'react-native-geolocation-service';
 import {onChange} from 'react-native-reanimated';
 import BottomSheet from '@gorhom/bottom-sheet';
-
 import MapboxDirectionsFactory from '@mapbox/mapbox-sdk/services/directions';
 import {lineString as makeLineString} from '@turf/helpers';
+import axios from 'axios';
 
 import IconAntDesign from 'react-native-vector-icons/AntDesign';
 import IconMaterialCommunity from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -37,6 +37,7 @@ import {useHealthCareFacilities} from '../../hooks/healthCareFacility';
 
 import {requestPermissions} from '../../services/permissions/requestPermissions';
 import {LOCATION_PERMISSION_MESSAGE} from '../../constants/string/requestPermissions/requestPermissions';
+import directions from '@mapbox/mapbox-sdk/services/directions';
 
 const dimensionHeight = Dimensions.get('window').height;
 const dimensionWidth = Dimensions.get('window').width;
@@ -120,7 +121,7 @@ const Home = ({navigation}) => {
           },
           {latitude: lat, longitude: lng},
         );
-        console.log(distance);
+        // console.log(distance);
         if (distance > 10) {
           setLocationFromMapboxLng(lng);
           setLocationFromMapboxLat(lat);
@@ -184,9 +185,14 @@ const Home = ({navigation}) => {
         geometries: 'geojson',
       };
       const res = await directionsClient.getDirections(reqOptions).send();
-      const route = makeLineString(
-        await res.body.routes[0].geometry.coordinates,
-      );
+      // const res = await axios.get(
+      //   `https://api.mapbox.com/directions/v5/mapbox/driving/${startLoc[0]},${startLoc[1]};${destLoc[0]},${destLoc[1]}?access_token=${accessToken}`
+
+      // );
+
+      // console.log(res);
+
+      const route = makeLineString(res.body.routes[0].geometry.coordinates);
 
       const routeLineString = makeLineString(
         await res.body.routes[0].geometry.coordinates,

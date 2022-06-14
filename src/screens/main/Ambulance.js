@@ -14,6 +14,7 @@ import React, {useState, useEffect, useCallback, useRef, useMemo} from 'react';
 import MapboxGL from '@rnmapbox/maps';
 import {PERMISSIONS, RESULTS, openSettings} from 'react-native-permissions';
 import Geolocation from 'react-native-geolocation-service';
+import {io} from 'socket.io-client';
 
 import Colors from '../../constants/colors';
 import {CustomButton} from '../../components/general/CustomButton';
@@ -27,6 +28,100 @@ import {LOCATION_PERMISSION_MESSAGE} from '../../constants/string/requestPermiss
 
 const dimensionHeight = Dimensions.get('window').height;
 const dimensionWidth = Dimensions.get('window').width;
+
+// const io = require('socket.io-client/dist/socket.io');
+
+const SOCKETIO_SERVER_URL = 'http://127.0.0.1:5000';
+
+var userType = 'u';
+var userId = 'userId2';
+
+const USER_TYPES = {
+  USER: 'u',
+  AMBULANCE: 'a',
+  HEALTH_FACILITY: 'h',
+};
+
+const NAMESPACES = {
+  USER: '/USER_NAMESPACE',
+  AMBULANCE: '/AMBULANCE_NAMESPACE',
+};
+const EVENTS = {
+  AMBULANCE_ONLINE: '0',
+  // AMBULANCE_STATUS_CHANGE : '1',
+  AMBULANCE_STATUS_CHANGED: '2',
+  APPOINT_AMBULANCE: '3',
+  // APPOINTMENT_REQUEST : '4', //might add amb to differentiate from hf later...
+  // ACCEPT_APPOINTMENT : '5', //
+  // DECLINE_APPOINTMENT : '6', //
+  APPOINTMENT_ACCEPTED: '7', //
+  APPOINTMENT_DECLINED: '8', //
+  // LOCATION_TO_USER : '9',
+  LOCATION_FROM_AMBULANCE: '10',
+  LOCATION_TO_AMBULANCE: '11',
+  // LOCATION_FROM_USER : '12',
+  // AMBULANCE_LOCATION_UPDATE : '13',
+  AMBULANCE_LOCATION_UPDATED: '14',
+  AMBULANCE_OFFLINE: '15',
+  ADD_EMERGENCY_CONTACTS: '16',
+  REMOVE_EMERGENCY_CONTACTS: '17',
+  UPDATE_EMERGENCY_CONTACTS: '18',
+  LOCATION_TO_EMERGENCY_CONTACTS: '19',
+  LOCATION_FROM_EMERGENCY_CONTACTS: '20',
+  ALERT_NEAR_AMBULANCE: '21',
+  // EMERGENCY_ALERT : '22',
+  CANT_FIND_AMBULANCE: '23',
+  ABORTED: '27',
+  HAVE_REACHED: '28',
+  FINISHED: '29',
+};
+
+switch (userType) {
+  case USER_TYPES.AMBULANCE:
+    var namespace = NAMESPACES.AMBULANCE;
+    break;
+  case USER_TYPES.USER:
+    var namespace = NAMESPACES.USER;
+    break;
+  default:
+    throw 'Invalid user_type trying to connect with socketio server.';
+}
+
+const ambuAppState = {
+  // logged_in_user_id: userID,
+  // user_type: USER_TYPES.USER,
+  in_appointment_with: {
+    ambulanceID: null, //useful?
+  },
+};
+
+const LS_UPDATE_INTERVAL = 5_00;
+
+const locationToAmbulance = (ambulanceID, lng, lat, socket) => {
+  data = {
+    /*ambulanceID: state.logged_in_user_id,*/ coordinates: [lng, lat],
+    ambulanceID: ambulanceID,
+  };
+  socket.emit(EVENTS.LOCATION_TO_AMBULANCE, data);
+};
+
+ambuAppState.streams = {
+  LS: {
+    key: null,
+    start: (ambulanceID, lng, lat) => {
+      ambuAppState.streams.LS.key = setInterval(
+        locationToAmbulance,
+        LS_UPDATE_INTERVAL,
+        [ambulanceID, lng, lat],
+      );
+    },
+    stop: () => {
+      clearInterval(ambuAppState.streams.LS.key);
+    },
+  },
+};
+
+var connection_url = SOCKETIO_SERVER_URL + namespace;
 
 const Ambulance = ({navigation}) => {
   var _map;
@@ -52,11 +147,28 @@ const Ambulance = ({navigation}) => {
   const [mapTypeVisibility, setMapTypeVisibility] = useState(false); // MapType modal visibility
   const startValueMoveY = useRef(new Animated.Value(0)).current; // Initial value of move Y animated for the location
   // const [driverNameVisibility, setDriverNameVisibility] = useState(false);
-
   // turn on and off when ambulance is called
   const [ambulanceCalled, setAmbulanceCalled] = useState(false);
 
+  const socketRef = useRef();
   // Exit the app and go to settings. This function is called when the 'Go to settings' button in the permission denied modal is pressed.
+
+  // const locationToAmbulance = useCallback(
+  //   ambulanceID => {
+  //     if (stream) {
+  //       data = {
+  //         /*ambulanceID: state.logged_in_user_id,*/ coordinates: [
+  //           userPositionLng,
+  //           userPositionLat,
+  //         ],
+  //         ambulanceID: ambulanceID,
+  //       };
+  //       socket.emit(EVENTS.LOCATION_TO_AMBULANCE, data);
+  //     }
+  //   },
+  //   [userPositionLng, userPositionLat, stream],
+  // )
+
   const settings = () => {
     BackHandler.exitApp();
     openSettings().catch(() => console.warn('Can not open settings'));
@@ -154,6 +266,7 @@ const Ambulance = ({navigation}) => {
   useEffect(() => {
     onDriverNamePositionChange(ambulanceCalled);
   });
+
   useEffect(() => {
     // Call 'checkPermission' every time something in the function is changed.
     checkPermission();
@@ -175,6 +288,96 @@ const Ambulance = ({navigation}) => {
     }
   }, [checkPermission, locationPermissionGranted]);
 
+  useEffect(() => {
+    socketRef.current = io(connection_url, {
+      // forceNew : true,
+      auth: {
+        token: {
+          id: userId,
+          iat: '',
+          expiry: '',
+        },
+        userID: userId,
+      },
+    });
+    // console.log('socketref: ', socketRef.current);
+    // console.log('io: ', io);
+
+    // on Connect
+    socketRef.current.on('connect', data => {
+      console.log('connected hoy hoy hoy: ', data);
+    });
+
+    // When no Ambulance is found
+    socketRef.current.on(EVENTS.CANT_FIND_AMBULANCE, data => {
+      console.table({event: 'CANT_FIND_AMBULANCE'});
+      console.log(">>>>>> Can't find ambulances. Try again");
+    });
+
+    // //when an ambulance is found
+    socketRef.current.on(EVENTS.APPOINTMENT_ACCEPTED, data => {
+      //   // start LS
+      ambuAppState.streams.LS.start(
+        data.ambulanceID,
+        userPositionLng,
+        userPositionLat,
+        socketRef.current,
+      );
+
+      console.log('>>>>>> Appointment accepted');
+
+      ambuAppState.in_appointment_with.ambulanceID = data.ambulanceID;
+    });
+
+    socketRef.current.on(EVENTS.LOCATION_FROM_AMBULANCE, data => {
+      console.log(`Ambulance at ${data.coordinates}`);
+    });
+
+    // on Aborted
+    socketRef.current.on(EVENTS.ABORTED, data => {
+      // stop LS
+      ambuAppState.streams.LS.stop();
+
+      ambuAppState.in_appointment_with.ambulanceID = null;
+
+      // document.body.innerHTML +=
+      console.log('Ambulance aborted');
+    });
+
+    // on Finished
+    socketRef.current.on(EVENTS.HAVE_REACHED, data => {
+      // stop LS
+      ambuAppState.streams.LS.stop();
+
+      // document.body.innerHTML +=
+      console.log('Ambulance reached your location');
+    });
+
+    // on Finished
+    socketRef.current.on(EVENTS.FINISHED, data => {
+      ambuAppState.in_appointment_with.ambulanceID = null;
+
+      // document.body.innerHTML +=
+      console.log('Job finished');
+    });
+    return () => {
+      socketRef.current.disconnect();
+    };
+  }, []);
+
+  const callAmbulance = () => {
+    console.log('Calling...');
+    socketRef.current.emit(
+      EVENTS.ALERT_NEAR_AMBULANCE,
+      {
+        coordinates: [userPositionLng, userPositionLat],
+        userID: userId,
+      }, //,
+      // (response)=>console.log(response)
+    );
+  };
+
+  // console.log('socket:', socket, io);
   return (
     <View style={styles.container}>
       {/* Map types modal */}
@@ -334,7 +537,8 @@ const Ambulance = ({navigation}) => {
             // Display if ambulance not called
             <CustomButton
               onPress={e => {
-                setAmbulanceCalled(true);
+                // setAmbulanceCalled(true);
+                callAmbulance();
               }}
               width={Dimensions.get('window').width - 50}
               backgroundColor={Colors.primary}
