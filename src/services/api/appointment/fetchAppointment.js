@@ -1,6 +1,6 @@
 import httpClient from "../../auth/httpClient";
-const fetchAppointments = async healthFacilityId => {
+const fetchAppointment = async healthFacilityId => {
     return await httpClient.get(`/appointments/${healthFacilityId}`);
 };
 
-export { fetchAppointments };
+export { fetchAppointment };
