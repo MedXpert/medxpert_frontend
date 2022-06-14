@@ -67,6 +67,8 @@ const Home = ({navigation}) => {
   const [followUserLocation, setFollowUserLocation] = useState(false);
   const startValueMoveY = useRef(new Animated.Value(0)).current; // Initial value of move Y animated for the location
 
+  const refUserLocation = useRef();
+
   const accessToken =
     'sk.eyJ1IjoibGl5dW1rIiwiYSI6ImNsMWtteG11NzAyZWgzZG9kOWpyb2x1dWMifQ.X4v8HxdCSmdrvVaCWXVjog';
 
@@ -109,15 +111,20 @@ const Home = ({navigation}) => {
       if (!locationFromMapboxLat || !locationFromMapboxLng) {
         setLocationFromMapboxLng(lng);
         setLocationFromMapboxLat(lat);
+        refUserLocation.current = {longitude: lng, latitude: lat};
       } else {
         const distance = getDistance(
-          {latitude: locationFromMapboxLat, longitude: locationFromMapboxLng},
+          {
+            latitude: refUserLocation.current.latitude,
+            longitude: refUserLocation.current.longitude,
+          },
           {latitude: lat, longitude: lng},
         );
         console.log(distance);
         if (distance > 10) {
           setLocationFromMapboxLng(lng);
           setLocationFromMapboxLat(lat);
+          refUserLocation.current = {longitude: lng, latitude: lat};
         }
       }
     }
