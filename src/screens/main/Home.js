@@ -17,8 +17,13 @@ import Geolocation from 'react-native-geolocation-service';
 import {onChange} from 'react-native-reanimated';
 import BottomSheet from '@gorhom/bottom-sheet';
 
+import MapboxDirectionsFactory from '@mapbox/mapbox-sdk/services/directions';
+import {lineString as makeLineString} from '@turf/helpers';
+
 import IconAntDesign from 'react-native-vector-icons/AntDesign';
 import IconMaterialCommunity from 'react-native-vector-icons/MaterialCommunityIcons';
+
+import {getDistance} from 'geolib';
 
 import {SearchBar} from '../../components/general/SearchBar';
 import Colors from '../../constants/colors';
@@ -58,7 +63,13 @@ const Home = ({navigation}) => {
   const [locationFromMapboxLng, setLocationFromMapboxLng] = useState(); // User's current position tracked from the mapboxGL userLocation - Longitude
   const [locationFromMapboxLat, setLocationFromMapboxLat] = useState(); // User's current position tracked from the mapboxGL userLocation - Latitude
   const [mapTypeVisibility, setMapTypeVisibility] = useState(false); // MapType modal visibility
+  const [route, setRoute] = useState(null);
   const startValueMoveY = useRef(new Animated.Value(0)).current; // Initial value of move Y animated for the location
+
+  const accessToken =
+    'sk.eyJ1IjoibGl5dW1rIiwiYSI6ImNsMWtteG11NzAyZWgzZG9kOWpyb2x1dWMifQ.X4v8HxdCSmdrvVaCWXVjog';
+
+  const directionsClient = MapboxDirectionsFactory({accessToken}); // To be used to get the direction: ;
 
   // Exit the app and go to settings. This function is called when the 'Go to settings' button in the permission denied modal is pressed.
   const settings = () => {
@@ -91,8 +102,23 @@ const Home = ({navigation}) => {
     if (location) {
       let lng = location.coords.longitude;
       let lat = location.coords.latitude;
-      setLocationFromMapboxLng(lng);
-      setLocationFromMapboxLat(lat);
+      // setLocationFromMapboxLng(lng);
+      // setLocationFromMapboxLat(lat);
+
+      if (!locationFromMapboxLat || !locationFromMapboxLng) {
+        setLocationFromMapboxLng(lng);
+        setLocationFromMapboxLat(lat);
+      } else {
+        const distance = getDistance(
+          {latitude: locationFromMapboxLat, longitude: locationFromMapboxLng},
+          {latitude: lat, longitude: lng},
+        );
+        console.log(distance);
+        if (distance > 10) {
+          setLocationFromMapboxLng(lng);
+          setLocationFromMapboxLat(lat);
+        }
+      }
     }
   };
 
@@ -107,7 +133,7 @@ const Home = ({navigation}) => {
         if (locationFromMapboxLat && locationFromMapboxLng) {
           setUserPositionLng(locationFromMapboxLng);
           setUserPositionLat(locationFromMapboxLat);
-          // console.log('Inside mapbox User position');
+          console.log('Inside mapbox User position');
         } else {
           setUserPositionLng(lng);
           setUserPositionLat(lat);
@@ -123,6 +149,48 @@ const Home = ({navigation}) => {
 
     await _camera.flyTo([userPositionLng, userPositionLat]);
   };
+
+  // To be rendered in the map
+  const renderRoadDirections = () => {
+    return (
+      <MapboxGL.ShapeSource id="routeSource" shape={route.geometry}>
+        <MapboxGL.LineLayer
+          id="routeFill"
+          style={{
+            lineColor: Colors.primary,
+            lineWidth: 3.2,
+            lineCap: MapboxGL.LineJoin.Round,
+            lineOpacity: 1.84,
+          }}
+        />
+      </MapboxGL.ShapeSource>
+    );
+  };
+
+  // Get direction from starting point to destination
+  const getDirections = useCallback(
+    async (startLoc, destLoc) => {
+      const reqOptions = {
+        waypoints: [{coordinates: startLoc}, {coordinates: destLoc}],
+        profile: 'driving',
+        geometries: 'geojson',
+      };
+      const res = await directionsClient.getDirections(reqOptions).send();
+      const route = makeLineString(
+        await res.body.routes[0].geometry.coordinates,
+      );
+
+      const routeLineString = makeLineString(
+        await res.body.routes[0].geometry.coordinates,
+        {name: 'line 1'},
+      );
+
+      setRoute(routeLineString);
+
+      // console.log('Route: ', JSON.stringify(route.geometry));
+    },
+    [directionsClient],
+  );
 
   // Choose the Map type that'll be displayed
   const chooseMapType = mapType => {
@@ -176,6 +244,17 @@ const Home = ({navigation}) => {
       );
     }
   }, [checkPermission, locationPermissionGranted]);
+
+  useEffect(() => {
+    // MapboxGL.setConnected(true);
+    // MapboxGL.setTelemetryEnabled(true);
+    if (locationFromMapboxLng && locationFromMapboxLat) {
+      getDirections(
+        [locationFromMapboxLng, locationFromMapboxLat],
+        [38.763611, 9.005401],
+      );
+    }
+  }, [getDirections, locationFromMapboxLat, locationFromMapboxLng]);
 
   return (
     <View style={styles.container}>
@@ -252,16 +331,13 @@ const Home = ({navigation}) => {
             <>
               <MapboxGL.Camera
                 zoomLevel={15}
-                // animationDuration={4000}
-                // followUserLevel={15}
-                // followUserLocation={followUserLocation}
-                // animationMode={'flyTo'}
                 centerCoordinate={[userPositionLng, userPositionLat]}
               />
               <MapboxGL.UserLocation
                 visible={true}
                 onUpdate={userLocationUpdate}
               />
+              {route ? renderRoadDirections() : null}
             </>
           )}
           <MapboxGL.Camera
