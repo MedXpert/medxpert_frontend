@@ -64,6 +64,7 @@ const Home = ({navigation}) => {
   const [locationFromMapboxLat, setLocationFromMapboxLat] = useState(); // User's current position tracked from the mapboxGL userLocation - Latitude
   const [mapTypeVisibility, setMapTypeVisibility] = useState(false); // MapType modal visibility
   const [route, setRoute] = useState(null);
+  const [followUserLocation, setFollowUserLocation] = useState(false);
   const startValueMoveY = useRef(new Animated.Value(0)).current; // Initial value of move Y animated for the location
 
   const accessToken =
@@ -346,7 +347,7 @@ const Home = ({navigation}) => {
             // animationMode={'flyTo'}
             // animationDuration={4000}
             // followZoomLevel={15}
-            // followUserLocation={followUserLocation}
+            followUserLocation={followUserLocation}
             centerCoordinate={[userPositionLng, userPositionLat]}
           />
         </MapboxGL.MapView>
