@@ -14,6 +14,7 @@ import NavigationStackUser from './NavigationStackUser';
 import NavigationStackHCF from '../hcf/routes/NavigationStackHCF';
 import WelcomeStackScreen from './Welcome';
 import AuthStackScreen from './Auth';
+import NavigationStackAmbulance from '../ambulance/routes/NavigationStackAmbulance';
 import {AuthContext, WelcomeContext} from '../components/general/Context';
 
 // The main route that evaluates whether the user is logged in or not and decides where to navigate when the app starts.
@@ -21,7 +22,7 @@ const Main = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false); // User state value from the cache  -- check if a login token exists
   const [appIsLoading, setAppIsLoading] = useState(true); // whether the app is loading or finished loading.
   const [openingForTheFirstTime, setOpeningForTheFirstTime] = useState(true); // Whether the app is being opened for the first time.
-  const [role, setRole] = useState('user');
+  const [role, setRole] = useState('amb');
 
   // setTimeout(() => setAppIsLoading(false), 3000);
   // setTimeout(() => setIsLoggedIn(true), 5000);
@@ -95,10 +96,12 @@ const Main = () => {
       storeData();
 
       // Check role
-      if (role === 'user') {
+      if (role === 'u') {
         return <NavigationStackUser />;
-      } else if (role === 'admin') {
+      } else if (role === 'adm') {
         return <NavigationStackHCF />;
+      } else if (role === 'amb') {
+        return <NavigationStackAmbulance />;
       }
     }
   }; // return stacks according to the state of the user.
