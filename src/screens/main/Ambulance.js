@@ -14,6 +14,9 @@ import React, {useState, useEffect, useCallback, useRef, useMemo} from 'react';
 import {PERMISSIONS, RESULTS, openSettings} from 'react-native-permissions';
 import Geolocation from 'react-native-geolocation-service';
 import {io} from 'socket.io-client';
+import {lineString as makeLineString} from '@turf/helpers';
+import {getDistance} from 'geolib';
+import axios from 'axios';
 
 import MapboxGL from '@react-native-mapbox-gl/maps';
 import Colors from '../../constants/colors';
@@ -33,6 +36,8 @@ const dimensionWidth = Dimensions.get('window').width;
 // const io = require('socket.io-client/dist/socket.io');
 
 const SOCKETIO_SERVER_URL = 'http://127.0.0.1:5000';
+
+const geoApifyAccessToken = '87d55356e5ab47dab8be60202bb80ae3';
 
 var userType = 'u';
 var userId = 'userId' + Math.random();
@@ -153,13 +158,15 @@ const Ambulance = ({navigation}) => {
   const [mapTypeVisibility, setMapTypeVisibility] = useState(false); // MapType modal visibility
   const [route, setRoute] = useState(null);
   const startValueMoveY = useRef(new Animated.Value(0)).current; // Initial value of move Y animated for the location
-  // const [driverNameVisibility, setDriverNameVisibility] = useState(false);
+  const [driverNameVisibility, setDriverNameVisibility] = useState(false);
   // turn on and off when ambulance is called
-  // const [ambulanceCalled, setAmbulanceCalled] = useState(false);
+  const [ambulanceCalled, setAmbulanceCalled] = useState(false);
 
   const [ambulanceId, setAmbulanceId] = useState(null);
   const [appointmentAccepted, setAppointmentAccepted] = useState(false);
   const [callingAmbulance, setCallingAmbulance] = useState(false);
+
+  const refUserLocation = useRef();
 
   const socketRef = useRef();
   // Exit the app and go to settings. This function is called when the 'Go to settings' button in the permission denied modal is pressed.
@@ -280,19 +287,20 @@ const Ambulance = ({navigation}) => {
   };
 
   // Choose the Map type that'll be displayed
-  // const chooseMapType = mapType => {
-  //   if (mapType === streetStyleURL) {
-  //     setStyleUrl(streetStyleURL);
-  //   } else if (mapType === lightStyleURL) {
-  //     setStyleUrl(lightStyleURL);
-  //   } else if (mapType === darkStyleURL) {
-  //     setStyleUrl(darkStyleURL);
-  //   } else if (mapType === satelliteStyleURL) {
-  //     setStyleUrl(satelliteStyleURL);
-  //   }
-  //   setMapTypeVisibility(false);
-  // };
+  const chooseMapType = mapType => {
+    if (mapType === streetStyleURL) {
+      setStyleUrl(streetStyleURL);
+    } else if (mapType === lightStyleURL) {
+      setStyleUrl(lightStyleURL);
+    } else if (mapType === darkStyleURL) {
+      setStyleUrl(darkStyleURL);
+    } else if (mapType === satelliteStyleURL) {
+      setStyleUrl(satelliteStyleURL);
+    }
+    setMapTypeVisibility(false);
+  };
 
+  // get the of the given starting and ending point coordinates
   const getDirections = useCallback(async (startLoc, destLoc) => {
     const res = await axios.get(
       `https://api.geoapify.com/v1/routing?waypoints=${startLoc.latitude},${startLoc.longitude}|${destLoc.latitude},${destLoc.longitude}&mode=drive&apiKey=${geoApifyAccessToken}`,
@@ -518,14 +526,15 @@ const Ambulance = ({navigation}) => {
             <>
               <MapboxGL.Camera
                 zoomLevel={15}
+                followUserLocation
                 centerCoordinate={[userPositionLng, userPositionLat]}
               />
               <MapboxGL.UserLocation
                 visible={true}
                 onUpdate={userLocationUpdate}
               />
-              {route ? <RenderDirection route={route} /> : null} //If there is
-              route, draw route from given source to destination
+              {/* If there is route, draw route from given source to destination  */}
+              {route ? <RenderDirection route={route} /> : null}
             </>
           )}
           <MapboxGL.Camera
