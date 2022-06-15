@@ -34,7 +34,7 @@ const dimensionWidth = Dimensions.get('window').width;
 const SOCKETIO_SERVER_URL = 'http://127.0.0.1:5000';
 
 var userType = 'u';
-var userId = 'userId2';
+var userId = 'userId' + Math.random();
 
 const USER_TYPES = {
   USER: 'u',
@@ -102,17 +102,22 @@ const locationToAmbulance = (ambulanceID, lng, lat, socket) => {
     /*ambulanceID: state.logged_in_user_id,*/ coordinates: [lng, lat],
     ambulanceID: ambulanceID,
   };
+  // console.log('location to ambulance: ', data, socket);
+
   socket.emit(EVENTS.LOCATION_TO_AMBULANCE, data);
 };
 
 ambuAppState.streams = {
   LS: {
     key: null,
-    start: (ambulanceID, lng, lat) => {
+    start: (ambulanceID, lng, lat, socket) => {
       ambuAppState.streams.LS.key = setInterval(
         locationToAmbulance,
         LS_UPDATE_INTERVAL,
-        [ambulanceID, lng, lat],
+        ambulanceID,
+        lng,
+        lat,
+        socket,
       );
     },
     stop: () => {
@@ -202,7 +207,14 @@ const Ambulance = ({navigation}) => {
       setLocationFromMapboxLng(lng);
       setLocationFromMapboxLat(lat);
     }
+
+    locationToAmbulance();
   };
+
+  // get current location
+  const getCurrentLocation = useCallback(() => {
+    return [userPositionLng, userPositionLat];
+  }, [userPositionLng, userPositionLat]);
 
   // Set center coordinate to the current position of the user.
   const findMyLocation = async () => {
@@ -314,21 +326,7 @@ const Ambulance = ({navigation}) => {
       console.log(">>>>>> Can't find ambulances. Try again");
     });
 
-    // //when an ambulance is found
-    socketRef.current.on(EVENTS.APPOINTMENT_ACCEPTED, data => {
-      //   // start LS
-      ambuAppState.streams.LS.start(
-        data.ambulanceID,
-        userPositionLng,
-        userPositionLat,
-        socketRef.current,
-      );
-
-      console.log('>>>>>> Appointment accepted');
-
-      ambuAppState.in_appointment_with.ambulanceID = data.ambulanceID;
-    });
-
+    //when an ambulance is found
     socketRef.current.on(EVENTS.LOCATION_FROM_AMBULANCE, data => {
       console.log(`Ambulance at ${data.coordinates}`);
     });
@@ -344,7 +342,7 @@ const Ambulance = ({navigation}) => {
       console.log('Ambulance aborted');
     });
 
-    // on Finished
+    // on reached
     socketRef.current.on(EVENTS.HAVE_REACHED, data => {
       // stop LS
       ambuAppState.streams.LS.stop();
@@ -360,10 +358,11 @@ const Ambulance = ({navigation}) => {
       // document.body.innerHTML +=
       console.log('Job finished');
     });
+
     return () => {
       socketRef.current.disconnect();
     };
-  }, []);
+  }, [getCurrentLocation]);
 
   const callAmbulance = () => {
     console.log('Calling...');

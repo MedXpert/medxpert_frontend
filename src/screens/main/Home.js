@@ -16,7 +16,7 @@ import {PERMISSIONS, RESULTS, openSettings} from 'react-native-permissions';
 import Geolocation from 'react-native-geolocation-service';
 import {onChange} from 'react-native-reanimated';
 import BottomSheet from '@gorhom/bottom-sheet';
-import MapboxDirectionsFactory from '@mapbox/mapbox-sdk/services/directions';
+// import MapboxDirectionsFactory from '@mapbox/mapbox-sdk/services/directions';
 import {lineString as makeLineString} from '@turf/helpers';
 import axios from 'axios';
 
@@ -37,7 +37,6 @@ import {useHealthCareFacilities} from '../../hooks/healthCareFacility';
 
 import {requestPermissions} from '../../services/permissions/requestPermissions';
 import {LOCATION_PERMISSION_MESSAGE} from '../../constants/string/requestPermissions/requestPermissions';
-import directions from '@mapbox/mapbox-sdk/services/directions';
 
 const dimensionHeight = Dimensions.get('window').height;
 const dimensionWidth = Dimensions.get('window').width;
@@ -73,7 +72,9 @@ const Home = ({navigation}) => {
   const accessToken =
     'sk.eyJ1IjoibGl5dW1rIiwiYSI6ImNsMWtteG11NzAyZWgzZG9kOWpyb2x1dWMifQ.X4v8HxdCSmdrvVaCWXVjog';
 
-  const directionsClient = MapboxDirectionsFactory({accessToken}); // To be used to get the direction: ;
+  const geoApifyAccessToken = '87d55356e5ab47dab8be60202bb80ae3';
+
+  // const directionsClient = MapboxDirectionsFactory({accessToken}); // To be used to get the direction: ;
 
   // Exit the app and go to settings. This function is called when the 'Go to settings' button in the permission denied modal is pressed.
   const settings = () => {
@@ -102,7 +103,7 @@ const Home = ({navigation}) => {
   }, [permissionName]);
 
   // Will be called when the user location is updated/changed
-  const userLocationUpdate = async location => {
+  const userLocationUpdate = location => {
     if (location) {
       let lng = location.coords.longitude;
       let lat = location.coords.latitude;
@@ -122,7 +123,7 @@ const Home = ({navigation}) => {
           {latitude: lat, longitude: lng},
         );
         // console.log(distance);
-        if (distance > 10) {
+        if (distance > 20) {
           setLocationFromMapboxLng(lng);
           setLocationFromMapboxLat(lat);
           refUserLocation.current = {longitude: lng, latitude: lat};
@@ -177,34 +178,30 @@ const Home = ({navigation}) => {
   };
 
   // Get direction from starting point to destination
-  const getDirections = useCallback(
-    async (startLoc, destLoc) => {
-      const reqOptions = {
-        waypoints: [{coordinates: startLoc}, {coordinates: destLoc}],
-        profile: 'driving',
-        geometries: 'geojson',
-      };
-      const res = await directionsClient.getDirections(reqOptions).send();
-      // const res = await axios.get(
-      //   `https://api.mapbox.com/directions/v5/mapbox/driving/${startLoc[0]},${startLoc[1]};${destLoc[0]},${destLoc[1]}?access_token=${accessToken}`
+  const getDirections = useCallback(async (startLoc, destLoc) => {
+    // const reqOptions = {
+    //   waypoints: [{coordinates: startLoc}, {coordinates: destLoc}],
+    //   profile: 'driving',
+    //   geometries: 'geojson',
+    // };
 
-      // );
+    // const res = await directionsClient.getDirections(reqOptions).send();
 
-      // console.log(res);
+    // const res2 = await axios.get(
+    //   'https://api.geoapify.com/v1/routing?waypoints=36.734770,-76.610637|36.761226,-76.488354&mode=drive&apiKey=87d55356e5ab47dab8be60202bb80ae3',
+    // );
+    // console.log('data from res2', res.data.features[0].geometry.coordinates[0]);
 
-      const route = makeLineString(res.body.routes[0].geometry.coordinates);
+    const res = await axios.get(
+      `https://api.geoapify.com/v1/routing?waypoints=${startLoc.latitude},${startLoc.longitude}|${destLoc.latitude},${destLoc.longitude}&mode=drive&apiKey=${geoApifyAccessToken}`,
+    );
 
-      const routeLineString = makeLineString(
-        await res.body.routes[0].geometry.coordinates,
-        {name: 'line 1'},
-      );
+    const coordinates = res.data.features[0].geometry.coordinates[0];
+    const routeLineString = makeLineString(coordinates, {name: 'line 1'});
+    setRoute(routeLineString);
 
-      setRoute(routeLineString);
-
-      // console.log('Route: ', JSON.stringify(route.geometry));
-    },
-    [directionsClient],
-  );
+    // console.log('Route: ', JSON.stringify(route.geometry));
+  }, []);
 
   // Choose the Map type that'll be displayed
   const chooseMapType = mapType => {
@@ -260,12 +257,10 @@ const Home = ({navigation}) => {
   }, [checkPermission, locationPermissionGranted]);
 
   useEffect(() => {
-    // MapboxGL.setConnected(true);
-    // MapboxGL.setTelemetryEnabled(true);
     if (locationFromMapboxLng && locationFromMapboxLat) {
       getDirections(
-        [locationFromMapboxLng, locationFromMapboxLat],
-        [38.763611, 9.005401],
+        {longitude: locationFromMapboxLng, latitude: locationFromMapboxLat},
+        {longitude: 38.763611, latitude: 9.005401},
       );
     }
   }, [getDirections, locationFromMapboxLat, locationFromMapboxLng]);
