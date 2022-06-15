@@ -1,14 +1,7 @@
-import axios from 'axios';
-
-const fetchHealthCareFacility = async id => {
-  try {
-    const res = await axios.get(`/api/healthCareFacilities/${id}`);
-    const data = res.data.healthCareFacility;
-
-    return data;
-  } catch (error) {
-    console.warn(error);
-  }
+import httpClient from "../../auth/httpClient";
+const fetchHealthCareFacility = async (id) => {
+  // 38.76111384105613,9.043677387443639
+  return await httpClient.get(`/healthCareFacility/${id}`).then((result) => result.data);
 };
 
-export {fetchHealthCareFacility};
+export { fetchHealthCareFacility };

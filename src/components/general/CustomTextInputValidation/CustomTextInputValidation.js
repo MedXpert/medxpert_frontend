@@ -1,16 +1,16 @@
-import {View, TextInput, StyleSheet} from 'react-native';
-import React, {useState} from 'react';
+import { View, TextInput, StyleSheet } from 'react-native';
+import React, { useState } from 'react';
 
 import Colors from '../../../constants/colors';
-import {isRequired} from 'react-native/Libraries/DeprecatedPropTypes/DeprecatedColorPropType';
-import {CustomText} from '../CustomText/CustomText';
-import {Controller} from 'react-hook-form';
+import { isRequired } from 'react-native/Libraries/DeprecatedPropTypes/DeprecatedColorPropType';
+import { CustomText } from '../CustomText/CustomText';
+import { Controller } from 'react-hook-form';
 import colors from '../../../constants/colors';
 
 const CustomTextInputValidation = ({
   label = null,
   control = isRequired(),
-  rules = {required: true},
+  rules = { required: true },
   name = isRequired(),
   customStyles = {},
   error = null,
@@ -21,6 +21,7 @@ const CustomTextInputValidation = ({
   textAlignVertical,
   placeholder,
   changeBorderOnFocus = false,
+  secureTextEntry = false,
 }) => {
   const [focus, setFocus] = useState(false);
   return (
@@ -31,9 +32,10 @@ const CustomTextInputValidation = ({
       <Controller
         control={control}
         rules={rules}
-        render={({field: {onChange, onBlur, value}}) => (
+        render={({ field: { onChange, onBlur, value } }) => (
           <>
             <TextInput
+              secureTextEntry={secureTextEntry}
               keyboardType={keyboardType}
               onBlur={() => {
                 setFocus(false);
@@ -44,7 +46,7 @@ const CustomTextInputValidation = ({
               style={[
                 styles.textInput,
                 customStyles,
-                focus ? {borderWidth: 1, borderColor: colors.primary} : null,
+                focus ? { borderWidth: 1, borderColor: colors.primary } : null,
               ]}
               editable={editable}
               multiline={multiline}
@@ -68,7 +70,7 @@ const CustomTextInputValidation = ({
   );
 };
 const styles = StyleSheet.create({
-  container: {marginBottom: 10},
+  container: { marginBottom: 10 },
   textInput: {
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -82,4 +84,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export {CustomTextInputValidation};
+export { CustomTextInputValidation };

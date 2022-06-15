@@ -1,19 +1,33 @@
-import {View, Image, StyleSheet, Pressable, ScrollView} from 'react-native';
-import React from 'react';
+import { View, Image, StyleSheet, Pressable, ScrollView } from 'react-native';
+import React, {useContext} from 'react';
 import Colors from '../../../../constants/colors';
-import {CustomText} from '../../../../components/general/CustomText';
-import {CustomButton} from '../../../../components/general/CustomButton';
-import {CustomTextInputValidation} from '../../../../components/general/CustomTextInputValidation';
+import { CustomText } from '../../../../components/general/CustomText';
+import { CustomButton } from '../../../../components/general/CustomButton';
+import { CustomTextInputValidation } from '../../../../components/general/CustomTextInputValidation';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import colors from '../../../../constants/colors';
 import IconAnt from 'react-native-vector-icons/AntDesign';
-import {useForm} from 'react-hook-form';
+import { useForm } from 'react-hook-form';
+import { AuthContext } from '../../../../components/general/Context';
 
-import {emailRegEx} from '../../../../constants/regEx';
+import { emailRegEx } from '../../../../constants/regEx';
 const UserProfile = () => {
+  const { loginStatus } = useContext(AuthContext);
+
+
+  const handleLogout = async () => {
+    await AsyncStorage.removeItem('@accessToken');
+    await AsyncStorage.removeItem('@refreshToken');
+    await AsyncStorage.removeItem('@role');
+    await AsyncStorage.removeItem('@userId');
+    loginStatus();
+
+  }
+
   const {
     control,
     handleSubmit,
-    formState: {errors},
+    formState: { errors },
   } = useForm({
     defaultValues: {
       fullName: user.firstName + ' ' + user.lastName,
@@ -40,6 +54,17 @@ const UserProfile = () => {
             fontWeight="bold"
             height={35}
           />
+          <CustomButton
+            title="Logout"
+            backgroundColor={Colors.white}
+            fontColor={Colors.dark}
+            width={100}
+            customStyle={styles.changePasswordButton}
+            fontSize={14}
+            fontWeight="bold"
+            height={35}
+            onPress={handleLogout}
+          />
         </View>
 
         {/* profile picture with edit button */}
@@ -47,7 +72,7 @@ const UserProfile = () => {
           {/* profile picture here */}
           <View style={styles.profilePictureBorder}>
             <Image
-              source={{uri: user.profilePicture}}
+              source={{ uri: user.profilePicture }}
               style={styles.profilePicture}
             />
             {/* image icon for changing profile */}
@@ -125,7 +150,7 @@ const UserProfile = () => {
             }}
           />
           <CustomButton
-            customStyle={{marginTop: 10}}
+            customStyle={{ marginTop: 10 }}
             title="Update Profile"
             width="100%"
             onPress={handleSubmit(onSubmit)}
@@ -140,7 +165,7 @@ const styles = StyleSheet.create({
   changePassword: {
     flex: 1,
     flexDirection: 'row',
-    justifyContent: 'flex-end',
+    justifyContent: 'space-between',
     padding: 20,
   },
   changePasswordButton: {
