@@ -11,10 +11,9 @@ import {
   Animated,
 } from 'react-native';
 import React, {useState, useEffect, useCallback, useRef, useMemo} from 'react';
-import MapboxGL from '@rnmapbox/maps';
 import {PERMISSIONS, RESULTS, openSettings} from 'react-native-permissions';
 import Geolocation from 'react-native-geolocation-service';
-
+import MapboxGL from '@react-native-mapbox-gl/maps';
 import Colors from '../../constants/colors';
 import {CustomButton} from '../../components/general/CustomButton';
 import {CustomText} from '../../components/general/CustomText';
