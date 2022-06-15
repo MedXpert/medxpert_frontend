@@ -347,8 +347,8 @@ const Home = ({navigation}) => {
                 visible={true}
                 onUpdate={userLocationUpdate}
               />
-              {route ? <RenderDirection route={route} /> : null} //If there is
-              route, draw route from given source to destination
+              {route ? <RenderDirection route={route} /> : null}
+              {/* If there is route, draw route from given source to destination */}
             </>
           )}
           <MapboxGL.Camera
