@@ -37,6 +37,7 @@ import {useHealthCareFacilities} from '../../hooks/healthCareFacility';
 
 import {requestPermissions} from '../../services/permissions/requestPermissions';
 import {LOCATION_PERMISSION_MESSAGE} from '../../constants/string/requestPermissions/requestPermissions';
+import {RenderDirection} from '../../components/general/RenderDirection';
 
 const dimensionHeight = Dimensions.get('window').height;
 const dimensionWidth = Dimensions.get('window').width;
@@ -161,21 +162,21 @@ const Home = ({navigation}) => {
   };
 
   // To be rendered in the map
-  const renderRoadDirections = () => {
-    return (
-      <MapboxGL.ShapeSource id="routeSource" shape={route.geometry}>
-        <MapboxGL.LineLayer
-          id="routeFill"
-          style={{
-            lineColor: Colors.primary,
-            lineWidth: 3.2,
-            lineCap: MapboxGL.LineJoin.Round,
-            lineOpacity: 1.84,
-          }}
-        />
-      </MapboxGL.ShapeSource>
-    );
-  };
+  // const renderRoadDirections = ({route}) => {
+  //   return (
+  //     <MapboxGL.ShapeSource id="routeSource" shape={route.geometry}>
+  //       <MapboxGL.LineLayer
+  //         id="routeFill"
+  //         style={{
+  //           lineColor: Colors.primary,
+  //           lineWidth: 3.2,
+  //           lineCap: MapboxGL.LineJoin.Round,
+  //           lineOpacity: 1.84,
+  //         }}
+  //       />
+  //     </MapboxGL.ShapeSource>
+  //   );
+  // };
 
   // Get direction from starting point to destination
   const getDirections = useCallback(async (startLoc, destLoc) => {
@@ -346,7 +347,8 @@ const Home = ({navigation}) => {
                 visible={true}
                 onUpdate={userLocationUpdate}
               />
-              {route ? renderRoadDirections() : null}
+              {route ? <RenderDirection route={route} /> : null} //If there is
+              route, draw route from given source to destination
             </>
           )}
           <MapboxGL.Camera
