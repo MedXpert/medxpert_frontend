@@ -11,14 +11,19 @@ import {
   Animated,
 } from 'react-native';
 import React, {useState, useEffect, useCallback, useRef, useMemo} from 'react';
-import MapboxGL from '@rnmapbox/maps';
+import MapboxGL from '@react-native-mapbox-gl/maps';
 import {PERMISSIONS, RESULTS, openSettings} from 'react-native-permissions';
 import Geolocation from 'react-native-geolocation-service';
 import {onChange} from 'react-native-reanimated';
 import BottomSheet from '@gorhom/bottom-sheet';
+// import MapboxDirectionsFactory from '@mapbox/mapbox-sdk/services/directions';
+import {lineString as makeLineString} from '@turf/helpers';
+import axios from 'axios';
 
 import IconAntDesign from 'react-native-vector-icons/AntDesign';
 import IconMaterialCommunity from 'react-native-vector-icons/MaterialCommunityIcons';
+
+import {getDistance} from 'geolib';
 
 import {SearchBar} from '../../components/general/SearchBar';
 import Colors from '../../constants/colors';
@@ -32,6 +37,7 @@ import {useHealthCareFacilities} from '../../hooks/healthCareFacility';
 
 import {requestPermissions} from '../../services/permissions/requestPermissions';
 import {LOCATION_PERMISSION_MESSAGE} from '../../constants/string/requestPermissions/requestPermissions';
+import {RenderDirection} from '../../components/general/RenderDirection';
 
 const dimensionHeight = Dimensions.get('window').height;
 const dimensionWidth = Dimensions.get('window').width;
@@ -57,8 +63,19 @@ const Home = ({navigation}) => {
   const [locationFromMapboxLng, setLocationFromMapboxLng] = useState(); // User's current position tracked from the mapboxGL userLocation - Longitude
   const [locationFromMapboxLat, setLocationFromMapboxLat] = useState(); // User's current position tracked from the mapboxGL userLocation - Latitude
   const [mapTypeVisibility, setMapTypeVisibility] = useState(false); // MapType modal visibility
+  const [route, setRoute] = useState(null);
+  const [followUserLocation, setFollowUserLocation] = useState(false);
   const startValueMoveY = useRef(new Animated.Value(0)).current; // Initial value of move Y animated for the location
   const locationPermission = PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION; // location permission name
+
+  const refUserLocation = useRef();
+
+  const accessToken =
+    'sk.eyJ1IjoibGl5dW1rIiwiYSI6ImNsMWtteG11NzAyZWgzZG9kOWpyb2x1dWMifQ.X4v8HxdCSmdrvVaCWXVjog';
+
+  const geoApifyAccessToken = '87d55356e5ab47dab8be60202bb80ae3';
+
+  // const directionsClient = MapboxDirectionsFactory({accessToken}); // To be used to get the direction: ;
 
   // Exit the app and go to settings. This function is called when the 'Go to settings' button in the permission denied modal is pressed.
   const settings = () => {
@@ -86,12 +103,32 @@ const Home = ({navigation}) => {
   }, [locationPermission]);
 
   // Will be called when the user location is updated/changed
-  const userLocationUpdate = async location => {
+  const userLocationUpdate = location => {
     if (location) {
       let lng = location.coords.longitude;
       let lat = location.coords.latitude;
-      setLocationFromMapboxLng(lng);
-      setLocationFromMapboxLat(lat);
+      // setLocationFromMapboxLng(lng);
+      // setLocationFromMapboxLat(lat);
+
+      if (!locationFromMapboxLat || !locationFromMapboxLng) {
+        setLocationFromMapboxLng(lng);
+        setLocationFromMapboxLat(lat);
+        refUserLocation.current = {longitude: lng, latitude: lat};
+      } else {
+        const distance = getDistance(
+          {
+            latitude: refUserLocation.current.latitude,
+            longitude: refUserLocation.current.longitude,
+          },
+          {latitude: lat, longitude: lng},
+        );
+        // console.log(distance);
+        if (distance > 20) {
+          setLocationFromMapboxLng(lng);
+          setLocationFromMapboxLat(lat);
+          refUserLocation.current = {longitude: lng, latitude: lat};
+        }
+      }
     }
   };
 
@@ -106,7 +143,7 @@ const Home = ({navigation}) => {
         if (locationFromMapboxLat && locationFromMapboxLng) {
           setUserPositionLng(locationFromMapboxLng);
           setUserPositionLat(locationFromMapboxLat);
-          // console.log('Inside mapbox User position');
+          console.log('Inside mapbox User position');
         } else {
           setUserPositionLng(lng);
           setUserPositionLat(lat);
@@ -122,6 +159,49 @@ const Home = ({navigation}) => {
 
     await _camera.flyTo([userPositionLng, userPositionLat]);
   };
+
+  // To be rendered in the map
+  // const renderRoadDirections = ({route}) => {
+  //   return (
+  //     <MapboxGL.ShapeSource id="routeSource" shape={route.geometry}>
+  //       <MapboxGL.LineLayer
+  //         id="routeFill"
+  //         style={{
+  //           lineColor: Colors.primary,
+  //           lineWidth: 3.2,
+  //           lineCap: MapboxGL.LineJoin.Round,
+  //           lineOpacity: 1.84,
+  //         }}
+  //       />
+  //     </MapboxGL.ShapeSource>
+  //   );
+  // };
+
+  // Get direction from starting point to destination
+  const getDirections = useCallback(async (startLoc, destLoc) => {
+    // const reqOptions = {
+    //   waypoints: [{coordinates: startLoc}, {coordinates: destLoc}],
+    //   profile: 'driving',
+    //   geometries: 'geojson',
+    // };
+
+    // const res = await directionsClient.getDirections(reqOptions).send();
+
+    // const res2 = await axios.get(
+    //   'https://api.geoapify.com/v1/routing?waypoints=36.734770,-76.610637|36.761226,-76.488354&mode=drive&apiKey=87d55356e5ab47dab8be60202bb80ae3',
+    // );
+    // console.log('data from res2', res.data.features[0].geometry.coordinates[0]);
+
+    const res = await axios.get(
+      `https://api.geoapify.com/v1/routing?waypoints=${startLoc.latitude},${startLoc.longitude}|${destLoc.latitude},${destLoc.longitude}&mode=drive&apiKey=${geoApifyAccessToken}`,
+    );
+
+    const coordinates = res.data.features[0].geometry.coordinates[0];
+    const routeLineString = makeLineString(coordinates, {name: 'line 1'});
+    setRoute(routeLineString);
+
+    // console.log('Route: ', JSON.stringify(route.geometry));
+  }, []);
 
   // Choose the Map type that'll be displayed
   const chooseMapType = mapType => {
@@ -175,6 +255,15 @@ const Home = ({navigation}) => {
       );
     }
   }, [checkPermission, locationPermissionGranted]);
+
+  useEffect(() => {
+    if (locationFromMapboxLng && locationFromMapboxLat) {
+      getDirections(
+        {longitude: locationFromMapboxLng, latitude: locationFromMapboxLat},
+        {longitude: 38.763611, latitude: 9.005401},
+      );
+    }
+  }, [getDirections, locationFromMapboxLat, locationFromMapboxLng]);
 
   return (
     <View style={styles.container}>
@@ -251,16 +340,14 @@ const Home = ({navigation}) => {
             <>
               <MapboxGL.Camera
                 zoomLevel={15}
-                // animationDuration={4000}
-                // followUserLevel={15}
-                // followUserLocation={followUserLocation}
-                // animationMode={'flyTo'}
                 centerCoordinate={[userPositionLng, userPositionLat]}
               />
               <MapboxGL.UserLocation
                 visible={true}
                 onUpdate={userLocationUpdate}
               />
+              {/* If there is route, draw route from given source to destination */}
+              {route ? <RenderDirection route={route} /> : null}
             </>
           )}
           <MapboxGL.Camera
@@ -269,7 +356,7 @@ const Home = ({navigation}) => {
             // animationMode={'flyTo'}
             // animationDuration={4000}
             // followZoomLevel={15}
-            // followUserLocation={followUserLocation}
+            followUserLocation={followUserLocation}
             centerCoordinate={[userPositionLng, userPositionLat]}
           />
         </MapboxGL.MapView>

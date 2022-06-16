@@ -4,7 +4,7 @@
 import 'react-native-gesture-handler';
 import {gestureHandlerRootHOC} from 'react-native-gesture-handler';
 import {AppRegistry, Platform} from 'react-native';
-import MapboxGL, {Logger} from '@rnmapbox/maps';
+import MapboxGL, {Logger} from '@react-native-mapbox-gl/maps';
 import App from './App';
 import {name as appName} from './app.json';
 import PushNotification from 'react-native-push-notification';

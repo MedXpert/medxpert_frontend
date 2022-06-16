@@ -13,7 +13,7 @@ import {LogBox} from 'react-native';
 
 import SplashScreen from '../screens/welcome/Splash';
 import NavigationStackUser from './NavigationStackUser';
-import NavigationStackHCF from '../hcf/routes/NavigationStackHCF';
+import NavigationStackHCF from '../HCF/routes/NavigationStackHCF';
 import WelcomeStackScreen from './Welcome';
 import AuthStackScreen from './Auth';
 import {
