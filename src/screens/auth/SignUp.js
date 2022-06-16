@@ -14,7 +14,7 @@ import { useForm } from 'react-hook-form';
 import { CustomTextInputValidation } from '../../components/general/CustomTextInputValidation';
 import { useSignUp } from '../../hooks/authentication/useSignUp';
 import colors from '../../constants/colors';
-import {emailRegEx} from '../../constants/regEx';
+import { emailRegEx } from '../../constants/regEx';
 import { showMessage } from "react-native-flash-message";
 
 const SignUp = ({ navigation }) => {
@@ -37,9 +37,9 @@ const SignUp = ({ navigation }) => {
 
   const { control, handleSubmit, formState: { errors }, getValues } = useForm({
     defaultValues: {
-      fullName: "Michael Belete",
-      email: "mike@mike.com",
-      password: "mike123",
+      fullName: "",
+      email: "",
+      password: "",
       profilePicture: "",
     }
   });
@@ -47,7 +47,7 @@ const SignUp = ({ navigation }) => {
   if (register.isError) {
     showMessage({
       message: "Error",
-      description: register.error.response.data.error,
+      description: register.error.response.data.error || register.error.message,
       type: "danger",
       icon: "danger",
       duration: 5000,
@@ -167,11 +167,11 @@ const SignUp = ({ navigation }) => {
               />
             </View>
             <View>
-              <CustomText content="I am a" />
-              <View style={{ width: 350, paddingVertical: 10, flexDirection: 'row', justifyContent: 'flex-start' }}>
-                <CustomButton title="user" onPress={() => setRole('u')} fontSize={14} backgroundColor={(role === 'u') ? colors.primary : colors.whiteSmoke} width="30%" />
-                <CustomButton title="Health Facility Owner" onPress={() => setRole('h')} fontSize={14} backgroundColor={(role === 'h') ? colors.primary : colors.whiteSmoke} width="40%" />
-                <CustomButton title="Ambulance" onPress={() => setRole('am')} fontSize={14} backgroundColor={(role === 'am') ? colors.primary : colors.whiteSmoke} width="30%" />
+              <CustomText content="I am" />
+              <View style={styles.roleButtons}>
+                <CustomButton title="A user" onPress={() => setRole('u')} fontSize={14} backgroundColor={(role === 'u') ? colors.primary : colors.whiteSmoke} width="20%" />
+                <CustomButton title="A Health Facility Owner" onPress={() => setRole('h')} fontSize={14} backgroundColor={(role === 'h') ? colors.primary : colors.whiteSmoke} width="50%" />
+                <CustomButton title="An Ambulance" onPress={() => setRole('am')} fontSize={14} backgroundColor={(role === 'am') ? colors.primary : colors.whiteSmoke} width="35%" />
               </View>
             </View>
             <View style={styles.buttonsContainer}>
@@ -210,6 +210,7 @@ const styles = StyleSheet.create({
     marginTop: 0,
     alignItems: 'center',
   },
+  roleButtons: { width: 350, paddingVertical: 10, flexDirection: 'row', justifyContent: 'flex-start' },
   signUpFormContainer: {
     alignItems: 'center',
     flex: 1,
@@ -239,7 +240,7 @@ const styles = StyleSheet.create({
   inputs: {
     width: 350,
     height: 50,
-    elevation:0.5
+    elevation: 0.5
   },
   registerContainer: {
     flexDirection: 'row',

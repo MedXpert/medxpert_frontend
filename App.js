@@ -9,10 +9,11 @@ const App = () => {
   const queryClient = new QueryClient();
   return (
     <QueryClientProvider client={queryClient}>
+      
+      <FlashMessage position="bottom" />
       {/* Navigation Container should be rendered at the root of the app */}
       <NavigationContainer theme={lightTheme}>
         <Navigator />
-        <FlashMessage position="bottom" />
       </NavigationContainer>
     </QueryClientProvider>
   );
