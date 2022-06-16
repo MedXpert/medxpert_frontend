@@ -27,6 +27,7 @@
     "react-native-disable-battery-optimizations-android": "^1.0.7",
     "react-native-document-picker": "^8.1.0",
     "react-native-easy-content-loader": "^0.3.2",
+    "react-native-flash-message": "^0.2.1",
     "react-native-geolocation-service": "^5.3.0-beta.4",
     "react-native-gesture-handler": "^2.4.0",
     "react-native-modal-datetime-picker": "^13.1.2",

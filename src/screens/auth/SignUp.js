@@ -15,7 +15,7 @@ import { CustomTextInputValidation } from '../../components/general/CustomTextIn
 import { useSignUp } from '../../hooks/authentication/useSignUp';
 import colors from '../../constants/colors';
 import {emailRegEx} from '../../constants/regEx';
-
+import { showMessage } from "react-native-flash-message";
 
 const SignUp = ({ navigation }) => {
   const { height, width } = useWindowDimensions();
@@ -37,17 +37,21 @@ const SignUp = ({ navigation }) => {
 
   const { control, handleSubmit, formState: { errors }, getValues } = useForm({
     defaultValues: {
-      fullName: "",
-      email: "",
-      password: "",
+      fullName: "Michael Belete",
+      email: "mike@mike.com",
+      password: "mike123",
       profilePicture: "",
     }
   });
 
-  if(register.isError) {
-    console.log("*******************************************************************")
-    console.log(register)
-    console.log("*******************************************************************")
+  if (register.isError) {
+    showMessage({
+      message: "Error",
+      description: register.error.response.data.error,
+      type: "danger",
+      icon: "danger",
+      duration: 5000,
+    });
   }
 
   return (
@@ -170,7 +174,6 @@ const SignUp = ({ navigation }) => {
                 <CustomButton title="Ambulance" onPress={() => setRole('am')} fontSize={14} backgroundColor={(role === 'am') ? colors.primary : colors.whiteSmoke} width="30%" />
               </View>
             </View>
-            {register.isError && (<CustomText content={register.error.message} fontColor={Colors.red} />)}
             <View style={styles.buttonsContainer}>
               <CustomButton
                 width={350}
