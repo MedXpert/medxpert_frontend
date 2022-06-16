@@ -1,55 +1,55 @@
-import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import {View, Text} from 'react-native';
+import {createNativeStackNavigator} from "@react-navigation/native-stack";
+import {View, Text} from "react-native";
 import React, {
   useState,
   useEffect,
   useCallback,
   createContext,
   useMemo,
-} from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage'; // AsyncStorage to store user ID and other infos after logged in
-import {FallDetectionEmitter, start} from 'react-native-fall-detection-module';
-import {LogBox} from 'react-native';
+} from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage"; // AsyncStorage to store user ID and other infos after logged in
+import {FallDetectionEmitter, start} from "react-native-fall-detection-module";
+import {LogBox} from "react-native";
 
-import SplashScreen from '../screens/welcome/Splash';
-import NavigationStackUser from './NavigationStackUser';
-import NavigationStackHCF from '../HCF/routes/NavigationStackHCF';
-import WelcomeStackScreen from './Welcome';
-import AuthStackScreen from './Auth';
+import SplashScreen from "../screens/welcome/Splash";
+import NavigationStackUser from "./NavigationStackUser";
+import NavigationStackHCF from "../HCF/routes/NavigationStackHCF";
+import WelcomeStackScreen from "./Welcome";
+import AuthStackScreen from "./Auth";
 import {
   AuthContext,
   WelcomeContext,
   FallContext,
-} from '../components/general/Context';
-import FallDetected from '../screens/main/Emergency/FallDetected';
-import {backgroundService} from '../services/backgroundService/backgroundService';
+} from "../components/general/Context";
+import FallDetected from "../screens/main/Emergency/FallDetected";
+import {backgroundService} from "../services/backgroundService/backgroundService";
 
 // Ignore new NativeEmitter error
-LogBox.ignoreLogs(['new NativeEventEmitter']);
+LogBox.ignoreLogs(["new NativeEventEmitter"]);
 
 // The main route that evaluates whether the user is logged in or not and decides where to navigate when the app starts.
 const Main = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(); // User state value from the cache  -- check if a login token exists
   const [appIsLoading, setAppIsLoading] = useState(true); // whether the app is loading or finished loading.
   const [openingForTheFirstTime, setOpeningForTheFirstTime] = useState(true); // Whether the app is being opened for the first time.
-  const [role, setRole] = useState('user');
+  const [role, setRole] = useState("user");
   const [fallDetected, setFallDetected] = useState(false);
 
   // Checks if the app is being opened for the first time; when the app finishes checking this, the appIsLoading state will be set to false;
   const setOpeningForTheFirstTimeValueFunc = useCallback(async () => {
-    const value = await AsyncStorage.getItem('@OpeningForTheFirstTime');
+    const value = await AsyncStorage.getItem("@OpeningForTheFirstTime");
     if (value == null) {
       setOpeningForTheFirstTime(true);
     }
-    if (value === 'false') {
+    if (value === "false") {
       setOpeningForTheFirstTime(false);
-      console.log('openingForTheFirstTime: ', value);
+      console.log("openingForTheFirstTime: ", value);
     }
     // Set AppIsLoading false (Splash screen won't be displayed)
   }, []);
 
   const checkLoginStatus = useCallback(async () => {
-    const token = await AsyncStorage.getItem('@token');
+    const token = await AsyncStorage.getItem("@token");
     if (token == null) {
       setIsLoggedIn(false);
     } else if (token) {
@@ -58,7 +58,7 @@ const Main = () => {
   }, []);
 
   const checkFallDetected = useCallback(async () => {
-    const fall = await AsyncStorage.getItem('@fallDetected');
+    const fall = await AsyncStorage.getItem("@fallDetected");
     if (fall == null) {
       setFallDetected(false);
     } else if (fall) {
@@ -92,14 +92,14 @@ const Main = () => {
     start();
   }, []);
 
-  // Listen to the fall detection events
+  // Listen to the fall events
   useEffect(() => {
     let isMounted = true;
 
     if (isMounted) {
-      FallDetectionEmitter.addListener('fall', async newData => {
+      FallDetectionEmitter.addListener("fall", async newData => {
         console.log(newData);
-        await AsyncStorage.setItem('@fallDetected', 'true');
+        await AsyncStorage.setItem("@fallDetected", "true");
         // put your data processing step here
         // setFallDetected(true);
         await backgroundService();
@@ -108,7 +108,7 @@ const Main = () => {
 
     return async () => {
       isMounted = false;
-      await AsyncStorage.removeItem('@fallDetected');
+      await AsyncStorage.removeItem("@fallDetected");
     };
   }, []);
 
@@ -145,16 +145,16 @@ const Main = () => {
       // Temporarily used to store static user id
       const storeData = async () => {
         try {
-          await AsyncStorage.setItem('@userId', '1');
+          await AsyncStorage.setItem("@userId", "1");
         } catch (e) {
           // saving error
-          console.warn('userId store error:  ', e);
+          console.warn("userId store error:  ", e);
         }
       };
       storeData();
 
       // Check role
-      if (role === 'user') {
+      if (role === "user") {
         if (fallDetected) {
           return (
             <FallContext.Provider value={fallContext}>
@@ -164,7 +164,7 @@ const Main = () => {
         } else {
           return <NavigationStackUser />;
         }
-      } else if (role === 'admin') {
+      } else if (role === "admin") {
         return <NavigationStackHCF />;
       }
     }

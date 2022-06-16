@@ -5,11 +5,11 @@ import {
   Modal,
   BackHandler,
   Dimensions,
-} from 'react-native';
-import React from 'react';
-import colors from '../../../constants/colors';
-import {CustomButton} from '../../../components/general/CustomButton';
-import {CustomText} from '../../../components/general/CustomText';
+} from "react-native";
+import React from "react";
+import colors from "../../../constants/colors";
+import {CustomButton} from "../../../components/general/CustomButton";
+import {CustomText} from "../../../components/general/CustomText";
 
 const PermissionModal = ({
   modalVisibility,
@@ -21,6 +21,7 @@ const PermissionModal = ({
   buttonRightTitle,
   buttonLeftOnPress,
   buttonOnRightOnPress,
+  height,
   onRequestClose = () => {
     BackHandler.exitApp();
   },
@@ -32,7 +33,7 @@ const PermissionModal = ({
       visible={modalVisibility}
       onRequestClose={onRequestClose}>
       <View style={styles.modalView}>
-        <View style={styles.innerModal}>
+        <View style={[styles.innerModal, {height: height}]}>
           <View>
             <CustomText content={TextContent} />
           </View>
@@ -60,16 +61,16 @@ const PermissionModal = ({
 
 const styles = StyleSheet.create({
   buttonsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-evenly',
+    flexDirection: "row",
+    justifyContent: "space-evenly",
     marginTop: 20,
-    width: '100%',
+    width: "100%",
   },
   modalView: {
-    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    backgroundColor: "rgba(0, 0, 0, 0.7)",
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   innerModal: {
     backgroundColor: colors.white,
@@ -77,9 +78,9 @@ const styles = StyleSheet.create({
     height: 170,
     margin: 20,
     padding: 20,
-    alignContent: 'center',
-    justifyContent: 'center',
-    alignItems: 'center',
+    alignContent: "center",
+    justifyContent: "center",
+    alignItems: "center",
   },
 });
 

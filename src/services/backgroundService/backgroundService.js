@@ -34,7 +34,7 @@ export const backgroundService = async () => {
       if (counting > 10) {
         sendSms(phoneNumber, message);
         console.log('Message sent');
-        BackgroundService.stop();
+        await BackgroundService.stop();
       }
     });
   };

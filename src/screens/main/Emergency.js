@@ -6,22 +6,23 @@ import {
   ScrollView,
   BackHandler,
   PermissionsAndroid,
-} from 'react-native';
-import React, {useState, useCallback, useEffect} from 'react';
+} from "react-native";
+import React, {useState, useCallback, useEffect} from "react";
 import {
   PERMISSIONS,
   RESULTS,
   openSettings,
   check,
-} from 'react-native-permissions';
+} from "react-native-permissions";
 
-import {CustomText} from '../../components/general/CustomText';
-import {ToggleFeatures} from '../../components/emergency/ToggleFeatures';
-import IconMaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import colors from '../../constants/colors';
-import {requestPermissions} from '../../services/permissions/requestPermissions';
-import {PermissionModal} from '../../components/permissions/PermissionModal';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import {CustomText} from "../../components/general/CustomText";
+import {ToggleFeatures} from "../../components/emergency/ToggleFeatures";
+import IconMaterialIcons from "react-native-vector-icons/MaterialIcons";
+import colors from "../../constants/colors";
+import {requestPermissions} from "../../services/permissions/requestPermissions";
+import {PermissionModal} from "../../components/permissions/PermissionModal";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import {removeAsyncStorages} from "../../services/removeAsyncStorages";
 
 const Emergency = ({navigation}) => {
   const [automationToggle, setAutomationToggle] = useState(false);
@@ -47,35 +48,73 @@ const Emergency = ({navigation}) => {
   // Exit the app and go to settings. This function is called when the 'Go to settings' button in the permission denied modal is pressed.
   const settings = () => {
     BackHandler.exitApp();
-    openSettings().catch(() => console.warn('Can not open settings'));
+    openSettings().catch(() => console.warn("Can not open settings"));
   };
 
-  const onAutomationChange = () => {
-    setAutomationToggle(previousValue => !previousValue);
+  // When Emergency automation switch is toggled.
+  const onAutomationChange = async newVal => {
+    setAutomationToggle(newVal);
+    const automationToggleFromAsyncStorage = await AsyncStorage.getItem(
+      "@automationToggle",
+    );
+    // If there is no automationToggle value stored in AsyncStorage and newVal is true, then store 'true' in AsyncStorage automationToggle.
+    if (!automationToggleFromAsyncStorage && newVal) {
+      await AsyncStorage.setItem("@automationToggle", JSON.stringify("true"));
+      // Else Just remove the automationToggle value from AsyncStorage.
+    } else {
+      await AsyncStorage.removeItem("@automationToggle");
+      await AsyncStorage.removeItem("@fallDetectionToggle");
+      await AsyncStorage.removeItem("@smsToggle");
+      await AsyncStorage.removeItem("@emailToggle");
+      setFallDetectionToggle(false);
+    }
   };
 
-  const onSmsToggleChange = () => {
-    setSmsToggle(previousValue => !previousValue);
+  // When Fall Detection switch is toggled.
+  const onFallDetectionToggleChange = async newVal => {
+    setFallDetectionToggle(newVal);
+    const fallDetectionToggleFromAsyncStorage = await AsyncStorage.getItem(
+      "@fallDetectionToggle",
+    );
+
+    if (!fallDetectionToggleFromAsyncStorage && newVal) {
+      await AsyncStorage.setItem(
+        "@fallDetectionToggle",
+        JSON.stringify("true"),
+      );
+    } else {
+      setSmsToggle(false);
+      setEmailToggle(false);
+      // Remove toggle values from AsyncStorage.
+      await removeAsyncStorages([
+        "@smsToggle",
+        "@emailToggle",
+        "@fallDetectionToggle",
+      ]);
+    }
   };
 
-  const onEmailToggleChange = () => {
-    setEmailToggle(previousValue => !previousValue);
+  const onSmsToggleChange = async newVal => {
+    setSmsToggle(newVal);
+    const smsToggleFromAsyncStorage = await AsyncStorage.getItem("@smsToggle");
+    if (!smsToggleFromAsyncStorage && newVal) {
+      await AsyncStorage.setItem("@smsToggle", JSON.stringify("true"));
+    } else {
+      await AsyncStorage.removeItem("@smsToggle");
+    }
   };
 
-  const onFallDetectionToggleChange = async () => {
-    // setFallDetectionToggleDisabled(true);
-    // await checkPermission();
-    // setFallDetectionToggle(false);
-    // if (sendSmsPermissionGranted && !fallDetectionToggle) {
-    //   setFallDetectionToggle(previousValue => !previousValue);
-    // } else if (fallDetectionToggle) {
-    //   setFallDetectionToggle(previousValue => !previousValue);
-    // }
-    setFallDetectionToggle(previousValue => !previousValue);
-  };
+  const onEmailToggleChange = async newVal => {
+    setEmailToggle(newVal);
+    const emailToggleFromAsyncStorage = await AsyncStorage.getItem(
+      "@emailToggle",
+    );
 
-  const onAmbulanceToggleChange = () => {
-    setAmbulanceServiceToggle(previousValue => !previousValue);
+    if (!emailToggleFromAsyncStorage && newVal) {
+      await AsyncStorage.setItem("@emailToggle", JSON.stringify("true"));
+    } else {
+      await AsyncStorage.removeItem("@emailToggle");
+    }
   };
 
   const checkPermission = useCallback(async () => {
@@ -92,22 +131,22 @@ const Emergency = ({navigation}) => {
         const status = await PermissionsAndroid.request(
           PermissionsAndroid.PERMISSIONS.SEND_SMS,
         );
-        if (status === 'never_ask_again') {
+        if (status === "never_ask_again") {
           setSendSmsPermissionGranted(false);
           setSendSmsPermissionDenied(false);
           setSendSmsPermissionBlocked(true);
-        } else if (status === 'denied') {
+        } else if (status === "denied") {
           setSendSmsPermissionGranted(false);
           setSendSmsPermissionDenied(true);
           setSendSmsPermissionBlocked(false);
-        } else if (status === 'granted') {
+        } else if (status === "granted") {
           setSendSmsPermissionGranted(true);
           setSendSmsPermissionDenied(false);
           setSendSmsPermissionBlocked(false);
         }
       }
     } catch (error) {
-      console.log('error', error);
+      console.log("error", error);
     }
   }, [
     setSendSmsPermissionGranted,
@@ -116,87 +155,110 @@ const Emergency = ({navigation}) => {
   ]);
 
   useEffect(() => {
-    var isMounted = true;
-    if (isMounted) {
-      const fallDetectionToggleChange = async () => {
-        await checkPermission();
-        if (sendSmsPermissionBlocked) {
-          setFallDetectionToggleDisabled(true);
-        }
-      };
-      fallDetectionToggleChange();
-    }
-    return () => {
-      isMounted = false;
-    };
-  }, [checkPermission, fallDetectionToggleDisabled, sendSmsPermissionBlocked]);
+    checkPermission();
+  }, [checkPermission]);
 
   useEffect(() => {
-    const storeToggleValues = async () => {
-      await AsyncStorage.setItem(
-        '@automationToggle',
-        JSON.stringify(automationToggle),
+    // Check automationToggle value from AsyncStorage.
+    const setAutomationFromAsyncStorage = async () => {
+      const automationToggleFromAsyncStorage = await AsyncStorage.getItem(
+        "@automationToggle",
       );
-      await AsyncStorage.setItem('@smsToggle', JSON.stringify(smsToggle));
-      await AsyncStorage.setItem('@emailToggle', JSON.stringify(emailToggle));
-      await AsyncStorage.setItem(
-        '@fallDetectionToggle',
-        JSON.stringify(fallDetectionToggle),
-      );
-      await AsyncStorage.setItem(
-        '@ambulanceServiceToggle',
-        JSON.stringify(ambulanceServiceToggle),
-      );
+      if (automationToggleFromAsyncStorage) {
+        setAutomationToggle(true);
+      } else {
+        setAutomationToggle(false);
+      }
     };
-    storeToggleValues();
-  }, [
-    emailToggle,
-    ambulanceServiceToggle,
-    automationToggle,
-    fallDetectionToggle,
-    smsToggle,
-  ]);
+
+    // Check fallDetectionToggle value from AsyncStorage.
+    const setFallDetectionFromAsyncStorage = async () => {
+      const fallDetectionToggleFromAsyncStorage = await AsyncStorage.getItem(
+        "@fallDetectionToggle",
+      );
+      if (fallDetectionToggleFromAsyncStorage) {
+        setFallDetectionToggle(true);
+        const smsToggleFromAsyncStorage = await AsyncStorage.getItem(
+          "@smsToggle",
+        );
+        const emailToggleFromAsyncStorage = await AsyncStorage.getItem(
+          "@emailToggle",
+        );
+        // Set smsToggle and emailToggle to true if fallDetectionToggle and smsToggle and emailToggle are true.
+        if (smsToggleFromAsyncStorage) {
+          setSmsToggle(true);
+        }
+        if (emailToggleFromAsyncStorage) {
+          setEmailToggle(true);
+        }
+      } else {
+        setFallDetectionToggle(false);
+        setSmsToggle(false);
+        setEmailToggle(false);
+        await removeAsyncStorages(["@smsToggle", "@emailToggle"]);
+      }
+    };
+
+    setAutomationFromAsyncStorage();
+    setFallDetectionFromAsyncStorage();
+  }, []);
+
+  useEffect(() => {
+    // console.log('automation toggle: ', automationToggle);
+    if (automationToggle) {
+      setFallDetectionToggleDisabled(false);
+      // console.log(
+      //   'fall detection toggle Disabled:',
+      //   fallDetectionToggleDisabled,
+      // );
+    } else {
+      setFallDetectionToggle(false);
+      setFallDetectionToggleDisabled(true);
+    }
+  }, [automationToggle]);
 
   return (
     <View style={styles.container}>
       {/* Modal for denied permission*/}
       <PermissionModal
         TextContent={
-          'MedXpert needs send sms permission to send emergency sms text to emergency contacts.'
+          "MedXpert needs send sms permission to send emergency sms text to emergency contacts."
         }
+        buttonLeftTitle={"Go to Home"}
         buttonLeftOnPress={() => {
-          // BackHandler.exitApp();
+          navigation.navigate("Home");
         }}
+        buttonRightTitle={"Give Permission"}
         buttonOnRightOnPress={async () => {
           await checkPermission(); // If button is clicked request permission again
         }}
-        buttonLeftTitle={'Cancel'}
-        buttonRightTitle={'Give Permission'}
         modalVisibility={sendSmsPermissionDenied}
+        buttonWidth={150}
       />
 
       {/* Modal for blocked permission */}
       <PermissionModal
         TextContent={
-          'MedXpert needs send sms permission to send emergency sms text to emergency contacts. please go to settings and give send sms permission.'
+          "MedXpert needs send sms permission to send emergency sms text to emergency contacts. please go to settings and give send sms permission."
         }
+        buttonLeftTitle={"Go to Home"}
         buttonLeftOnPress={() => {
-          BackHandler.exitApp();
+          navigation.navigate("Home");
         }}
+        buttonRightTitle={"Go to settings"}
         buttonOnRightOnPress={() => {
           settings(); // Go to permission settings
         }}
-        buttonLeftTitle={'Close App'}
-        buttonRightTitle={'Go to settings'}
         modalVisibility={sendSmsPermissionBlocked}
-        buttonWidth={170}
+        buttonWidth={150}
+        height={190}
       />
       {/* Emergency automation title and toggle */}
       <View style={styles.emergencyAutomation}>
         <View>
-          <CustomText content={'Emergency automation'} fontSize={18} />
+          <CustomText content={"Emergency automation"} fontSize={18} />
           <CustomText
-            content={'Set automation for emergency purposes.'}
+            content={"Set automation for emergency purposes."}
             fontSize={12}
           />
         </View>
@@ -217,18 +279,18 @@ const Emergency = ({navigation}) => {
           <View style={styles.fallDetection}>
             {/* Toggle Fall detection */}
             <ToggleFeatures
-              disabled={sendSmsPermissionBlocked}
-              largeText={'Fall Detection'}
+              disabled={fallDetectionToggleDisabled}
+              largeText={"Fall Detection"}
               largeTextFontColor={
                 fallDetectionToggle ? colors.primary : colors.gray
               }
-              smallText={'Send notifications when a possible fall is detected.'}
+              smallText={"Send notifications when a possible fall is detected."}
               borderRadius={{
                 borderRadius: 30,
                 borderBottomEndRadius: fallDetectionToggle ? 0 : 30,
               }}
-              toggleFeature={fallDetectionToggle}
-              onToggleChange={onFallDetectionToggleChange}
+              value={fallDetectionToggle}
+              onValueChange={onFallDetectionToggleChange}
             />
             {/* configure where where to send emergency notice when possible fall is detected */}
             {fallDetectionToggle && (
@@ -236,7 +298,7 @@ const Emergency = ({navigation}) => {
                 {/* SMS toggle and Pressable */}
                 <Pressable
                   onPress={() => {
-                    navigation.navigate('AutomationSms');
+                    navigation.navigate("AutomationSms");
                   }}>
                   <View
                     style={[styles.sendToSection, {borderBottomEndRadius: 0}]}>
@@ -252,7 +314,7 @@ const Emergency = ({navigation}) => {
                         ]}
                         size={20}
                       />
-                      <CustomText content={'SMS'} />
+                      <CustomText content={"SMS"} />
                     </View>
                     <Switch
                       trackColor={{
@@ -268,7 +330,7 @@ const Emergency = ({navigation}) => {
                 {/* Email toggle  and Pressable*/}
                 <Pressable
                   onPress={() => {
-                    navigation.navigate('AutomationEmail');
+                    navigation.navigate("AutomationEmail");
                   }}>
                   <View style={styles.sendToSection}>
                     <View style={styles.emailTxtIcon}>
@@ -283,7 +345,7 @@ const Emergency = ({navigation}) => {
                         ]}
                         size={20}
                       />
-                      <CustomText content={'email'} />
+                      <CustomText content={"email"} />
                     </View>
                     <Switch
                       trackColor={{
@@ -300,18 +362,7 @@ const Emergency = ({navigation}) => {
               </View>
             )}
           </View>
-          {/* Ambulance service */}
-          <ToggleFeatures
-            largeText={'Ambulance Service'}
-            largeTextFontColor={
-              ambulanceServiceToggle ? colors.primary : colors.gray
-            }
-            smallText={
-              'An ambulance service for faster access to health care facilities, specially in emergency cases.'
-            }
-            toggleFeature={ambulanceServiceToggle}
-            onToggleChange={onAmbulanceToggleChange}
-          />
+        
         </View>
       </ScrollView>
     </View>
@@ -326,9 +377,9 @@ const styles = StyleSheet.create({
     paddingTop: 20,
   },
   emergencyAutomation: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     padding: 10,
   },
   configAutomation: {
@@ -338,8 +389,8 @@ const styles = StyleSheet.create({
   },
   sendToSection: {
     backgroundColor: colors.white,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
     padding: 15,
     marginTop: 10,
     marginLeft: 50,
@@ -349,11 +400,11 @@ const styles = StyleSheet.create({
   },
   fallDetectionSendTo: {},
   smsTxtIcon: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
   },
   emailTxtIcon: {
-    flexDirection: 'row',
+    flexDirection: "row",
   },
   smsAndEmailIcons: {marginRight: 10},
 });

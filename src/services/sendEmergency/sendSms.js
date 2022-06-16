@@ -2,7 +2,7 @@ import SmsAndroid from 'react-native-get-sms-android';
 export const sendSms = (phoneNumber, message) => {
   SmsAndroid.autoSend(
     JSON.stringify(phoneNumber),
-    JSON.stringify(message),
+    message,
     fail => {
       console.log('Failed with this error: ' + fail);
     },

@@ -1,15 +1,16 @@
-import {View, StyleSheet, Switch} from 'react-native';
-import React, {useState} from 'react';
+import {View, StyleSheet, Switch} from "react-native";
+import React, {useState} from "react";
 
-import colors from '../../../constants/colors';
-import {CustomText} from '../../general/CustomText';
+import colors from "../../../constants/colors";
+import {CustomText} from "../../general/CustomText";
 
 const ToggleFeatures = ({
   largeText,
-  smallText = '',
+  smallText = "",
   borderRadius = {borderRadius: 30},
-  onToggleChange,
-  toggleFeature,
+  onValueChange,
+  onChange,
+  value,
   disabled = false,
   largeTextFontColor = colors.black,
   smallTextFontColor = colors.gray,
@@ -32,9 +33,10 @@ const ToggleFeatures = ({
         <Switch
           disabled={disabled}
           trackColor={{false: colors.lightGray, true: colors.primary}}
-          thumbColor={toggleFeature ? colors.white : colors.gray}
-          onValueChange={onToggleChange}
-          value={toggleFeature}
+          thumbColor={value ? colors.white : colors.gray}
+          onValueChange={onValueChange}
+          onChange={onChange ? onChange : null}
+          value={value}
         />
       </View>
     </View>
@@ -43,9 +45,9 @@ const ToggleFeatures = ({
 
 const styles = StyleSheet.create({
   toggleContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     paddingHorizontal: 15,
     paddingVertical: 20,
     backgroundColor: colors.white,
@@ -53,7 +55,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   text: {
-    width: '80%',
+    width: "80%",
   },
   toggle: {},
 });
