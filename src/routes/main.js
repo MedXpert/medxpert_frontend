@@ -11,7 +11,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage'; // AsyncSt
 
 import SplashScreen from '../screens/welcome/Splash';
 import NavigationStackUser from './NavigationStackUser';
-import NavigationStackHCF from '../hcf/routes/NavigationStackHCF';
+import NavigationStackHCF from '../HCF/routes/NavigationStackHCF';
 import WelcomeStackScreen from './Welcome';
 import Loading from '../screens/welcome/Loading';
 import AuthStackScreen from './Auth';

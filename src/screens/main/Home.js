@@ -10,9 +10,9 @@ import {
   Pressable,
   Animated,
 } from 'react-native';
-import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
-import MapboxGL from '@rnmapbox/maps';
-import { PERMISSIONS, RESULTS, openSettings } from 'react-native-permissions';
+import React, {useState, useEffect, useCallback, useRef, useMemo} from 'react';
+import MapboxGL from '@react-native-mapbox-gl/maps';
+import {PERMISSIONS, RESULTS, openSettings} from 'react-native-permissions';
 import Geolocation from 'react-native-geolocation-service';
 import { onChange } from 'react-native-reanimated';
 import BottomSheet from '@gorhom/bottom-sheet';
