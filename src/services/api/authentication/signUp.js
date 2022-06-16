@@ -8,7 +8,7 @@ const signUp = async newUser => {
     headers: {
       'Content-Type': 'application/json',
     }
-  });
+  })
 };
 
 export { signUp };

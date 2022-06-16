@@ -14,10 +14,12 @@ import { useForm } from 'react-hook-form';
 import { CustomTextInputValidation } from '../../components/general/CustomTextInputValidation';
 import { useSignUp } from '../../hooks/authentication/useSignUp';
 import colors from '../../constants/colors';
+import {emailRegEx} from '../../constants/regEx';
+
 
 const SignUp = ({ navigation }) => {
   const { height, width } = useWindowDimensions();
-  const [isUser, setIsUser] = useState(true);
+  const [role, setRole] = useState('u');
   const register = useSignUp();
   const onSubmit = data => {
 
@@ -28,7 +30,7 @@ const SignUp = ({ navigation }) => {
       email: data.email,
       password: data.password,
       profilePicture: `https://ui-avatars.com/api/?name=${fullName}&background=random&size=120&bold=true&color=random&format=png`,
-      role: isUser ? 'u' : 'h',
+      role: role,
     }
     register.mutate({ ...newUser });
   };
@@ -41,6 +43,12 @@ const SignUp = ({ navigation }) => {
       profilePicture: "",
     }
   });
+
+  if(register.isError) {
+    console.log("*******************************************************************")
+    console.log(register)
+    console.log("*******************************************************************")
+  }
 
   return (
     <ScrollView>
@@ -74,7 +82,7 @@ const SignUp = ({ navigation }) => {
                   validate: value => {
                     const fullName = value.split(' ');
                     if (fullName.length < 2) {
-                      return 'At least father name is required.';
+                      return 'please add your father name';
                     }
                     return true;
                   }
@@ -94,6 +102,10 @@ const SignUp = ({ navigation }) => {
                     value: true,
                     message: 'Email is required.',
                   },
+                  pattern: {
+                    value: emailRegEx,
+                    message: 'Please enter a valid email address',
+                  },
                 }}
               />
             </View>
@@ -111,6 +123,13 @@ const SignUp = ({ navigation }) => {
                     value: true,
                     message: 'Password is required.',
                   },
+                  validate: value => {
+                    if (value.length < 6) {
+                      return 'password must be at least 6 characters';
+                    }
+                    return true;
+                  }
+
                 }}
               />
             </View>
@@ -146,8 +165,9 @@ const SignUp = ({ navigation }) => {
             <View>
               <CustomText content="I am a" />
               <View style={{ width: 350, paddingVertical: 10, flexDirection: 'row', justifyContent: 'flex-start' }}>
-                <CustomButton title="user" onPress={() => setIsUser(true)} backgroundColor={isUser ? colors.primary : colors.whiteSmoke} width="40%" />
-                <CustomButton title="Health Facility Owner" onPress={() => setIsUser(false)} backgroundColor={isUser ? colors.whiteSmoke : colors.primary} width="60%" />
+                <CustomButton title="user" onPress={() => setRole('u')} fontSize={14} backgroundColor={(role === 'u') ? colors.primary : colors.whiteSmoke} width="30%" />
+                <CustomButton title="Health Facility Owner" onPress={() => setRole('h')} fontSize={14} backgroundColor={(role === 'h') ? colors.primary : colors.whiteSmoke} width="40%" />
+                <CustomButton title="Ambulance" onPress={() => setRole('am')} fontSize={14} backgroundColor={(role === 'am') ? colors.primary : colors.whiteSmoke} width="30%" />
               </View>
             </View>
             {register.isError && (<CustomText content={register.error.message} fontColor={Colors.red} />)}
@@ -215,7 +235,8 @@ const styles = StyleSheet.create({
   },
   inputs: {
     width: 350,
-    height: 60,
+    height: 50,
+    elevation:0.5
   },
   registerContainer: {
     flexDirection: 'row',
