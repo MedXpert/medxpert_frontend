@@ -3,6 +3,7 @@ import BackgroundService from "react-native-background-actions";
 import {sendSms} from "../sendEmergency/sendSms";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import colors from "../../constants/colors";
+import { sendEmail } from "../sendEmergency/sendEmail";
 
 export const backgroundService = async () => {
   // You can do anything in your task such as network requests, timers and so on,
@@ -13,11 +14,10 @@ export const backgroundService = async () => {
   const sleep = async time =>
     new Promise(resolve => setTimeout(() => resolve(), time));
 
-  const {phoneNumber, message} = {
-    phoneNumber: "0916112143",
-    message:
-      "A possible fall has been detected from useNameHere phone, please check them.",
-  };
+  const message =  "A possible fall has been detected from useNameHere phone, please check them.";
+  const subject = "Possible fall detected";
+  const phoneNumber = "0916112143";
+  const email = "liyuumk@gmail.com";
 
   const veryIntensiveTask = async taskDataArguments => {
     // Example of an infinite loop task
@@ -29,9 +29,9 @@ export const backgroundService = async () => {
     await new Promise(async resolve => {
       console.log("counting for loop promise");
       for (let i = 0; counting <= 15; i++) {
+        const abort = await AsyncStorage.getItem("@fallDetectionAbort");
         counting += 1;
         console.log(counting);
-        const abort = await AsyncStorage.getItem("@fallDetectionAbort");
         if (abort) {
           break;
         }
@@ -41,8 +41,11 @@ export const backgroundService = async () => {
       const abort = await AsyncStorage.getItem("@fallDetectionAbort");
       if(!abort){
         // sendSms(phoneNumber, message);
-        console.log("Message sent");
-        return;
+        console.log("Text message sent");
+        sendEmail(email, subject, message);
+        console.log("Email sent");
+        await BackgroundService.stop();
+        
       }else{  
         await AsyncStorage.removeItem("@fallDetected");
         await AsyncStorage.removeItem("@counting");

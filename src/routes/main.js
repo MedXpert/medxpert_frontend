@@ -10,6 +10,8 @@ import React, {
 import AsyncStorage from "@react-native-async-storage/async-storage"; // AsyncStorage to store user ID and other infos after logged in
 import {FallDetectionEmitter, start} from "react-native-fall-detection-module";
 import {LogBox} from "react-native";
+import NetInfo from "@react-native-community/netinfo";
+
 
 import SplashScreen from "../screens/welcome/Splash";
 import NavigationStackUser from "./NavigationStackUser";
@@ -23,6 +25,7 @@ import {
 } from "../components/general/Context";
 import FallDetected from "../screens/main/Emergency/FallDetected";
 import {backgroundService} from "../services/backgroundService/backgroundService";
+import Connecting from "../screens/main/Connecting";
 
 // Ignore new NativeEmitter error
 LogBox.ignoreLogs(["new NativeEventEmitter"]);
@@ -36,6 +39,7 @@ const Main = () => {
   const [fallDetected, setFallDetected] = useState(false);
   const [currentCounter, setCurrentCounter] = useState();
   const [aState, setAppState] = useState(AppState.currentState);
+  const [isConnected, setIsConnected] = useState(false);
 
   // Checks if the app is being opened for the first time; when the app finishes checking this, the appIsLoading state will be set to false;
   const setOpeningForTheFirstTimeValueFunc = useCallback(async () => {
@@ -45,7 +49,6 @@ const Main = () => {
     }
     if (value === "false") {
       setOpeningForTheFirstTime(false);
-      console.log("openingForTheFirstTime: ", value);
     }
     // Set AppIsLoading false (Splash screen won't be displayed)
   }, []);
@@ -89,6 +92,17 @@ const Main = () => {
     };
   }, [checkFallDetected]);
 
+  useEffect(()=>{
+    const unsubscribe = NetInfo.addEventListener(state => {
+      // console.log("Connection type", state.type);
+     
+      setIsConnected(state.isInternetReachable);
+    });
+
+    // Unsubscribe
+    // unsubscribe();
+  });
+
   // Start listening to the fall detection events
   useEffect(() => {
     start();
@@ -108,10 +122,6 @@ const Main = () => {
     };
   }, []);
 
-  useEffect(()=>{
-    console.log("Current appstate: ", aState);
-  }, [aState]);
-
   // Listen to the fall events
   useEffect(() => {
     let isMounted = true;
@@ -126,7 +136,6 @@ const Main = () => {
 
         // If fall detection toggle is on 
         if(fallDetectionToggle){
-          console.log("Current appstate: ", AppState.currentState);
           if(aState === "background"){
             const currentCounter = await AsyncStorage.getItem("@counting");
             if(!currentCounter){
@@ -216,7 +225,7 @@ const Main = () => {
   }; // return stacks according to the state of the user.
 
   //Check whether the app finished loading; show the splash screen until it finishes loading; then call the homeOrLogin function.
-  return appIsLoading ? <SplashScreen /> : homeOrLogin();
+  return appIsLoading ? <SplashScreen /> : isConnected ? homeOrLogin() : <Connecting />;
 };
 
 export default Main;
