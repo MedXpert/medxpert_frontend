@@ -108,7 +108,7 @@ const Home = ({ navigation }) => {
           { latitude: lat, longitude: lng },
         );
         console.log(distance);
-        if (distance > 10) {
+        if (distance > 100) {
           setLocationFromMapboxLng(lng);
           setLocationFromMapboxLat(lat);
           refUserLocation.current = { longitude: lng, latitude: lat };
@@ -343,7 +343,7 @@ const Home = ({ navigation }) => {
         index={1}
         onChange={onSheetChange}
         ref={bsRef}
-        snapPoints={['7%', '35%', '100%']}>
+        snapPoints={['7%', '37%', '100%']}>
         <BottomSheetContent navigation={navigation} currentLocation={`${locationFromMapboxLng},${locationFromMapboxLat}`} />
       </BottomSheet>
     </View>
