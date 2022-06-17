@@ -1,12 +1,12 @@
-import React from 'react';
-import {QueryClient, QueryClientProvider} from 'react-query';
+import React from "react";
+import {QueryClient, QueryClientProvider} from "react-query";
 
-import {NavigationContainer} from '@react-navigation/native';
-import {darkTheme, lightTheme} from './src/constants/themes';
-import Navigator from './src/routes/main';
-import {LogBox} from 'react-native';
+import {NavigationContainer} from "@react-navigation/native";
+import {darkTheme, lightTheme} from "./src/constants/themes";
+import Navigator from "./src/routes/main";
+import {LogBox} from "react-native";
 
-LogBox.ignoreLogs(['EventEmitter.removeListener']);
+LogBox.ignoreLogs(["EventEmitter.removeListener"]);
 
 const App = () => {
   const queryClient = new QueryClient();

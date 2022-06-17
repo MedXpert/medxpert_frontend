@@ -6,6 +6,7 @@ import {
   ScrollView,
   BackHandler,
   PermissionsAndroid,
+
 } from "react-native";
 import React, {useState, useCallback, useEffect} from "react";
 import {
@@ -53,21 +54,27 @@ const Emergency = ({navigation}) => {
 
   // When Emergency automation switch is toggled.
   const onAutomationChange = async newVal => {
-    setAutomationToggle(newVal);
-    const automationToggleFromAsyncStorage = await AsyncStorage.getItem(
-      "@automationToggle",
-    );
-    // If there is no automationToggle value stored in AsyncStorage and newVal is true, then store 'true' in AsyncStorage automationToggle.
-    if (!automationToggleFromAsyncStorage && newVal) {
-      await AsyncStorage.setItem("@automationToggle", JSON.stringify("true"));
+    checkPermission();
+    if(sendSmsPermissionGranted){
+      setAutomationToggle(newVal);
+      const automationToggleFromAsyncStorage = await AsyncStorage.getItem(
+        "@automationToggle",
+      );
+      // If there is no automationToggle value stored in AsyncStorage and newVal is true, then store 'true' in AsyncStorage automationToggle.
+      if (!automationToggleFromAsyncStorage && newVal) {
+        await AsyncStorage.setItem("@automationToggle", JSON.stringify("true"));
       // Else Just remove the automationToggle value from AsyncStorage.
-    } else {
-      await AsyncStorage.removeItem("@automationToggle");
-      await AsyncStorage.removeItem("@fallDetectionToggle");
-      await AsyncStorage.removeItem("@smsToggle");
-      await AsyncStorage.removeItem("@emailToggle");
-      setFallDetectionToggle(false);
+      } else {
+        await removeAsyncStorages([
+          "@automationToggle",
+          "@fallDetectionToggle",
+          "@smsToggle",
+          "@emailToggle",
+        ]);
+        setFallDetectionToggle(false);
+      }
     }
+    
   };
 
   // When Fall Detection switch is toggled.
@@ -173,6 +180,7 @@ const Emergency = ({navigation}) => {
 
     // Check fallDetectionToggle value from AsyncStorage.
     const setFallDetectionFromAsyncStorage = async () => {
+      console.log("inside fallDetectionToggleFromAsyncStorage");
       const fallDetectionToggleFromAsyncStorage = await AsyncStorage.getItem(
         "@fallDetectionToggle",
       );
@@ -181,15 +189,21 @@ const Emergency = ({navigation}) => {
         const smsToggleFromAsyncStorage = await AsyncStorage.getItem(
           "@smsToggle",
         );
+        if (smsToggleFromAsyncStorage) {
+          setSmsToggle(true);
+        }
+        else {
+          setSmsToggle(false);
+        }
         const emailToggleFromAsyncStorage = await AsyncStorage.getItem(
           "@emailToggle",
         );
         // Set smsToggle and emailToggle to true if fallDetectionToggle and smsToggle and emailToggle are true.
-        if (smsToggleFromAsyncStorage) {
-          setSmsToggle(true);
-        }
+       
         if (emailToggleFromAsyncStorage) {
           setEmailToggle(true);
+        }else{
+          setEmailToggle(false);
         }
       } else {
         setFallDetectionToggle(false);
@@ -204,13 +218,8 @@ const Emergency = ({navigation}) => {
   }, []);
 
   useEffect(() => {
-    // console.log('automation toggle: ', automationToggle);
     if (automationToggle) {
-      setFallDetectionToggleDisabled(false);
-      // console.log(
-      //   'fall detection toggle Disabled:',
-      //   fallDetectionToggleDisabled,
-      // );
+      setFallDetectionToggleDisabled(false); 
     } else {
       setFallDetectionToggle(false);
       setFallDetectionToggleDisabled(true);
@@ -297,8 +306,9 @@ const Emergency = ({navigation}) => {
               <View style={styles.fallDetectionSendTo}>
                 {/* SMS toggle and Pressable */}
                 <Pressable
+                  disabled={!smsToggle}
                   onPress={() => {
-                    navigation.navigate("AutomationSms");
+                    navigation.push("AutomationSms");
                   }}>
                   <View
                     style={[styles.sendToSection, {borderBottomEndRadius: 0}]}>
@@ -329,8 +339,9 @@ const Emergency = ({navigation}) => {
                 </Pressable>
                 {/* Email toggle  and Pressable*/}
                 <Pressable
+                  disabled={!emailToggle}
                   onPress={() => {
-                    navigation.navigate("AutomationEmail");
+                    navigation.push("AutomationEmail");
                   }}>
                   <View style={styles.sendToSection}>
                     <View style={styles.emailTxtIcon}>

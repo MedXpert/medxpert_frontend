@@ -1,5 +1,5 @@
 import {createNativeStackNavigator} from "@react-navigation/native-stack";
-import {View, Text} from "react-native";
+import {View, Text, AppState} from "react-native";
 import React, {
   useState,
   useEffect,
@@ -34,6 +34,8 @@ const Main = () => {
   const [openingForTheFirstTime, setOpeningForTheFirstTime] = useState(true); // Whether the app is being opened for the first time.
   const [role, setRole] = useState("user");
   const [fallDetected, setFallDetected] = useState(false);
+  const [currentCounter, setCurrentCounter] = useState();
+  const [aState, setAppState] = useState(AppState.currentState);
 
   // Checks if the app is being opened for the first time; when the app finishes checking this, the appIsLoading state will be set to false;
   const setOpeningForTheFirstTimeValueFunc = useCallback(async () => {
@@ -92,6 +94,24 @@ const Main = () => {
     start();
   }, []);
 
+ 
+  useEffect(() => {
+    const appStateListener = AppState.addEventListener(
+      "change",
+      nextAppState => {
+        // console.log("Next AppState is: ", nextAppState);
+        setAppState(nextAppState);
+      },
+    );
+    return () => {
+      appStateListener.remove();
+    };
+  }, []);
+
+  useEffect(()=>{
+    console.log("Current appstate: ", aState);
+  }, [aState]);
+
   // Listen to the fall events
   useEffect(() => {
     let isMounted = true;
@@ -102,15 +122,35 @@ const Main = () => {
         await AsyncStorage.setItem("@fallDetected", "true");
         // put your data processing step here
         // setFallDetected(true);
-        await backgroundService();
+        const fallDetectionToggle = await AsyncStorage.getItem("@fallDetectionToggle");
+
+        // If fall detection toggle is on 
+        if(fallDetectionToggle){
+          console.log("Current appstate: ", AppState.currentState);
+          if(aState === "background"){
+            const currentCounter = await AsyncStorage.getItem("@counting");
+            if(!currentCounter){
+              backgroundService();
+            }
+          }
+          else if(aState === "active"){
+            const currentCounter = await AsyncStorage.getItem("@counting");
+            if(!currentCounter){
+              backgroundService();
+            }else{
+
+              setCurrentCounter(currentCounter);
+            }
+            setFallDetected(true);
+          }
+        }
       });
     }
 
     return async () => {
       isMounted = false;
-      await AsyncStorage.removeItem("@fallDetected");
     };
-  }, []);
+  }, [aState]);
 
   // Listen to the fall detection events
   useEffect(() => {
@@ -158,11 +198,16 @@ const Main = () => {
         if (fallDetected) {
           return (
             <FallContext.Provider value={fallContext}>
-              <FallDetected />
+              <FallDetected  duration={currentCounter ? parseInt(currentCounter) : 15}/>
             </FallContext.Provider>
           );
         } else {
           return <NavigationStackUser />;
+          // return (
+          //   <FallContext.Provider value={fallContext}>
+          //     <FallDetected />
+          //   </FallContext.Provider>
+          // );
         }
       } else if (role === "admin") {
         return <NavigationStackHCF />;

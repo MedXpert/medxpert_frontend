@@ -19,6 +19,7 @@ import BottomSheet from "@gorhom/bottom-sheet";
 // import MapboxDirectionsFactory from '@mapbox/mapbox-sdk/services/directions';
 import {lineString as makeLineString} from "@turf/helpers";
 import axios from "axios";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import IconAntDesign from "react-native-vector-icons/AntDesign";
 import IconMaterialCommunity from "react-native-vector-icons/MaterialCommunityIcons";
@@ -123,7 +124,7 @@ const Home = ({navigation}) => {
           {latitude: lat, longitude: lng},
         );
         // console.log(distance);
-        if (distance > 20) {
+        if (distance > 10) {
           setLocationFromMapboxLng(lng);
           setLocationFromMapboxLat(lat);
           refUserLocation.current = {longitude: lng, latitude: lat};
@@ -194,10 +195,7 @@ const Home = ({navigation}) => {
 
     const res = await axios.get(
       `https://api.geoapify.com/v1/routing?waypoints=${startLoc.latitude},${startLoc.longitude}|${destLoc.latitude},${destLoc.longitude}&mode=drive&apiKey=${geoApifyAccessToken}`,
-    );
-    console.log("====================================");
-    console.log(res);
-    console.log("====================================");
+    ); 
 
     const coordinates = res.data.features[0].geometry.coordinates[0];
     const routeLineString = makeLineString(coordinates, {name: "line 1"});
@@ -258,6 +256,17 @@ const Home = ({navigation}) => {
       );
     }
   }, [checkPermission, locationPermissionGranted]);
+
+  useEffect(()=>{
+    const cleanUp = async ()=> {
+      await AsyncStorage.removeItem("@abortBackgroundFall");
+      await AsyncStorage.removeItem("@counting");
+      await AsyncStorage.removeItem("@fallDetectionAbort");
+      await AsyncStorage.removeItem("@fallDetected");
+    };
+    cleanUp();
+	
+  });
 
   useEffect(() => {
     if (locationFromMapboxLng && locationFromMapboxLat) {
