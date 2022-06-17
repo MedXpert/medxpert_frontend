@@ -199,7 +199,9 @@ const styles = StyleSheet.create({
     marginRight: 5,
     marginLeft: 5,
     borderRadius: 10,
-    elevation: 5,
+    elevation: 2,
+    borderTopWidth: 1,
+    borderTopColor: colors.whiteSmoke,
   },
   renderContainerImage: {
     flex: 1.5,
