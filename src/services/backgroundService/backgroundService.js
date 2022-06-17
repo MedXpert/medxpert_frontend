@@ -25,10 +25,10 @@ export const backgroundService = async () => {
 
     const {delay} = taskDataArguments;
     var counting = 0;
-
+    var sent = false;
     await new Promise(async resolve => {
       console.log("counting for loop promise");
-      for (let i = 0; counting <= 15; i++) {
+      for (let i = 0; counting <= 14; i++) {
         const abort = await AsyncStorage.getItem("@fallDetectionAbort");
         counting += 1;
         console.log(counting);
@@ -39,13 +39,14 @@ export const backgroundService = async () => {
         await sleep(delay);
       }
       const abort = await AsyncStorage.getItem("@fallDetectionAbort");
-      if(!abort){
+      if(!abort && !sent){
         // sendSms(phoneNumber, message);
         console.log("Text message sent");
         sendEmail(email, subject, message);
         console.log("Email sent");
         await BackgroundService.stop();
-        
+        sent = true;
+        return;
       }else{  
         await AsyncStorage.removeItem("@fallDetected");
         await AsyncStorage.removeItem("@counting");

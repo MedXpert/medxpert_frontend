@@ -58,8 +58,8 @@ const FallDetected = ({duration = 15}) => {
         <CountdownCircleTimer
           isPlaying
           duration={parseInt(duration)}
-          colors={["#004777", "#F7B801", "#A30000", "#A30000"]}
-          colorsTime={[7, 5, 2, 0]}
+          colors={["#004777", "#F7B801", "#A30000", colors.red]}
+          colorsTime={[12, 9, 6, 3]}
           onComplete={onFinish}
         >
           {({ remainingTime }) => <CustomText content={remainingTime} fontSize={30}></CustomText>}
@@ -100,7 +100,7 @@ const styles = StyleSheet.create({
   },
   buttons: {
     flexDirection: "row",
-    width: "70%",
+    width: "80%",
     alignItems: "center",
     justifyContent: "center",
     marginTop: 30,
