@@ -1,11 +1,7 @@
-import axios from 'axios';
+import httpClient from "../../auth/httpClient";
+
 const deleteAppointment = async id => {
-  try {
-    const deleteApp = await axios.delete(`/api/appointments/${id}`);
-    return deleteApp;
-  } catch (e) {
-    console.log(e);
-  }
+  return await httpClient.delete(`/appointment/${id}`);
 };
 
 export {deleteAppointment};

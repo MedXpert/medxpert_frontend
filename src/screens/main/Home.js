@@ -43,7 +43,7 @@ import {RenderDirection} from "../../components/general/RenderDirection";
 const dimensionHeight = Dimensions.get("window").height;
 const dimensionWidth = Dimensions.get("window").width;
 
-const Home = ({navigation}) => {
+const Home = ({ navigation }) => {
   var _map;
   var _camera;
   var bsRef = useRef();
@@ -155,7 +155,7 @@ const Home = ({navigation}) => {
         // See error code charts below.
         console.log(error.code, error.message);
       },
-      {enableHighAccuracy: true, timeout: 15000, maximumAge: 10000},
+      { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 },
     );
 
     await _camera.flyTo([userPositionLng, userPositionLat]);
@@ -252,7 +252,7 @@ const Home = ({navigation}) => {
           // See error code charts below.
           console.log(error.code, error.message);
         },
-        {enableHighAccuracy: true, timeout: 15000, maximumAge: 10000},
+        { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 },
       );
     }
   }, [checkPermission, locationPermissionGranted]);
@@ -343,7 +343,7 @@ const Home = ({navigation}) => {
           // ref={c => (_map = c)}
           ref={c => (_map = c)}
           logoEnabled={false}
-          compassViewMargins={{x: 10, y: (30 * dimensionHeight) / 100}}
+          compassViewMargins={{ x: 10, y: (30 * dimensionHeight) / 100 }}
           style={styles.map}
           surfaceView>
           {/* Display user location */}
@@ -421,7 +421,7 @@ const Home = ({navigation}) => {
         onChange={onSheetChange}
         ref={bsRef}
         snapPoints={["7%", "35%", "100%"]}>
-        <BottomSheetContent navigation={navigation} />
+        <BottomSheetContent navigation={navigation} currentLocation={`${locationFromMapboxLng},${locationFromMapboxLat}`} />
       </BottomSheet>
     </View>
   );

@@ -26,6 +26,7 @@ import {
 import FallDetected from "../screens/main/Emergency/FallDetected";
 import {backgroundService} from "../services/backgroundService/backgroundService";
 import Connecting from "../screens/main/Connecting";
+import Loading from "../screens/welcome/Loading";
 
 // Ignore new NativeEmitter error
 LogBox.ignoreLogs(["new NativeEventEmitter"]);
@@ -54,10 +55,12 @@ const Main = () => {
   }, []);
 
   const checkLoginStatus = useCallback(async () => {
-    const token = await AsyncStorage.getItem("@token");
+    const token = await AsyncStorage.getItem("@accessToken");
     if (token == null) {
       setIsLoggedIn(false);
     } else if (token) {
+      const userRole = await AsyncStorage.getItem("@role");
+      setRole(userRole);
       setIsLoggedIn(true);
     }
   }, []);
@@ -175,51 +178,35 @@ const Main = () => {
     return () => {
       isMounted = false;
     };
-  }, [setOpeningForTheFirstTimeValueFunc, checkLoginStatus, checkFallDetected]);
-
+  }, [setOpeningForTheFirstTimeValueFunc, checkLoginStatus.apply, checkFallDetected]);
+  console.log("role", role);
   const homeOrLogin = () => {
-    if (openingForTheFirstTime && !isLoggedIn) {
-      return (
-        <WelcomeContext.Provider value={welcomeContext}>
-          <WelcomeStackScreen />
-        </WelcomeContext.Provider>
-      );
-    } else if (!openingForTheFirstTime && !isLoggedIn) {
-      return (
-        <AuthContext.Provider value={authContext}>
-          <AuthStackScreen />
-        </AuthContext.Provider>
-      );
-    } else if (isLoggedIn) {
-      // Temporarily used to store static user id
-      const storeData = async () => {
-        try {
-          await AsyncStorage.setItem("@userId", "1");
-        } catch (e) {
-          // saving error
-          console.warn("userId store error:  ", e);
-        }
-      };
-      storeData();
-
+    if (isLoggedIn) {
       // Check role
-      if (role === "user") {
-        if (fallDetected) {
-          return (
-            <FallContext.Provider value={fallContext}>
-              <FallDetected  duration={currentCounter ? parseInt(currentCounter) : 15}/>
-            </FallContext.Provider>
-          );
-        } else {
-          return <NavigationStackUser />;
-          // return (
-          //   <FallContext.Provider value={fallContext}>
-          //     <FallDetected />
-          //   </FallContext.Provider>
-          // );
-        }
-      } else if (role === "admin") {
-        return <NavigationStackHCF />;
+      if (role === "u") {
+        return (
+          <AuthContext.Provider value={authContext}>
+            <NavigationStackUser />
+          </AuthContext.Provider>
+        );
+      } else if (role === "h") {
+        return <AuthContext.Provider value={authContext}><NavigationStackHCF /></AuthContext.Provider>;
+      } else {
+        return <AuthContext.Provider value={authContext}><Loading /></AuthContext.Provider>;
+      }
+    } else {
+      if (openingForTheFirstTime) {
+        return (
+          <WelcomeContext.Provider value={welcomeContext}>
+            <WelcomeStackScreen />
+          </WelcomeContext.Provider>
+        );
+      } else {
+        return (
+          <AuthContext.Provider value={authContext}>
+            <AuthStackScreen />
+          </AuthContext.Provider>
+        );
       }
     }
   }; // return stacks according to the state of the user.
