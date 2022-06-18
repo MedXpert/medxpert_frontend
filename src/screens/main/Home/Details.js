@@ -98,14 +98,6 @@ const Details = ({ route, navigation }) => {
     />
   );
 
-  // if(isSuccess) {
-  //   if(data.imageGallaryLinks.length !== 0) {
-  //     console.log(data.imageGallaryLinks[0])
-  //     // setSelectedImage(data.imageGallaryLinks[0]);
-  //   }
-
-  //   console.log(selectedImage);
-  // }
   return (
     <View style={styles.container}>
       {isLoading && (
