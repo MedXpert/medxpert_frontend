@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import {
   View,
-  ImageBackground,
   FlatList,
   Image,
   StyleSheet,
   Pressable,
   Modal,
-  Text,
   Dimensions,
+  Platform,
+  Linking
 } from 'react-native';
 import ContentLoader, {
   FacebookLoader,
@@ -76,6 +76,17 @@ const Details = ({ route, navigation }) => {
         return `${Math.round(travelTimeInCarHours)} h`;
       }
     }
+  }
+
+  const makeACall = (phone) => {
+    if (Platform.OS === 'android') {
+      phoneNumber = `tel:${phone}`;
+    }
+    else {
+      phoneNumber = `telprompt:${phone}`;
+    }
+
+    Linking.openURL(phoneNumber);
   }
 
   const renderItem = ({ item }) => (
@@ -160,18 +171,18 @@ const Details = ({ route, navigation }) => {
           </View>
           <View style={styles.main}>
             <View style={styles.mainContainer}>
-              <View style={{flexDirection: 'row', alignItems: 'center'}}>
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                 <CustomText
                   fontSize={26}
                   customStyles={styles.bold}
                   content={data.name}
                   customStyle={styles.marginRight5}
                 />
-                {(data.verificationIndexPer10 === 5) ? 
-                (<IconFontAws name="check" size={20} color={Colors.primary} />) : 
-                data.verificationIndexPer10 == 10 ?
-                (<IconFontAws name="check-double" size={20} color={Colors.primary} />) :
-                (null)                
+                {(data.verificationIndexPer10 === 5) ?
+                  (<IconFontAws name="check" size={20} color={Colors.primary} />) :
+                  data.verificationIndexPer10 == 10 ?
+                    (<IconFontAws name="check-double" size={20} color={Colors.primary} />) :
+                    (null)
                 }
               </View>
               <View style={styles.location}>
@@ -221,14 +232,14 @@ const Details = ({ route, navigation }) => {
                     content="Travel Time"
                     customStyles={styles.typeTravelElement}
                   />
-                  <View style={{flexDirection: 'row', alignContent: 'center'}}>
-                    <IconFontAws name="walking" size={14} color={Colors.primary}/>
+                  <View style={{ flexDirection: 'row', alignContent: 'center' }}>
+                    <IconFontAws name="walking" size={14} color={Colors.primary} />
                     <CustomText
                       content={travelTime(true)}
                       fontColor={Colors.gray}
                       customStyles={[styles.marginLeft5, styles.marginRight5]}
                     />
-                    <IconFontAws name="car-alt" size={16} color={Colors.primary}  />
+                    <IconFontAws name="car-alt" size={16} color={Colors.primary} />
                     <CustomText
                       content={travelTime(false)}
                       fontColor={Colors.gray}
@@ -247,7 +258,7 @@ const Details = ({ route, navigation }) => {
                   content={data.description || `Hello there, ${data.name} is ${travelDistance} away from you.it will take you ${travelTime(true)} to walk there and ${travelTime(false)} to drive there. To continue, click the direction button and navigate using the map to get to them.`}
                   fontColor={Colors.gray}
                   fontSize={14}
-                  customStyles={{textAlign:'justify'}}
+                  customStyles={{ textAlign: 'justify' }}
                 />
               </View>
 
@@ -287,22 +298,24 @@ const Details = ({ route, navigation }) => {
                     });
                   }}
                 />
-
-                <CustomButton
-                  title="Call"
-                  fontSize={13}
-                  width={100}
-                  height={45}
-                  fontColor={Colors.lightGray}
-                  customStyle={[styles.buttonStyle, styles.grayButtons]}
-                  icon={
-                    <IconEntypo
-                      name="phone"
-                      size={20}
-                      color={Colors.lightGray}
-                    />
-                  }
-                />
+                {data.phoneNumbers && data.phoneNumbers.length > 0 && (
+                  <CustomButton
+                    title="Call"
+                    onPress={() => { makeACall(data.phoneNumbers[0]) }}
+                    fontSize={13}
+                    width={100}
+                    height={45}
+                    fontColor={Colors.lightGray}
+                    customStyle={[styles.buttonStyle, styles.grayButtons]}
+                    icon={
+                      <IconEntypo
+                        name="phone"
+                        size={20}
+                        color={Colors.lightGray}
+                      />
+                    }
+                  />)
+                }
               </View>
             </View>
           </View>
@@ -370,7 +383,7 @@ const styles = StyleSheet.create({
   bold: { fontWeight: 'bold' },
   location: { flexDirection: 'row', marginVertical: 5 },
   marginLeft5: { marginLeft: 5 },
-  marginRight5: {marginRight: 5},
+  marginRight5: { marginRight: 5 },
   stars: { width: 150, marginBottom: 5 },
   open: { fontSize: 14, marginTop: 5 },
   typeAndTravel: {
