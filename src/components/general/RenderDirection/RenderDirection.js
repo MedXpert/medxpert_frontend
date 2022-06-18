@@ -1,7 +1,7 @@
 import {View, Text} from 'react-native';
 import React from 'react';
 
-import MapboxGL from '@rnmapbox/maps';
+import MapboxGL from '@react-native-mapbox-gl/maps';
 
 const RenderDirection = ({route}) => {
   return (
