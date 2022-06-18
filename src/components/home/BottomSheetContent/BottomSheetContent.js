@@ -33,15 +33,15 @@ const BottomSheetContent = ({ navigation, currentLocation }) => {
     return coordinate.substring(17, coordinate.length - 1).split(' ').map((item) => parseFloat(item));
   }
 
-  const getDistanceFromGPS = (coordinateString) => {
+  const getDistanceFromGPS = (coordinateString, withString=false) => {
     const coordinate = getGPSFromString(coordinateString);
     const current = currentLocation.split(',')
     const distance =  getDistance(
         { latitude: current[0], longitude: current[1] },
         { latitude: coordinate[0], longitude: coordinate[1]},
       );
-    return distance > 1000 ? `${(distance / 1000).toFixed(2)} km` : `${distance} m`;; 
-    
+
+    return withString ? distance: distance > 1000 ? `${(distance / 1000).toFixed(2)} km` : `${distance} m`; 
   }
 
 
@@ -63,7 +63,7 @@ const BottomSheetContent = ({ navigation, currentLocation }) => {
     return (
       <Pressable
         onPress={() => {
-          navigation.navigate('Details', { id: item.id });
+          navigation.navigate('Details', { id: item.id, travelDistance: getDistanceFromGPS(item.GPSCoordinates, true) });
         }}>
         <View style={styles.renderContainer}>
           {/* Card Image */}
