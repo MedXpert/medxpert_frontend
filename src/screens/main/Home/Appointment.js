@@ -1,30 +1,30 @@
-import {View, StyleSheet, Modal, ActivityIndicator} from 'react-native';
-import React, {useState, useEffect, useCallback, useMemo} from 'react';
-import {Calendar, CalendarList, Agenda} from 'react-native-calendars';
-import Spinner from 'react-native-spinkit';
+import {View, StyleSheet, Modal, ActivityIndicator} from "react-native";
+import React, {useState, useEffect, useCallback, useMemo} from "react";
+import {Calendar, CalendarList, Agenda} from "react-native-calendars";
+import Spinner from "react-native-spinkit";
 
-import {CustomText} from '../../../components/general/CustomText';
-import colors from '../../../constants/colors';
-import IconEntypo from 'react-native-vector-icons/Entypo';
-import IonIcons from 'react-native-vector-icons/Ionicons';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import {CustomButton} from '../../../components/general/CustomButton';
-import {BackButton} from '../../../components/general/BackButton';
-import {CustomModal} from '../../../components/general/CustomModal/CustomModal';
-import PushNotification, {Importance} from 'react-native-push-notification';
-import RNDisableBatteryOptimizationsAndroid from 'react-native-disable-battery-optimizations-android';
+import {CustomText} from "../../../components/general/CustomText";
+import colors from "../../../constants/colors";
+import IconEntypo from "react-native-vector-icons/Entypo";
+import IonIcons from "react-native-vector-icons/Ionicons";
+import FontAwesome from "react-native-vector-icons/FontAwesome";
+import {CustomButton} from "../../../components/general/CustomButton";
+import {BackButton} from "../../../components/general/BackButton";
+import {CustomModal} from "../../../components/general/CustomModal/CustomModal";
+import PushNotification, {Importance} from "react-native-push-notification";
+import RNDisableBatteryOptimizationsAndroid from "react-native-disable-battery-optimizations-android";
 import {
   useAppointment,
   useCreateAppointment,
   useDeleteAppointment,
   useUpdateAppointment,
-} from '../../../hooks/appointment';
-import {readAsyncStorage} from '../../../services/readAsyncStorage';
-import {AppointmentModel} from '../../../models/Appointment';
-import {useHealthCareFacility} from '../../../hooks/healthCareFacility';
-import {create} from 'react-test-renderer';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import {log} from 'react-native-reanimated';
+} from "../../../hooks/appointment";
+import {readAsyncStorage} from "../../../services/readAsyncStorage";
+import {AppointmentModel} from "../../../models/Appointment";
+import {useHealthCareFacility} from "../../../hooks/healthCareFacility";
+import {create} from "react-test-renderer";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import {log} from "react-native-reanimated";
 
 const Appointment = ({route, navigation}) => {
   // const [markedDates, setMarkedDates] = useState({});
@@ -64,13 +64,13 @@ const Appointment = ({route, navigation}) => {
 
     var YearMonthDateString =
       year.toString() +
-      '-' +
-      (month + 1).toLocaleString('en-US', {
+      "-" +
+      (month + 1).toLocaleString("en-US", {
         minimumIntegerDigits: 2,
         useGrouping: false,
       }) +
-      '-' +
-      date.toLocaleString('en-US', {
+      "-" +
+      date.toLocaleString("en-US", {
         minimumIntegerDigits: 2,
         useGrouping: false,
       });
@@ -88,11 +88,11 @@ const Appointment = ({route, navigation}) => {
   const sendAppointmentRequest = async () => {
     var appointmentModel = new AppointmentModel(
       null,
-      await readAsyncStorage('userId'),
+      await readAsyncStorage("userId"),
       hcfId,
       healthCareFacility.data.type,
       selectedDate.dateString,
-      'pending',
+      "pending",
       false,
     );
 
@@ -126,11 +126,11 @@ const Appointment = ({route, navigation}) => {
   const createAppointmentChannel = () => {
     PushNotification.createChannel(
       {
-        channelId: 'appointmentReminderChannel',
-        channelName: 'Appointment Reminder',
-        channelDescription: 'A channel for appointment Reminder',
+        channelId: "appointmentReminderChannel",
+        channelName: "Appointment Reminder",
+        channelDescription: "A channel for appointment Reminder",
         playSound: true,
-        soundName: 'default',
+        soundName: "default",
         importance: Importance.HIGH,
         vibrate: true,
       },
@@ -156,14 +156,14 @@ const Appointment = ({route, navigation}) => {
   const setReminder = () => {
     if (appointment.data) {
       PushNotification.localNotificationSchedule({
-        channelId: 'appointmentReminderChannel',
+        channelId: "appointmentReminderChannel",
         // id: 'appointmentPushReminder',
-        title: 'Appointment reminder',
+        title: "Appointment reminder",
         allowWhileIdle: false,
         message:
-          'You have an appointment at 5 O"clock at' + appointment.data.name,
+          "You have an appointment at 5 O\"clock at" + appointment.data.name,
         date: new Date(appointment.data.dateTime),
-        subText: 'Medxpert appointment reminder',
+        subText: "Medxpert appointment reminder",
         // bigPictureUrl: 'https://www.example.tld/picture.jpg',
       });
     }
@@ -206,13 +206,13 @@ const Appointment = ({route, navigation}) => {
       const dat = new Date(appointment.data.dateTime);
       const appointmentDateString =
         dat.getFullYear().toString() +
-        '-' +
-        (dat.getMonth() + 1).toLocaleString('en-US', {
+        "-" +
+        (dat.getMonth() + 1).toLocaleString("en-US", {
           minimumIntegerDigits: 2,
           useGrouping: false,
         }) +
-        '-' +
-        (dat.getDate() + 1).toLocaleString('en-US', {
+        "-" +
+        (dat.getDate() + 1).toLocaleString("en-US", {
           minimumIntegerDigits: 2,
           useGrouping: false,
         });
@@ -221,11 +221,11 @@ const Appointment = ({route, navigation}) => {
         selected: true,
 
         selectedColor:
-          appointment.data.status === 'pending'
+          appointment.data.status === "pending"
             ? colors.golden
-            : appointment.data.status === 'scheduled'
-            ? colors.primary
-            : null,
+            : appointment.data.status === "scheduled"
+              ? colors.primary
+              : null,
       };
       selectedDateObj[getYearMonthDate()] = {
         disabled: false,
@@ -258,13 +258,13 @@ const Appointment = ({route, navigation}) => {
       )}
 
       {appointment.isError && (
-        <View style={{justifyContent: 'center', flex: 1}}>
+        <View style={{justifyContent: "center", flex: 1}}>
           <CustomText content={appointment.error} />
         </View>
       )}
 
       {healthCareFacility.isError && (
-        <View style={{justifyContent: 'center', flex: 1}}>
+        <View style={{justifyContent: "center", flex: 1}}>
           <CustomText content={healthCareFacility.error} />
         </View>
       )}
@@ -305,18 +305,18 @@ const Appointment = ({route, navigation}) => {
           <CustomModal
             transparent
             visibility={scheduleAppointmentModalVisibility}
-            animationType={'fade'}
-            modalTitle={'Send request'}
+            animationType={"fade"}
+            modalTitle={"Send request"}
             modalContent={
-              'Do you want to schedule an appointment on ' +
+              "Do you want to schedule an appointment on " +
               selectedDate.dateString +
-              '?'
+              "?"
             }
-            leftButtonTitle={'Cancel'}
+            leftButtonTitle={"Cancel"}
             onPressLeftButton={() => {
               setScheduleAppointmentModalVisibility(false);
             }}
-            rightButtonTitle={'Yes'}
+            rightButtonTitle={"Yes"}
             onPressRightButton={() => {
               onModalScheduleYesPressed();
             }}
@@ -328,14 +328,14 @@ const Appointment = ({route, navigation}) => {
           <CustomModal
             transparent
             visibility={cancelAppointmentModalVisibility}
-            animationType={'fade'}
-            modalTitle={'Cancel Appointment'}
-            modalContent={'Are you Sure you want to cancel this appointment?'}
-            leftButtonTitle={'Cancel'}
+            animationType={"fade"}
+            modalTitle={"Cancel Appointment"}
+            modalContent={"Are you Sure you want to cancel this appointment?"}
+            leftButtonTitle={"Cancel"}
             onPressLeftButton={() => {
               setCancelAppointmentModalVisibility(false);
             }}
-            rightButtonTitle={'Yes'}
+            rightButtonTitle={"Yes"}
             onPressRightButton={onModalCancelYesPressed}
           />
 
@@ -345,7 +345,7 @@ const Appointment = ({route, navigation}) => {
               {/* If there is no appointment show choose a date text */}
               {!appointment.data && (
                 <CustomText
-                  content={'Choose a date'}
+                  content={"Choose a date"}
                   fontColor={colors.primary}
                 />
               )}
@@ -362,17 +362,17 @@ const Appointment = ({route, navigation}) => {
             <View style={styles.legendContainer}>
               <View style={styles.datesLegend}>
                 <View style={[styles.greenCircleLegend, styles.legendCircle]} />
-                <CustomText content={'Available Dates'} />
+                <CustomText content={"Available Dates"} />
               </View>
               <View style={styles.datesLegend}>
                 <View
                   style={[styles.goldenCircleLegend, styles.legendCircle]}
                 />
-                <CustomText content={'Pending Appointment'} />
+                <CustomText content={"Pending Appointment"} />
               </View>
               <View style={styles.datesLegend}>
                 <View style={[styles.blueCircleLegend, styles.legendCircle]} />
-                <CustomText content={'Scheduled Appointment'} />
+                <CustomText content={"Scheduled Appointment"} />
               </View>
             </View>
           </View>
@@ -381,14 +381,14 @@ const Appointment = ({route, navigation}) => {
           <View style={styles.yourAppointmentsContainer}>
             <View style={styles.titleAndCancelButton}>
               <CustomText
-                content={'Your Appointment'}
+                content={"Your Appointment"}
                 fontSize={16}
                 fontColor={colors.primary}
               />
               {appointment.data && (
                 <View style={styles.reminderAndCancel}>
                   {/* Show Reminder icon if an appointment is scheduled */}
-                  {appointment.data.status === 'scheduled' && (
+                  {appointment.data.status === "scheduled" && (
                     <>
                       <ActivityIndicator
                         animating={
@@ -400,29 +400,29 @@ const Appointment = ({route, navigation}) => {
 
                       {!updateAppointment.isLoading &&
                         !appointment.isRefetching && (
-                          <FontAwesome
-                            name={
-                              appointment.data.reminderStatus
-                                ? 'bell'
-                                : 'bell-slash-o'
-                            }
-                            color={
-                              appointment.data.reminderStatus
-                                ? colors.primary
-                                : colors.gray
-                            }
-                            size={20}
-                            style={{marginRight: 15}}
-                            onPress={onReminderPressed}
-                          />
-                        )}
+                        <FontAwesome
+                          name={
+                            appointment.data.reminderStatus
+                              ? "bell"
+                              : "bell-slash-o"
+                          }
+                          color={
+                            appointment.data.reminderStatus
+                              ? colors.primary
+                              : colors.gray
+                          }
+                          size={20}
+                          style={{marginRight: 15}}
+                          onPress={onReminderPressed}
+                        />
+                      )}
                     </>
                   )}
 
                   {/*Cancel button is shown in 'Your appointment' section if an
               appointment is pending or scheduled*/}
                   <CustomButton
-                    title={'Cancel'}
+                    title={"Cancel"}
                     height={30}
                     width={75}
                     fontSize={12}
@@ -442,7 +442,7 @@ const Appointment = ({route, navigation}) => {
                   <CustomText
                     content={new Date(appointment.data.dateTime).toDateString()}
                   />
-                  {appointment.data.status === 'scheduled' && (
+                  {appointment.data.status === "scheduled" && (
                     <CustomText
                       content={new Date(
                         appointment.data.dateTime,
@@ -452,7 +452,7 @@ const Appointment = ({route, navigation}) => {
                   {/* Show the status of the appointment  */}
                   <View style={styles.appointmentStatus}>
                     <CustomText
-                      content={'Status'}
+                      content={"Status"}
                       customStyles={{marginRight: 10}}
                     />
                     <CustomText
@@ -460,9 +460,9 @@ const Appointment = ({route, navigation}) => {
                       fontColor={colors.gray}
                     />
                   </View>
-                  {appointment.data.status === 'scheduled' && (
+                  {appointment.data.status === "scheduled" && (
                     <CustomText
-                      content={'Appointment ID  ' + appointment.data.id}
+                      content={"Appointment ID  " + appointment.data.id}
                       fontColor={colors.lightGray}
                     />
                   )}
@@ -471,7 +471,7 @@ const Appointment = ({route, navigation}) => {
 
               {!appointment.data && (
                 <CustomText
-                  content={'No pending or scheduled Appointment.'}
+                  content={"No pending or scheduled Appointment."}
                   fontColor={colors.gray}
                 />
               )}
@@ -485,11 +485,11 @@ const Appointment = ({route, navigation}) => {
 
 const styles = StyleSheet.create({
   datesLegend: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   appointmentStatus: {
-    flexDirection: 'row',
+    flexDirection: "row",
   },
 
   calendarContainer: {
@@ -527,7 +527,7 @@ const styles = StyleSheet.create({
   healthFacilityInfo: {},
   healthFacilityNameFont: {
     fontSize: 24,
-    fontWeight: '600',
+    fontWeight: "600",
   },
 
   legendContainer: {
@@ -535,30 +535,30 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   location: {
-    flexDirection: 'row',
+    flexDirection: "row",
   },
   modalContainer: {
     // flex: 1,
     // justifyContent: 'center',
   },
   nameAndBackButton: {
-    flexDirection: 'row',
-    width: '85%',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    width: "85%",
+    justifyContent: "space-between",
+    alignItems: "center",
   },
   reminderAndCancel: {
-    flexDirection: 'row',
+    flexDirection: "row",
   },
   spinnerContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
 
   titleAndCancelButton: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
   },
   yourAppointmentsContainer: {
     marginTop: 30,
@@ -568,8 +568,8 @@ const styles = StyleSheet.create({
     elevation: 4,
   },
   yourAppointmentsBody: {
-    justifyContent: 'center',
-    height: '80%',
+    justifyContent: "center",
+    height: "80%",
   },
 });
 export default Appointment;

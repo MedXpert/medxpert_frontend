@@ -36,7 +36,7 @@ const Main = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(); // User state value from the cache  -- check if a login token exists
   const [appIsLoading, setAppIsLoading] = useState(true); // whether the app is loading or finished loading.
   const [openingForTheFirstTime, setOpeningForTheFirstTime] = useState(true); // Whether the app is being opened for the first time.
-  const [role, setRole] = useState("user");
+  const [role, setRole] = useState();
   const [fallDetected, setFallDetected] = useState(false);
   const [currentCounter, setCurrentCounter] = useState();
   const [aState, setAppState] = useState(AppState.currentState);
@@ -108,8 +108,12 @@ const Main = () => {
 
   // Start listening to the fall detection events
   useEffect(() => {
-    start();
-  }, []);
+    if(role === "u"){
+      start();
+    }else if(role === "ab" || role == "h") {
+      stop();
+    }
+  }, [role]);
 
  
   useEffect(() => {
@@ -130,33 +134,35 @@ const Main = () => {
     let isMounted = true;
 
     if (isMounted) {
+      
       FallDetectionEmitter.addListener("fall", async newData => {
         console.log(newData);
         await AsyncStorage.setItem("@fallDetected", "true");
         // put your data processing step here
         // setFallDetected(true);
         const fallDetectionToggle = await AsyncStorage.getItem("@fallDetectionToggle");
-
+          
         // If fall detection toggle is on 
-        if(fallDetectionToggle){
-          if(aState === "background"){
-            const currentCounter = await AsyncStorage.getItem("@counting");
-            if(!currentCounter){
-              backgroundService();
-            }
+        const smsToggle = await AsyncStorage.getItem("@smsToggle");
+        const emailToggle = await AsyncStorage.getItem("@emailToggle");
+
+        if(fallDetectionToggle && (smsToggle || emailToggle)){
+          const currentCounter = await AsyncStorage.getItem("@counting");
+          if(aState === "background" && !currentCounter){
+            backgroundService();
           }
           else if(aState === "active"){
             const currentCounter = await AsyncStorage.getItem("@counting");
             if(!currentCounter){
               backgroundService();
             }else{
-
               setCurrentCounter(currentCounter);
             }
             setFallDetected(true);
           }
         }
       });
+      
     }
 
     return async () => {
@@ -184,15 +190,32 @@ const Main = () => {
     if (isLoggedIn) {
       // Check role
       if (role === "u") {
+        if(fallDetected){
+          return (
+            <FallContext.Provider value={fallContext}>
+              <FallDetected  duration={currentCounter ? parseInt(currentCounter) : 15}/>
+            </FallContext.Provider>
+          );
+        }
+        else {
+          return (
+            <AuthContext.Provider value={authContext}>
+              <NavigationStackUser />
+            </AuthContext.Provider>
+          );
+        }
+      } else if (role === "h") {
         return (
           <AuthContext.Provider value={authContext}>
-            <NavigationStackUser />
+            <NavigationStackHCF />
           </AuthContext.Provider>
         );
-      } else if (role === "h") {
-        return <AuthContext.Provider value={authContext}><NavigationStackHCF /></AuthContext.Provider>;
       } else {
-        return <AuthContext.Provider value={authContext}><Loading /></AuthContext.Provider>;
+        return(
+          <AuthContext.Provider value={authContext}>
+            <Loading />
+          </AuthContext.Provider>
+        );
       }
     } else {
       if (openingForTheFirstTime) {

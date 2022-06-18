@@ -61,8 +61,8 @@ const Home = ({ navigation }) => {
     useState(false); //Whether the location permission is Denied
   const [userPositionLng, setUserPositionLng] = useState(0); // User's current position
   const [userPositionLat, setUserPositionLat] = useState(0); // User's current position
-  const [locationFromMapboxLng, setLocationFromMapboxLng] = useState(); // User's current position tracked from the mapboxGL userLocation - Longitude
-  const [locationFromMapboxLat, setLocationFromMapboxLat] = useState(); // User's current position tracked from the mapboxGL userLocation - Latitude
+  const [locationFromMapboxLng, setLocationFromMapboxLng] = useState(0); // User's current position tracked from the mapboxGL userLocation - Longitude
+  const [locationFromMapboxLat, setLocationFromMapboxLat] = useState(0); // User's current position tracked from the mapboxGL userLocation - Latitude
   const [mapTypeVisibility, setMapTypeVisibility] = useState(false); // MapType modal visibility
   const [route, setRoute] = useState(null);
   const [followUserLocation, setFollowUserLocation] = useState(false);

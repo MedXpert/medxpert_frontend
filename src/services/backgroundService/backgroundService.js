@@ -1,4 +1,3 @@
-/* eslint-disable no-async-promise-executor */
 import BackgroundService from "react-native-background-actions";
 import {sendSms} from "../sendEmergency/sendSms";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -19,6 +18,17 @@ export const backgroundService = async () => {
   const phoneNumber = "0916112143";
   const email = "liyuumk@gmail.com";
 
+  //   const veryIntensiveTask = async (taskDataArguments) => {
+  //     // Example of an infinite loop task
+  //     const { delay } = taskDataArguments;
+  //     await new Promise( async (resolve) => {
+  //         for (let i = 0; BackgroundService.isRunning(); i++) {
+  //             console.log(i);
+  //             await sleep(delay);
+  //         }
+  //     });
+  // };
+
   const veryIntensiveTask = async taskDataArguments => {
     // Example of an infinite loop task
     console.log("inside background service");
@@ -26,34 +36,38 @@ export const backgroundService = async () => {
     const {delay} = taskDataArguments;
     var counting = 0;
     var sent = false;
-    await new Promise(async resolve => {
-      console.log("counting for loop promise");
-      for (let i = 0; counting <= 14; i++) {
-        const abort = await AsyncStorage.getItem("@fallDetectionAbort");
-        counting += 1;
-        console.log(counting);
-        if (abort) {
-          break;
-        }
-        await AsyncStorage.setItem("@counting", counting.toString());
-        await sleep(delay);
-      }
+    console.log("counting for loop promise");
+    for (let i = 0; counting <= 15; i++) {
       const abort = await AsyncStorage.getItem("@fallDetectionAbort");
-      if(!abort && !sent){
-        // sendSms(phoneNumber, message);
-        console.log("Text message sent");
-        sendEmail(email, subject, message);
-        console.log("Email sent");
-        await BackgroundService.stop();
-        sent = true;
-        return;
-      }else{  
-        await AsyncStorage.removeItem("@fallDetected");
-        await AsyncStorage.removeItem("@counting");
-        await AsyncStorage.removeItem("@fallDetectionAbort");
-        await BackgroundService.stop();
+      counting += 1;
+      console.log(counting);
+      if (abort) {
+        break;
       }
-    });
+      await AsyncStorage.setItem("@counting", counting.toString());
+      await sleep(delay);
+    }
+    const abort = await AsyncStorage.getItem("@fallDetectionAbort");
+    if(!abort && !sent){
+      // sendSms(phoneNumber, message);
+      console.log("Text message sent");
+      sendEmail(email, subject, message);
+      console.log("Email sent");
+      sent = true;
+      await BackgroundService.stop();
+    
+    }else{  
+      await AsyncStorage.removeItem("@fallDetected");
+      await AsyncStorage.removeItem("@counting");
+      await AsyncStorage.removeItem("@fallDetectionAbort");
+      await BackgroundService.stop();
+    }
+    
+
+  
+    // await new Promise(async resolve => {
+     
+    // });
   };
 
   const options = {

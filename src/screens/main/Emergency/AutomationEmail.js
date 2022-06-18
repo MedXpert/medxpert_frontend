@@ -10,7 +10,7 @@ import IconMaterialIcons from "react-native-vector-icons/MaterialIcons";
 import IconFontAwesome from "react-native-vector-icons/FontAwesome";
 import IconEntypo from "react-native-vector-icons/Entypo";
 import {EmailItem} from "../../../components/emergency/EmailItem";
-import {AddEmergencyContactModal} from "../../../components/emergency/AddEmergencyContactModal";
+import {AddEmergencyEmailModal} from "../../../components/emergency/AddEmergencyEmailModal";
 
 const AutomationEmail = ({navigation}) => {
   const [modalVisibility, setModalVisibility] = useState(false);
@@ -24,7 +24,7 @@ const AutomationEmail = ({navigation}) => {
         />
       </View>
       {/* SMS toggle section */} 
-      <AddEmergencyContactModal
+      <AddEmergencyEmailModal
         modalText={
           "Please enter an email to add it to emergency contacts list."
         }

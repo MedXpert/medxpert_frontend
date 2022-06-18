@@ -4,16 +4,16 @@ import {
   TouchableOpacity,
   useWindowDimensions,
   ScrollView
-} from 'react-native';
-import React, { useContext, useState } from 'react';
-import Colors from '../../constants/colors';
-import { CustomText } from '../../components/general/CustomText';
-import SignUpSvg from '../../assets/svg/auth/signUp.svg';
-import { CustomButton } from '../../components/general/CustomButton';
-import { useForm } from 'react-hook-form';
-import { CustomTextInputValidation } from '../../components/general/CustomTextInputValidation';
-import { useSignUp } from '../../hooks/authentication/useSignUp';
-import colors from '../../constants/colors';
+} from "react-native";
+import React, { useContext, useState } from "react";
+import Colors from "../../constants/colors";
+import { CustomText } from "../../components/general/CustomText";
+import SignUpSvg from "../../assets/svg/auth/signUp.svg";
+import { CustomButton } from "../../components/general/CustomButton";
+import { useForm } from "react-hook-form";
+import { CustomTextInputValidation } from "../../components/general/CustomTextInputValidation";
+import { useSignUp } from "../../hooks/authentication/useSignUp";
+import colors from "../../constants/colors";
 
 const SignUp = ({ navigation }) => {
   const { height, width } = useWindowDimensions();
@@ -21,15 +21,15 @@ const SignUp = ({ navigation }) => {
   const register = useSignUp();
   const onSubmit = data => {
 
-    const fullName = data.fullName.split(' ')
+    const fullName = data.fullName.split(" ");
     const newUser = {
       firstName: fullName[0],
-      lastName: fullName[1] ? fullName[1] : '',
+      lastName: fullName[1] ? fullName[1] : "",
       email: data.email,
       password: data.password,
       profilePicture: `https://ui-avatars.com/api/?name=${fullName}&background=random&size=120&bold=true&color=random&format=png`,
-      role: isUser ? 'u' : 'h',
-    }
+      role: isUser ? "u" : "h",
+    };
     register.mutate({ ...newUser });
   };
 
@@ -52,11 +52,11 @@ const SignUp = ({ navigation }) => {
           <CustomText content="Welcome to MedXpert" fontSize={28} fontWeight="bold" customStyles={styles.welcomeText} />
           <CustomText content="Signed up successfully" fontSize={20} customStyles={styles.successText} />
           <CustomButton width={200}
-            height={50} backgroundColor={colors.primary} title="Login" onPress={() => navigation.navigate('Login')} />
+            height={50} backgroundColor={colors.primary} title="Login" onPress={() => navigation.navigate("Login")} />
         </View>) : (
           <View style={styles.signUpFormContainer}>
             <View style={styles.signUpText}>
-              <CustomText content={'Create Account'} fontSize={28} />
+              <CustomText content={"Create Account"} fontSize={28} />
             </View>
             <View style={styles.inputContainer}>
               <CustomTextInputValidation
@@ -69,12 +69,12 @@ const SignUp = ({ navigation }) => {
                 rules={{
                   required: {
                     value: true,
-                    message: 'Full name is required.',
+                    message: "Full name is required.",
                   },
                   validate: value => {
-                    const fullName = value.split(' ');
+                    const fullName = value.split(" ");
                     if (fullName.length < 2) {
-                      return 'At least father name is required.';
+                      return "At least father name is required.";
                     }
                     return true;
                   }
@@ -92,7 +92,7 @@ const SignUp = ({ navigation }) => {
                 rules={{
                   required: {
                     value: true,
-                    message: 'Email is required.',
+                    message: "Email is required.",
                   },
                 }}
               />
@@ -109,7 +109,7 @@ const SignUp = ({ navigation }) => {
                 rules={{
                   required: {
                     value: true,
-                    message: 'Password is required.',
+                    message: "Password is required.",
                   },
                 }}
               />
@@ -127,7 +127,7 @@ const SignUp = ({ navigation }) => {
                 rules={{
                   required: {
                     value: true,
-                    message: 'Confirm password is required.',
+                    message: "Confirm password is required.",
                   },
                   validate: (value) => {
                     // validate: {
@@ -145,7 +145,7 @@ const SignUp = ({ navigation }) => {
             </View>
             <View>
               <CustomText content="I am a" />
-              <View style={{ width: 350, paddingVertical: 10, flexDirection: 'row', justifyContent: 'flex-start' }}>
+              <View style={{ width: 350, paddingVertical: 10, flexDirection: "row", justifyContent: "flex-start" }}>
                 <CustomButton title="user" onPress={() => setIsUser(true)} backgroundColor={isUser ? colors.primary : colors.whiteSmoke} width="40%" />
                 <CustomButton title="Health Facility Owner" onPress={() => setIsUser(false)} backgroundColor={isUser ? colors.whiteSmoke : colors.primary} width="60%" />
               </View>
@@ -155,17 +155,17 @@ const SignUp = ({ navigation }) => {
               <CustomButton
                 width={350}
                 height={60}
-                title={register.isLoading ? 'Please wait...' : 'Create Account'}
+                title={register.isLoading ? "Please wait..." : "Create Account"}
                 customStyle={styles.signUpButtonStyle}
                 onPress={handleSubmit(onSubmit)}
               />
               <View style={styles.registerContainer}>
-                <CustomText content={'Joined us before?'} />
+                <CustomText content={"Joined us before?"} />
                 <TouchableOpacity
                   onPress={() => {
-                    navigation.navigate('Login');
+                    navigation.navigate("Login");
                   }}>
-                  <CustomText content={'Login'} fontColor={Colors.primary} />
+                  <CustomText content={"Login"} fontColor={Colors.primary} />
                 </TouchableOpacity>
               </View>
             </View>
@@ -180,21 +180,21 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: Colors.secondary,
   },
-  successMessage: { flex: 1, alignItems: 'center', justifyContent: 'center' },
+  successMessage: { flex: 1, alignItems: "center", justifyContent: "center" },
   welcomeText: { marginVertical: 5 },
   successText: { marginBottom: 20 },
   buttonsContainer: {
     marginTop: 0,
-    alignItems: 'center',
+    alignItems: "center",
   },
   signUpFormContainer: {
-    alignItems: 'center',
+    alignItems: "center",
     flex: 1,
     padding: 30,
     paddingTop: 0,
   },
   signUpSvgContainer: {
-    alignItems: 'center',
+    alignItems: "center",
     marginTop: 30,
   },
   signUpButtonStyle: {
@@ -205,10 +205,10 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   inputContainer: {
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    alignItems: "center",
+    justifyContent: "space-between",
     borderRadius: 10,
-    flexDirection: 'row',
+    flexDirection: "row",
     height: 60,
     paddingHorizontal: 15,
     marginVertical: 20,
@@ -218,7 +218,7 @@ const styles = StyleSheet.create({
     height: 60,
   },
   registerContainer: {
-    flexDirection: 'row',
+    flexDirection: "row",
     marginTop: 10,
   },
 });
