@@ -11,29 +11,28 @@ import {
   Animated,
 } from 'react-native';
 import React, {useState, useEffect, useCallback, useRef, useMemo} from 'react';
-import MapboxGL from '@rnmapbox/maps';
+import MapboxGL from '@react-native-mapbox-gl/maps';
 import {PERMISSIONS, RESULTS, openSettings} from 'react-native-permissions';
 import Geolocation from 'react-native-geolocation-service';
-import {onChange} from 'react-native-reanimated';
+import { onChange } from 'react-native-reanimated';
 import BottomSheet from '@gorhom/bottom-sheet';
 // import MapboxDirectionsFactory from '@mapbox/mapbox-sdk/services/directions';
 import {lineString as makeLineString} from '@turf/helpers';
 import axios from 'axios';
+import { getDistance } from 'geolib';
 
 import IconAntDesign from 'react-native-vector-icons/AntDesign';
 import IconMaterialCommunity from 'react-native-vector-icons/MaterialCommunityIcons';
 
-import {getDistance} from 'geolib';
-
-import {SearchBar} from '../../components/general/SearchBar';
+import { SearchBar } from '../../components/general/SearchBar';
 import Colors from '../../constants/colors';
-import {CustomButton} from '../../components/general/CustomButton';
-import {CustomText} from '../../components/general/CustomText';
-import {PermissionModal} from '../../components/permissions/PermissionModal';
-import {IconButton} from 'react-native-paper';
-import {MapTypeModal} from '../../components/home/MapTypeModal';
-import {BottomSheetContent} from '../../components/home/BottomSheetContent';
-import {useHealthCareFacilities} from '../../hooks/healthCareFacility';
+import { CustomButton } from '../../components/general/CustomButton';
+import { CustomText } from '../../components/general/CustomText';
+import { PermissionModal } from '../../components/permissions/PermissionModal';
+import { IconButton } from 'react-native-paper';
+import { MapTypeModal } from '../../components/home/MapTypeModal';
+import { BottomSheetContent } from '../../components/home/BottomSheetContent';
+import { useHealthCareFacilities } from '../../hooks/healthCareFacility';
 
 import {requestPermissions} from '../../services/permissions/requestPermissions';
 import {LOCATION_PERMISSION_MESSAGE} from '../../constants/string/requestPermissions/requestPermissions';
@@ -42,7 +41,7 @@ import {RenderDirection} from '../../components/general/RenderDirection';
 const dimensionHeight = Dimensions.get('window').height;
 const dimensionWidth = Dimensions.get('window').width;
 
-const Home = ({navigation}) => {
+const Home = ({ navigation }) => {
   var _map;
   var _camera;
   var bsRef = useRef();
@@ -155,7 +154,7 @@ const Home = ({navigation}) => {
         // See error code charts below.
         console.log(error.code, error.message);
       },
-      {enableHighAccuracy: true, timeout: 15000, maximumAge: 10000},
+      { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 },
     );
 
     await _camera.flyTo([userPositionLng, userPositionLat]);
@@ -252,7 +251,7 @@ const Home = ({navigation}) => {
           // See error code charts below.
           console.log(error.code, error.message);
         },
-        {enableHighAccuracy: true, timeout: 15000, maximumAge: 10000},
+        { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 },
       );
     }
   }, [checkPermission, locationPermissionGranted]);
@@ -332,7 +331,7 @@ const Home = ({navigation}) => {
           // ref={c => (_map = c)}
           ref={c => (_map = c)}
           logoEnabled={false}
-          compassViewMargins={{x: 10, y: (30 * dimensionHeight) / 100}}
+          compassViewMargins={{ x: 10, y: (30 * dimensionHeight) / 100 }}
           style={styles.map}
           surfaceView>
           {/* Display user location */}
@@ -410,7 +409,7 @@ const Home = ({navigation}) => {
         onChange={onSheetChange}
         ref={bsRef}
         snapPoints={['7%', '35%', '100%']}>
-        <BottomSheetContent navigation={navigation} />
+        <BottomSheetContent navigation={navigation} currentLocation={`${locationFromMapboxLng},${locationFromMapboxLat}`} />
       </BottomSheet>
     </View>
   );

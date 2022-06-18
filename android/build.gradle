@@ -39,6 +39,17 @@ allprojects {
                 excludeGroup "com.facebook.react"
             }
         }
+         maven {
+            url 'https://api.mapbox.com/downloads/v2/releases/maven'
+            authentication {
+                basic(BasicAuthentication)
+            }
+            credentials {
+            username = "mapbox"
+            password = "sk.eyJ1IjoibGl5dW1rIiwiYSI6ImNsMWtteG11NzAyZWgzZG9kOWpyb2x1dWMifQ.X4v8HxdCSmdrvVaCWXVjog"
+
+            }
+        }
         google()
         maven { url 'https://www.jitpack.io' }
         mavenCentral()    
