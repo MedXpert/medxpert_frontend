@@ -1,6 +1,6 @@
 import httpClient from "../../auth/httpClient";
-const claimedRequest = async healthFacilityId => {
-    return await httpClient.get(`/appointments/${healthFacilityId}`);
+const claimedRequest = async () => {
+    return await httpClient.get(`/claimrequests?claim=done`);
 };
 
 export { claimedRequest };
