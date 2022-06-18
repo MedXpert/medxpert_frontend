@@ -39,6 +39,8 @@ import {useHealthCareFacilities} from "../../hooks/healthCareFacility";
 import {requestPermissions} from "../../services/permissions/requestPermissions";
 import {LOCATION_PERMISSION_MESSAGE} from "../../constants/string/requestPermissions/requestPermissions";
 import {RenderDirection} from "../../components/general/RenderDirection";
+import { useEmergencyContacts } from "../../hooks/emergencyContact";
+
 
 const dimensionHeight = Dimensions.get("window").height;
 const dimensionWidth = Dimensions.get("window").width;
@@ -70,6 +72,14 @@ const Home = ({ navigation }) => {
   const locationPermission = PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION; // location permission name
 
   const refUserLocation = useRef();
+
+  const phone = useEmergencyContacts({
+    type: "phone"
+  });
+
+  const email = useEmergencyContacts({
+    type: "email"
+  });
 
   const accessToken =
     "sk.eyJ1IjoibGl5dW1rIiwiYSI6ImNsMWtteG11NzAyZWgzZG9kOWpyb2x1dWMifQ.X4v8HxdCSmdrvVaCWXVjog";
@@ -256,6 +266,33 @@ const Home = ({ navigation }) => {
       );
     }
   }, [checkPermission, locationPermissionGranted]);
+
+  useEffect(()=>{
+    const addEmergencyContacts = async () => {
+
+      var storeToAsyncStorage = [];
+     
+      if(email.isSuccess && email.data){
+        const emails = email.data.data.emergencyContact;
+        // console.log("email", emails);
+        storeToAsyncStorage = emails;
+      }
+
+      if(phone.isSuccess && phone.data){
+        const phoneNumbers = phone.data.data.emergencyContact;
+        storeToAsyncStorage = [...storeToAsyncStorage, ...phoneNumbers];
+      }
+
+      await AsyncStorage.setItem("@emergencyContacts", JSON.stringify(storeToAsyncStorage));
+
+      const sdsd = await AsyncStorage.getItem("@emergencyContacts");
+
+      console.log(sdsd);
+      
+    };
+
+    addEmergencyContacts();
+  }, [phone.data, email.data, phone.isSuccess, email.isSuccess]);
 
   useEffect(()=>{
     const cleanUp = async ()=> {

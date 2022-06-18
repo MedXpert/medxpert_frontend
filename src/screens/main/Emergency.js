@@ -62,8 +62,8 @@ const Emergency = ({navigation}) => {
       );
       // If there is no automationToggle value stored in AsyncStorage and newVal is true, then store 'true' in AsyncStorage automationToggle.
       if (!automationToggleFromAsyncStorage && newVal) {
-        await AsyncStorage.setItem("@automationToggle", JSON.stringify("true"));
-      // Else Just remove the automationToggle value from AsyncStorage.
+        await AsyncStorage.setItem("@automationToggle", "true");
+      // Else Just remove the toggle value from AsyncStorage.
       } else {
         await removeAsyncStorages([
           "@automationToggle",
@@ -87,7 +87,7 @@ const Emergency = ({navigation}) => {
     if (!fallDetectionToggleFromAsyncStorage && newVal) {
       await AsyncStorage.setItem(
         "@fallDetectionToggle",
-        JSON.stringify("true"),
+        "true",
       );
     } else {
       setSmsToggle(false);
@@ -105,7 +105,7 @@ const Emergency = ({navigation}) => {
     setSmsToggle(newVal);
     const smsToggleFromAsyncStorage = await AsyncStorage.getItem("@smsToggle");
     if (!smsToggleFromAsyncStorage && newVal) {
-      await AsyncStorage.setItem("@smsToggle", JSON.stringify("true"));
+      await AsyncStorage.setItem("@smsToggle", "true");
     } else {
       await AsyncStorage.removeItem("@smsToggle");
     }
@@ -118,7 +118,7 @@ const Emergency = ({navigation}) => {
     );
 
     if (!emailToggleFromAsyncStorage && newVal) {
-      await AsyncStorage.setItem("@emailToggle", JSON.stringify("true"));
+      await AsyncStorage.setItem("@emailToggle", "true");
     } else {
       await AsyncStorage.removeItem("@emailToggle");
     }

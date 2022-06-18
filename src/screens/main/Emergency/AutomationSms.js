@@ -1,4 +1,11 @@
-import {View, Text, StyleSheet, Switch, ScrollView, Dimensions} from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Switch,
+  ScrollView,
+  Dimensions,
+} from "react-native";
 import React, {useEffect, useState} from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
@@ -12,25 +19,24 @@ import {AddEmergencyPhoneModal} from "../../../components/emergency/AddEmergency
 import IconFontAwesome from "react-native-vector-icons/FontAwesome";
 import IconEntypo from "react-native-vector-icons/Entypo";
 import IconMaterialIcons from "react-native-vector-icons/MaterialIcons";
-import { useEmergencyContacts } from "../../../hooks/emergencyContact";
+import {useEmergencyContacts} from "../../../hooks/emergencyContact";
 import LoadingPage from "../../../components/general/LoadingPage";
-import { showMessage, hideMessage } from "react-native-flash-message";
+import {showMessage, hideMessage} from "react-native-flash-message";
 
 const AutomationSms = ({navigation}) => {
   const [modalVisibility, setModalVisibility] = useState(false);
   const [smsToggle, setSmsToggle] = useState(false);
 
-  const { data, isSuccess, isError, isLoading, status, error, refetch } = useEmergencyContacts({
-    type: "phone"
-  });
+  const {data, isSuccess, isError, isLoading, status, error, refetch} =
+    useEmergencyContacts({
+      type: "phone",
+    });
 
   return (
     <View style={styles.container}>
-      {
-        isLoading ? <LoadingPage/> : null
-      }
+      {isLoading ? <LoadingPage /> : null}
 
-      { isSuccess && data &&
+      {isSuccess && data && (
         <>
           <View style={{marginLeft: -10}}>
             <BackButton
@@ -39,7 +45,7 @@ const AutomationSms = ({navigation}) => {
               }}
             />
           </View>
-   
+
           <AddEmergencyPhoneModal
             modalText={
               "Please enter a phone number to add it to emergency contacts list."
@@ -60,7 +66,11 @@ const AutomationSms = ({navigation}) => {
           <View style={styles.phoneNumbersContainer}>
             {/* add phone number */}
             <View style={[styles.listPhoneNumber, styles.addPhoneNumber]}>
-              <IconFontAwesome name={"phone"} color={colors.primary} size={30} />
+              <IconFontAwesome
+                name={"phone"}
+                color={colors.primary}
+                size={30}
+              />
               <CustomText content={"Add phone number"} fontSize={15} />
               <IconEntypo
                 name={"plus"}
@@ -74,44 +84,42 @@ const AutomationSms = ({navigation}) => {
             </View>
             {/* List of added phone numbers */}
             <View style={styles.listOfPhoneNumbers}>
-
-              
-              {
-                data.data.emergencyContact.length > 0 ? (
-                  <>
-                    <View>
-                      <CustomText content={"List of phone numbers"} fontSize={15} />
+              {data.data.emergencyContact.length > 0 ? (
+                <>
+                  <View>
+                    <CustomText
+                      content={"List of phone numbers"}
+                      fontSize={15}
+                    />
+                  </View>
+                  <ScrollView>
+                    {/* phone number component */}
+                    <View style={{marginBottom: 60}}>
+                      {data.data.emergencyContact.map(phoneInfo => (
+                        <PhoneNumber
+                          key={phoneInfo.id}
+                          phoneNumber={phoneInfo.phone_number}
+                          name={phoneInfo.name}
+                          id={phoneInfo.id}
+                        />
+                      ))}
                     </View>
-                    <ScrollView>
-                      {/* phone number component */}
-                      <View style={{marginBottom: 60}}>
-                        {/* {
-                    data.data.emergencyContact.map((phoneNumber) => )
-                  } */}
-                        {
-                          data.data.emergencyContact.map((phoneInfo) => <PhoneNumber key={phoneInfo.id} phoneNumber={phoneInfo.phone_number} name={phoneInfo.name} id={phoneInfo.id} deletedToast={() => {showMessage({
-                            message: "contact deleted",
-                            type: "danger",
-                          });}} />)
-                        }
-                      </View>
-                    </ScrollView>
-                  </>
-                  
-                ) : 
-                  (
-                    <View style={{height: Dimensions.get("screen").height - 300, justifyContent: "center", alignItems: "center"}}>
-                      <CustomText content={"No contact found"} fontSize={20}/>
-                    </View>
-                  )
-                
-              }
-              
+                  </ScrollView>
+                </>
+              ) : (
+                <View
+                  style={{
+                    height: Dimensions.get("screen").height - 300,
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}>
+                  <CustomText content={"No contact found"} fontSize={20} />
+                </View>
+              )}
             </View>
           </View>
         </>
-      }
-      
+      )}
     </View>
   );
 };

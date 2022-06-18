@@ -1,8 +1,8 @@
 import BackgroundService from "react-native-background-actions";
-import {sendSms} from "../sendEmergency/sendSms";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import {sendSms} from "../sendEmergency/sendSms";
 import colors from "../../constants/colors";
-import { sendEmail } from "../sendEmergency/sendEmail";
+import {sendEmail} from "../sendEmergency/sendEmail";
 
 export const backgroundService = async () => {
   // You can do anything in your task such as network requests, timers and so on,
@@ -10,32 +10,37 @@ export const backgroundService = async () => {
   // React Native will go into "paused" mode (unless there are other tasks running,
   // or there is a foreground app).
 
+  const emergencyContact = await AsyncStorage.getItem("@emergencyContacts");
+
+  const parsedEmergencyContact = JSON.parse(emergencyContact);
+
+  const phoneEmergency = [];
+  const emailEmergency = [];
+
+  parsedEmergencyContact.forEach(emergencyContact => {
+    if (emergencyContact.phone_number) {
+      phoneEmergency.push(emergencyContact.phone_number);
+    } else {
+      emailEmergency.push(emergencyContact.email);
+    }
+  });
+
   const sleep = async time =>
     new Promise(resolve => setTimeout(() => resolve(), time));
 
-  const message =  "A possible fall has been detected from useNameHere phone, please check them.";
+  const message =
+    "A possible fall has been detected from useNameHere phone, please check them.";
   const subject = "Possible fall detected";
   const phoneNumber = "0916112143";
   const email = "liyuumk@gmail.com";
-
-  //   const veryIntensiveTask = async (taskDataArguments) => {
-  //     // Example of an infinite loop task
-  //     const { delay } = taskDataArguments;
-  //     await new Promise( async (resolve) => {
-  //         for (let i = 0; BackgroundService.isRunning(); i++) {
-  //             console.log(i);
-  //             await sleep(delay);
-  //         }
-  //     });
-  // };
 
   const veryIntensiveTask = async taskDataArguments => {
     // Example of an infinite loop task
     console.log("inside background service");
 
     const {delay} = taskDataArguments;
-    var counting = 0;
-    var sent = false;
+    let counting = 0;
+
     console.log("counting for loop promise");
     for (let i = 0; counting <= 15; i++) {
       const abort = await AsyncStorage.getItem("@fallDetectionAbort");
@@ -48,25 +53,26 @@ export const backgroundService = async () => {
       await sleep(delay);
     }
     const abort = await AsyncStorage.getItem("@fallDetectionAbort");
-    if(!abort && !sent){
+    if (!abort) {
       // sendSms(phoneNumber, message);
-      console.log("Text message sent");
-      sendEmail(email, subject, message);
-      console.log("Email sent");
-      sent = true;
+      emailEmergency.forEach(element => {
+        sendEmail(element, subject, message);
+      });
+
+      // phoneEmergency.forEach((element) => {
+      //   sendSms(element, message);
+      // })
+
       await BackgroundService.stop();
-    
-    }else{  
+    } else {
       await AsyncStorage.removeItem("@fallDetected");
       await AsyncStorage.removeItem("@counting");
       await AsyncStorage.removeItem("@fallDetectionAbort");
       await BackgroundService.stop();
     }
-    
 
-  
     // await new Promise(async resolve => {
-     
+
     // });
   };
 

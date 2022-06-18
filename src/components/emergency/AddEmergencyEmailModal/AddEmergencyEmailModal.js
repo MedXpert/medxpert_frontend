@@ -1,47 +1,80 @@
 import {View, Modal, StyleSheet, Dimensions, TextInput} from "react-native";
 import React from "react";
 
+import {useForm} from "react-hook-form";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import {CustomText} from "../../general/CustomText/CustomText";
 import colors from "../../../constants/colors";
 import {CustomTextInput} from "../../general/CustomTextInput";
 import {CustomButton} from "../../general/CustomButton";
-import { useForm } from "react-hook-form";
 import {useCreateEmergencyContact} from "../../../hooks/emergencyContact/useCreateEmergencyContact";
+import {CustomTextInputValidation} from "../../general/CustomTextInputValidation";
+import {emailRegEx} from "../../../constants/regEx";
+import {useEmergencyContacts} from "../../../hooks/emergencyContact";
 
 const dimensionWidth = Dimensions.get("window").width;
 const dimensionHeight = Dimensions.get("window").height;
 
-const AddEmergencyEmailModal = ({
-  
+function AddEmergencyEmailModal({
   modalVisible,
   onRequestClose,
   modalText,
   placeholder,
   onPressLeftButton,
   onPressRightButton,
-}) => {
-  const { control, handleSubmit, formState: { errors } } = useForm({
+}) {
+  const {
+    control,
+    reset,
+    handleSubmit,
+    formState: {errors},
+  } = useForm({
     defaultValues: {
       name: "",
-      phoneNumber: "", 
-    }
+      email: "",
+    },
   });
 
-  const addPhone = useCreateEmergencyContact();
+  const addEmail = useCreateEmergencyContact();
 
-  const onAdd = (data) => {
-    addPhone.mutate({
+  const fetchEmail = useEmergencyContacts({
+    type: "email",
+  });
+
+  const onAdd = async data => {
+    const email = {
       name: data.name,
-      phone_number: data.phoneNumber
-    });
+      email: data.email,
+    };
+    addEmail.mutate({...email});
+    reset();
+
+    const addEmergencyContacts = async () => {
+      let emergencyConts = await AsyncStorage.getItem("@emergencyContacts");
+      var storeToAsyncStorage = JSON.parse(emergencyConts);
+      if (fetchEmail.isSuccess && fetchEmail.data) {
+        const emails = fetchEmail.data.data.emergencyContact;
+        // console.log("email", emails);
+        storeToAsyncStorage = [...storeToAsyncStorage, ...emails];
+      }
+      // if (fetchPhone.isSuccess && fetchPhone.data) {
+      //   const phoneNumbers = fetchPhone.data.data.emergencyContact;
+      //   storeToAsyncStorage = [...storeToAsyncStorage, ...phoneNumbers];
+      // }
+      await AsyncStorage.setItem(
+        "@emergencyContacts",
+        JSON.stringify(storeToAsyncStorage),
+      );
+    };
+    addEmergencyContacts();
   };
+
   return (
     <Modal
       transparent
       animationType="fade"
       visible={modalVisible}
-      onRequestClose={onRequestClose}
-      style={{backgroundColor: "red"}}>
+      onRequestClose={onRequestClose}>
       <View style={styles.innerFirst}>
         <View style={styles.innerSecond}>
           {/* Modal text */}
@@ -52,7 +85,7 @@ const AddEmergencyEmailModal = ({
             label="Name"
             control={control}
             name="name"
-            error={errors.name.message ? errors.name.message :  null}
+            error={errors.name?.message}
             rules={{
               required: {
                 value: true,
@@ -60,39 +93,44 @@ const AddEmergencyEmailModal = ({
               },
             }}
           />
-          
+
           <CustomTextInputValidation
             customStyles={styles.inputs}
-            label="Phone number"
+            label="Email"
             control={control}
-            name="phoneNumber"
-            error={errors.phoneNumber.message ? errors.phoneNumber.message : null}
+            name="email"
+            error={errors.email?.message}
             rules={{
               required: {
                 value: true,
-                message: "Phone number is required.",
+                message: "Email is required.",
+              },
+              pattern: {
+                value: emailRegEx,
+                message: "Please enter a valid email address",
               },
             }}
           />
+          {addEmail.isError ? (
+            <CustomText content={addEmail.error.message} />
+          ) : null}
           {/* Modal buttons */}
           <View style={styles.modalButtons}>
             <CustomButton
               customStyle={{marginRight: 10}}
               backgroundColor={colors.lightGray}
-              title={"Cancel"}
+              title="Cancel"
               height={40}
               fontSize={14}
-              disabled = {
-                addPhone.isLoading ? true : false
-              }
+              disabled={!!addEmail.isLoading}
               onPress={onPressLeftButton}
             />
             <CustomButton
               backgroundColor={colors.primary}
-              title={"Add"}
+              title="Add"
               height={40}
               fontSize={14}
-              disabled ={addPhone.isLoading ? true : false}
+              disabled={!!addEmail.isLoading}
               onPress={handleSubmit(onAdd)}
             />
           </View>
@@ -100,7 +138,7 @@ const AddEmergencyEmailModal = ({
       </View>
     </Modal>
   );
-};
+}
 
 const styles = StyleSheet.create({
   innerFirst: {
@@ -112,10 +150,9 @@ const styles = StyleSheet.create({
   innerSecond: {
     backgroundColor: colors.white,
     borderRadius: 20,
-    height: 250,
+    height: 400,
     margin: 10,
     padding: 20,
-    alignContent: "center",
     justifyContent: "center",
     alignItems: "center",
   },
@@ -138,6 +175,7 @@ const styles = StyleSheet.create({
   inputs: {
     width: 330,
     height: 60,
+    backgroundColor: colors.secondary,
   },
 });
 

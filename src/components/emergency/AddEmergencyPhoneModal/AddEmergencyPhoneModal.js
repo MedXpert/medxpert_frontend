@@ -2,60 +2,80 @@ import {View, Modal, StyleSheet, Dimensions, TextInput} from "react-native";
 import React from "react";
 import {useMutation, useQueryClient} from "react-query";
 
-
 import {CustomText} from "../../general/CustomText/CustomText";
 import colors from "../../../constants/colors";
 import {CustomTextInput} from "../../general/CustomTextInput";
-import { CustomTextInputValidation } from "../../general/CustomTextInputValidation";
+import {CustomTextInputValidation} from "../../general/CustomTextInputValidation";
 import {CustomButton} from "../../general/CustomButton";
-import { useForm } from "react-hook-form";
+import {useForm} from "react-hook-form";
 import {useCreateEmergencyContact} from "../../../hooks/emergencyContact/useCreateEmergencyContact";
-import { createEmergencyContact } from "../../../services/api/emergencyContact";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import {useEmergencyContacts} from "../../../hooks/emergencyContact";
 
 const dimensionWidth = Dimensions.get("window").width;
 const dimensionHeight = Dimensions.get("window").height;
 
 const AddEmergencyPhoneModal = ({
-  
   modalVisible,
   onRequestClose,
   modalText,
   placeholder,
   onPressLeftButton,
   onPressRightButton,
-  
 }) => {
-  const { control, handleSubmit, formState: { errors }, reset } = useForm({
+  const {
+    control,
+    handleSubmit,
+    formState: {errors},
+    reset,
+  } = useForm({
     defaultValues: {
       name: "",
-      phoneNumber: "", 
-    }
+      phoneNumber: "",
+    },
   });
-
 
   const addPhone = useCreateEmergencyContact();
 
-  const onAdd = async (data) => {
+  const fetchPhone = useEmergencyContacts({
+    type: "phone",
+  });
+
+  const onAdd = async data => {
     const phoneNumb = {
       name: data.name,
-      phone_number: data.phoneNumber
+      phone_number: data.phoneNumber,
     };
-    // addPhone.mutate({...phoneNumb});
-    await createEmergencyContact(phoneNumb);
+    addPhone.mutate({...phoneNumb});
+    // await createEmergencyContact(phoneNumb);
     reset();
-  };
 
-  if(addPhone.error){
-    console.log("error has occurred");
-  }
+    const addEmergencyContacts = async () => {
+      let emergencyConts = await AsyncStorage.getItem("@emergencyContacts");
+      var storeToAsyncStorage = JSON.parse(emergencyConts);
+      if (fetchPhone.isSuccess && fetchPhone.data) {
+        const phones = fetchPhone.data.data.emergencyContact;
+        // console.log("email", emails);
+        storeToAsyncStorage = [...storeToAsyncStorage, ...phones];
+      }
+      // if (fetchPhone.isSuccess && fetchPhone.data) {
+      //   const phoneNumbers = fetchPhone.data.data.emergencyContact;
+      //   storeToAsyncStorage = [...storeToAsyncStorage, ...phoneNumbers];
+      // }
+      await AsyncStorage.setItem(
+        "@emergencyContacts",
+        JSON.stringify(storeToAsyncStorage),
+      );
+    };
+    addEmergencyContacts();
+  };
 
   return (
     <Modal
       transparent
       animationType="fade"
       visible={modalVisible}
-      onRequestClose={onRequestClose}
-    >
+      onRequestClose={onRequestClose}>
       <View style={styles.innerFirst}>
         <View style={styles.innerSecond}>
           {/* Modal text */}
@@ -66,7 +86,7 @@ const AddEmergencyPhoneModal = ({
             label="Name"
             control={control}
             name="name"
-            error={errors.name?.message }
+            error={errors.name?.message}
             rules={{
               required: {
                 value: true,
@@ -74,7 +94,7 @@ const AddEmergencyPhoneModal = ({
               },
             }}
           />
-          
+
           <CustomTextInputValidation
             customStyles={styles.inputs}
             label="Phone number"
@@ -89,7 +109,9 @@ const AddEmergencyPhoneModal = ({
               },
             }}
           />
-          {addPhone.isError ? <CustomText content={addPhone.error.message}/> : null}
+          {addPhone.isError ? (
+            <CustomText content={addPhone.error.message} />
+          ) : null}
           {/* Modal buttons */}
           <View style={styles.modalButtons}>
             <CustomButton
@@ -98,9 +120,7 @@ const AddEmergencyPhoneModal = ({
               title={"Cancel"}
               height={40}
               fontSize={14}
-              disabled = {
-                addPhone.isLoading ? true : false
-              }
+              disabled={addPhone.isLoading ? true : false}
               onPress={onPressLeftButton}
             />
             <CustomButton
@@ -108,7 +128,7 @@ const AddEmergencyPhoneModal = ({
               title={"Add"}
               height={40}
               fontSize={14}
-              disabled ={addPhone.isLoading ? true : false}
+              disabled={addPhone.isLoading ? true : false}
               onPress={handleSubmit(onAdd, onPressRightButton)}
             />
           </View>
@@ -153,7 +173,7 @@ const styles = StyleSheet.create({
   inputs: {
     width: 330,
     height: 60,
-    backgroundColor: colors.secondary
+    backgroundColor: colors.secondary,
   },
 });
 
