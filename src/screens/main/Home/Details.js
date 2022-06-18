@@ -91,6 +91,7 @@ const Details = ({ route, navigation }) => {
 
   const renderItem = ({ item }) => (
     <ImageItem
+      key={item}
       image={{ uri: item }}
       onPress={() => {
         setSelectedImage(item);

@@ -167,11 +167,10 @@ const SignUp = ({ navigation }) => {
               />
             </View>
             <View>
-              <CustomText content="I am" />
+              <CustomText content="I am a" fontColor={colors.gray} />
               <View style={styles.roleButtons}>
-                <CustomButton title="A user" onPress={() => setRole('u')} fontSize={14} backgroundColor={(role === 'u') ? colors.primary : colors.whiteSmoke} width="20%" />
-                <CustomButton title="A Health Facility Owner" onPress={() => setRole('h')} fontSize={14} backgroundColor={(role === 'h') ? colors.primary : colors.whiteSmoke} width="50%" />
-                <CustomButton title="An Ambulance" onPress={() => setRole('am')} fontSize={14} backgroundColor={(role === 'am') ? colors.primary : colors.whiteSmoke} width="35%" />
+                <CustomButton title="User" onPress={() => setRole('u')} fontSize={14} backgroundColor={(role === 'u') ? colors.primary : colors.whiteSmoke} width="50%" />
+                <CustomButton title="Health Facility Owner" onPress={() => setRole('h')} fontSize={14} backgroundColor={(role === 'h') ? colors.primary : colors.whiteSmoke} width="50%" />
               </View>
             </View>
             <View style={styles.buttonsContainer}>
