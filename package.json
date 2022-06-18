@@ -18,8 +18,11 @@
     "@react-navigation/native": "^6.0.8",
     "@react-navigation/native-stack": "^6.5.0",
     "@react-navigation/stack": "^6.1.1",
+    "@rnmapbox/maps": "github:rnmapbox/maps#main",
+    "@turf/helpers": "^6.5.0",
     "axios": "^0.26.1",
     "geolib": "^3.3.3",
+    "gps-distance": "^0.0.4",
     "react": "17.0.2",
     "react-hook-form": "^7.28.1",
     "react-native": "0.67.3",
@@ -44,7 +47,8 @@
     "react-native-tab-view": "^3.1.1",
     "react-native-toast-message": "^2.1.5",
     "react-native-vector-icons": "^9.1.0",
-    "react-query": "^3.38.0"
+    "react-query": "^3.38.0",
+    "socket.io-client": "^4.5.1"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9",
