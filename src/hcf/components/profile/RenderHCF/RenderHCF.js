@@ -13,7 +13,6 @@ const RenderHCF = ({
   hcfName,
   address,
   rating,
-  images,
   type,
   travelTime,
 }) => {
@@ -42,36 +41,12 @@ const RenderHCF = ({
           <StarRating
             disabled={false}
             maxStars={5}
-            rating={3.5}
+            rating={rating}
             starSize={25}
             fullStarColor={colors.golden}
           />
-          <CustomText content={4.5} />
+          <CustomText content={rating} />
         </View>
-      </View>
-      {/* Images section  */}
-      <View style={styles.imagesContainer}>
-        <Image
-          source={{uri: 'https://mapio.net/images-p/17493410.jpg'}}
-          resizeMethod="scale"
-          resizeMode="cover"
-          style={styles.imageStyle}
-          loadingIndicatorSource={require('../../../../assets/img/default_load_image.png')}
-        />
-        <Image
-          source={{uri: 'https://mapio.net/images-p/3638281.jpg'}}
-          resizeMethod="scale"
-          resizeMode="cover"
-          style={styles.imageStyle}
-          loadingIndicatorSource={require('../../../../assets/img/default_load_image.png')}
-        />
-        <Image
-          source={{uri: 'https://mapio.net/images-p/17493410.jpg'}}
-          resizeMethod="scale"
-          resizeMode="cover"
-          style={styles.imageStyle}
-          loadingIndicatorSource={require('../../../../assets/img/default_load_image.png')}
-        />
       </View>
       {/* Type Travel Time and Edit  */}
       <View style={styles.typeTravelEdit}>
@@ -79,16 +54,7 @@ const RenderHCF = ({
           {/* Type */}
           <View style={styles.type}>
             <CustomText content={'TYPE'} fontWeight="900" fontSize={16} />
-            <CustomText content={'Clinic'} />
-          </View>
-          {/* Travel time */}
-          <View style={styles.travelTime}>
-            <CustomText
-              content={'TRAVEL TIME'}
-              fontWeight="900"
-              fontSize={16}
-            />
-            <CustomText content={'5 mins'} />
+            <CustomText content={type} />
           </View>
         </View>
         {/* Edit button */}

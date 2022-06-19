@@ -1,14 +1,24 @@
-import {View, ScrollView, StyleSheet} from 'react-native';
+import { View, ScrollView, StyleSheet } from 'react-native';
 import React from 'react';
 
 import colors from '../../../../constants/colors';
-import {CustomText} from '../../../../components/general/CustomText';
-import {CustomButton} from '../../../../components/general/CustomButton';
-import {RenderHCF} from '../../../components/profile/RenderHCF';
+import { CustomText } from '../../../../components/general/CustomText';
+import { CustomButton } from '../../../../components/general/CustomButton';
+import { RenderHCF } from '../../../components/profile/RenderHCF';
+import { useClaimedRequest, usePendingRequest } from "../../../../hooks/claimRequest";
+import Spinner from 'react-native-spinkit';
 
-const Claimed = ({navigation}) => {
+const Claimed = ({ navigation }) => {
+
+  // const pendingRequests = usePendingRequest();
+  const claimedHCF = useClaimedRequest();
+
+  if(claimedHCF.isSuccess) {
+    console.log();
+  }
   return (
     <View style={styles.container}>
+
       <View style={styles.header}>
         {/* Header */}
         <CustomText content={'Claimed'} fontSize={18} />
@@ -23,16 +33,32 @@ const Claimed = ({navigation}) => {
         />
       </View>
 
-      <ScrollView style={styles.hcfSection}>
-        {/* Render Health Care Facility */}
-        {hcfs.map(item => (
-          <RenderHCF
-            navigation={navigation}
-            hcfName={item.name}
-            key={item.name}
+      {claimedHCF.isLoading && (
+        <View style={styles.spinnerContainer}>
+          <Spinner
+            isVisible
+            color={colors.primary}
+            size={70}
+            type="ThreeBounce"
+            style={styles.appointmentsSpinner}
           />
-        ))}
-      </ScrollView>
+        </View>
+      )}
+      {claimedHCF.isSuccess && (
+        <ScrollView style={styles.hcfSection}>
+          {claimedHCF.data.data.healthFacilities.map(item => (
+            <RenderHCF
+              navigation={navigation}
+              hcfName={item.name}
+              key={item.id}
+              address={item.address}
+              rating={item.total_ratings}
+              images={item.images}
+              type={item.facility_type}
+            />
+          ))}
+        </ScrollView>
+      )}
     </View>
   );
 };
@@ -55,6 +81,11 @@ const styles = StyleSheet.create({
   hcfSection: {
     marginTop: 30,
   },
+  spinnerContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   pendingButton: {
     paddingHorizontal: 10,
     paddingVertical: 6,
@@ -65,10 +96,10 @@ const styles = StyleSheet.create({
 });
 
 const hcfs = [
-  {name: 'hcf 0'},
-  {name: 'hcf 1'},
-  {name: 'hcf 2'},
-  {name: 'hcf 3'},
+  { name: 'hcf 0' },
+  { name: 'hcf 1' },
+  { name: 'hcf 2' },
+  { name: 'hcf 3' },
 ];
 
 export default Claimed;
