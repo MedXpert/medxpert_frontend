@@ -172,13 +172,14 @@ const Ambulance = ({navigation}) => {
   const [ambulanceCalled, setAmbulanceCalled] = useState(false);
 const [ambulanceAborted, setAmbulanceAborted] = useState();
 const [userId, setUserId] = useState();
+const [showFinishButton, setShowFinishButton] = useState(false);
 
 
   // const [ambulanceId, setAmbulanceId] = useState(null);
   const [appointmentAccepted, setAppointmentAccepted] = useState(false);
   const [callingAmbulance, setCallingAmbulance] = useState(false);
   const [canNotFindAmbulance, setCanNotFindAmbulance] = useState(false);
-  const [locationFromAmbulance, setLocationFromAmbulance] = useState()
+  const [locationFromUser, setLocationFromUser] = useState()
   const [ambulanceHasReached, setAmbulanceHasReached] = useState()
   const [isFree, setIsFree] = useState(false);
   const [isInAppointment, setIsInAppointment] = useState(false);
@@ -261,11 +262,13 @@ const [userId, setUserId] = useState();
         if (isInAppointment) {
             locationToUser(lng, lat); 
             // Send user location to the ambulance every time location coordinates are changed.
+          console.log( "sending location to user");
+
           }
          if(isFree){
           ambulanceLocationUpdate(lng, lat);
           console.log( "sending location to server");
-         
+
          }
 
         const distance = getDistance(
@@ -414,6 +417,7 @@ const [userId, setUserId] = useState();
 
   const onDeclineEmergency = () => {
     setEmergencyReceived(false);
+    setUserId(null);
     socketRef.current.emit(EVENTS.DECLINE_APPOINTMENT, 
       {
         userID: userId,
@@ -424,11 +428,27 @@ const [userId, setUserId] = useState();
       })
   }
 
-  const onReach = () => {}
+  const onReach = () => {
+    setIsInAppointment(false)
+    setShowFinishButton(true)
+    socketRef.current.emit(EVENTS.REACHED, { userID: userId })
 
-  const onAborted = () => {}
+  }
 
-  const onFinish = () => {}
+  const onFinish = () => {
+    setUserId(null);
+    setShowFinishButton(false);
+    socketRef.current.emit(EVENTS.FINISH, { userID: userId})
+
+
+  }
+
+  const onAborted = () => {
+    setUserId(null);
+    setIsInAppointment(false);
+    socketRef.current.emit(EVENTS.ABORT, { userID: userId })
+  }
+
 
 
   useEffect(() => {
@@ -456,6 +476,7 @@ const [userId, setUserId] = useState();
     socketRef.current.on(EVENTS.EMERGENCY_ALERT, (data, ack) => {
         setEmergencyReceived(true);
         setUserId(data.userID);
+        setLocationFromUser(data.coordinates);
         setAlertInfo({coordinates: data.coordinates, try: data.try, failedAmbulances: data.failedAmbulances});
        console.table({
         event: 'EMERGENCY_ALERT', 
@@ -463,7 +484,12 @@ const [userId, setUserId] = useState();
         coordinates: data.coordinates
       });
     })
-   
+    
+    // When an appointment is accepted
+    socketRef.current.on(EVENTS.LOCATION_FROM_USER, (data) => {
+        console.log(`User at ${data.coordinates}`);
+        setLocationFromUser(data.coordinates);
+    })
 
     return () => {
       socketRef.current.disconnect();
@@ -473,13 +499,13 @@ const [userId, setUserId] = useState();
 
   useEffect(() => {
 
-    if (locationFromMapboxLng && locationFromMapboxLat && locationFromAmbulance) {
+    if (locationFromMapboxLng && locationFromMapboxLat && locationFromUser) {
       getDirections(
         {longitude: locationFromMapboxLng, latitude: locationFromMapboxLat},
-        {longitude: locationFromAmbulance[0], latitude: locationFromAmbulance[1]},
+        {longitude: locationFromUser[0], latitude: locationFromUser[1]},
       );
     }
-  }, [getDirections, locationFromMapboxLat, locationFromMapboxLng, locationFromAmbulance]);
+  }, [getDirections, locationFromMapboxLat, locationFromMapboxLng, locationFromUser]);
 
   // console.log('socket:', socket, io);
   return (
@@ -565,10 +591,11 @@ const [userId, setUserId] = useState();
                 onUpdate={userLocationUpdate}
               />
               {/* If there is route, draw route from given source to destination  */}
-              {route && ambulanceId ? <RenderDirection route={route} /> : null}
               {
-                locationFromAmbulance && ambulanceId ?  <MapboxGL.PointAnnotation id="23" coordinate={locationFromAmbulance} /> : null
+                locationFromUser && userId ?  <MapboxGL.PointAnnotation id={JSON.stringify(userId)} coordinate={locationFromUser} /> : null
               }
+              {route && userId ? <RenderDirection route={route} /> : null}
+             
             </>
           )}
           <MapboxGL.Camera
@@ -584,9 +611,23 @@ const [userId, setUserId] = useState();
       {emergencyReceived && !appointmentAccepted &&  (
         <View style={styles.statusBarContainer}>
           {/* Display arriving status  */}
-          <View style={styles.statusBar}>
-            <CustomButton title={"Accept"}  width={150} onPress={onAcceptEmergency} customStyle={{ marginRight: 5}} backgroundColor={colors.green} />
-            <CustomButton title={"Decline"}  width={150} onPress={onDeclineEmergency} backgroundColor={colors.red} />
+          
+            <View style={[styles.statusBar, {flexDirection: 'column'}]}>
+            <View style={styles.spinnerText}>
+              <CustomText
+                content="Emergency Call   "
+                fontWeight="bold"
+                fontColor={Colors.primary}
+                fontSize={18}
+              />
+              <Spinner isVisible type='Wave' size={25} color={colors.primary} style={{marginTop:5}}/>
+            </View>
+            
+            <View style={{ flexDirection: 'row' }}>
+               <CustomButton title={"Accept"}  width={150} onPress={onAcceptEmergency} customStyle={{ marginRight: 5}} backgroundColor={colors.green} />
+              <CustomButton title={"Decline"}  width={150} onPress={onDeclineEmergency} backgroundColor={colors.red} />
+            </View>
+           
           </View>
         </View>
       )
@@ -637,7 +678,7 @@ const [userId, setUserId] = useState();
       {/* Bottom View  */}
       <View style={styles.bottomView}>
         {
-          (!isInAppointment && !emergencyReceived) ? (
+          (!isInAppointment && !emergencyReceived && !showFinishButton) ? (
              <View style={styles.bottomButtonContainer}>
               <CustomButton title={"Free"}  width={150} onPress={onFreePressed} customStyle={{borderRadius: 0}} backgroundColor={isFree ? colors.green : colors.secondary} />
               <CustomButton title={"Busy"}  width={150} onPress={onBusyPressed} customStyle={{borderRadius: 0}} backgroundColor={!isFree ? colors.red : colors.secondary}/>
@@ -651,6 +692,13 @@ const [userId, setUserId] = useState();
              <CustomButton title={"Abort"} fontColor={colors.white} width={150} onPress={onAborted} customStyle={{marginRight: 5}}  backgroundColor={ colors.red}/>
               <CustomButton title={"Reached"} fontColor={colors.white}  width={150} onPress={onReach}  backgroundColor={ colors.primary} />
               
+            </View>
+          ) : null
+        }
+        {
+          showFinishButton ? (
+            <View style={styles.bottomButtonContainer}>
+              <CustomButton title={"Finished"}  width={150} onPress={onFinish} backgroundColor={colors.golden} />
             </View>
           ) : null
         }
@@ -785,6 +833,11 @@ const styles = StyleSheet.create({
     paddingTop: 10,
   },
   nameGap: {paddingBottom: 3},
+  spinnerText: {
+    flexDirection: 'row', 
+    marginBottom: 10
+  }
 });
 
 export default Ambulance;
+
