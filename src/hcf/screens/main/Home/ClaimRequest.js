@@ -101,9 +101,6 @@ const ClaimRequest = ({ route, navigation }) => {
     claim.mutate(data);
   };
 
-  if (claim.isError) {
-    console.log(claim.error.response.data)
-  }
 
   if (claim.isError) {
     showMessage({
