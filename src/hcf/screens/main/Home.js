@@ -107,7 +107,6 @@ const Home = ({ navigation }) => {
           },
           { latitude: lat, longitude: lng },
         );
-        console.log(distance);
         if (distance > 100) {
           setLocationFromMapboxLng(lng);
           setLocationFromMapboxLat(lat);
