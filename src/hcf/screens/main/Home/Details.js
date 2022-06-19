@@ -41,7 +41,6 @@ const dimensionsHeight = Dimensions.get('window').height;
 const Details = ({ route, navigation }) => {
   const healthCareFacilityId = route.params.id;
   const travelDistance = route.params.travelDistance;
-
   const { data, isError, isLoading, isSuccess } =
     useHealthCareFacility(healthCareFacilityId);
 
@@ -106,6 +105,10 @@ const Details = ({ route, navigation }) => {
     // navigate to claim request page
     navigation.navigate('ClaimRequest', { id: healthCareFacilityId });
   };
+
+  if(isSuccess && loggedInUser.isSuccess) {
+    console.log(data.owner, loggedInUser.data.data)
+  }
 
   return (
     <View style={styles.container}>
@@ -278,23 +281,23 @@ const Details = ({ route, navigation }) => {
                   }
                 />
 
-                {data.owner === null ? ( <CustomButton
-                    title="Claim"
-                    fontSize={13}
-                    width={"40%"}
-                    height={45}
-                    customStyle={styles.buttonStyle}
-                    onPress={claimHCF}
-                    icon={
-                      <IconEntypo
-                        name="hand"
-                        size={20}
-                        color={Colors.dark}
-                      />
-                    }
-                  />): (
-                    <CustomButton
-                    title="Claimed"
+                {loggedInUser.isSuccess && data.owner === null ? (<CustomButton
+                  title="Claim"
+                  fontSize={13}
+                  width={"40%"}
+                  height={45}
+                  customStyle={styles.buttonStyle}
+                  onPress={claimHCF}
+                  icon={
+                    <IconEntypo
+                      name="hand"
+                      size={20}
+                      color={Colors.dark}
+                    />
+                  }
+                />) : (
+                  <CustomButton
+                    title={data.owner === loggedInUser.data.data.user.id ? "Owned By You" : "Claimed"}
                     fontSize={13}
                     disabled={true}
                     width={"40%"}
@@ -308,38 +311,14 @@ const Details = ({ route, navigation }) => {
                       />
                     }
                   />
-                  )} 
-                  
-                 
-                {/* <View style={styles.claimButton}>
-                  {data.verificationStatus && (
-                    <CustomButton
-                      title={'Claimed'}
-                      width={'100%'}
-                      height={50}
-                      backgroundColor={Colors.gray}
-                      fontColor={Colors.lightGray}
-                      disabled={true}
-                    />
-                  )}
-                  {!data.verificationStatus && (
-                    <CustomButton
-                      title={'Claim'}
-                      width={'100%'}
-                      height={50}
-                      backgroundColor={Colors.primary}
-                      fontColor={Colors.white}
-                      onPress={claimHCF}
-                    />
-                  )}
-                </View> */}
+                )}
               </View>
             </View>
           </View>
           <FlatList
             data={data.imageGallaryLinks[0] ? data.imageGallaryLinks : [defaultPicture]}
             renderItem={renderItem}
-            keyExtractor={image => image.id}
+            keyExtractor={image => image}
             horizontal={true}
             style={styles.imageItemsFlatList}
           />
