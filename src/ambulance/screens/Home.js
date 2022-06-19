@@ -9,6 +9,7 @@ import {
   Image,
   Pressable,
   Animated,
+  Switch
 } from 'react-native';
 import React, {useState, useEffect, useCallback, useRef, useMemo} from 'react';
 import {PERMISSIONS, RESULTS, openSettings} from 'react-native-permissions';
@@ -53,39 +54,43 @@ const USER_TYPES = {
   HEALTH_FACILITY: 'h',
 };
 
+const AMBULANCE_STATUS = {
+        FREE: 'FREE',
+        BUZY: 'BUZY'
+    }
+
 const NAMESPACES = {
   USER: '/USER_NAMESPACE',
   AMBULANCE: '/AMBULANCE_NAMESPACE',
 };
 const EVENTS = {
-  AMBULANCE_ONLINE: '0',
-  // AMBULANCE_STATUS_CHANGE : '1',
-  AMBULANCE_STATUS_CHANGED: '2',
-  APPOINT_AMBULANCE: '3',
-  // APPOINTMENT_REQUEST : '4', //might add amb to differentiate from hf later...
-  // ACCEPT_APPOINTMENT : '5', //
-  // DECLINE_APPOINTMENT : '6', //
-  APPOINTMENT_ACCEPTED: '7', //
-  APPOINTMENT_DECLINED: '8', //
-  // LOCATION_TO_USER : '9',
-  LOCATION_FROM_AMBULANCE: '10',
-  LOCATION_TO_AMBULANCE: '11',
-  // LOCATION_FROM_USER : '12',
-  // AMBULANCE_LOCATION_UPDATE : '13',
-  AMBULANCE_LOCATION_UPDATED: '14',
-  AMBULANCE_OFFLINE: '15',
-  ADD_EMERGENCY_CONTACTS: '16',
-  REMOVE_EMERGENCY_CONTACTS: '17',
-  UPDATE_EMERGENCY_CONTACTS: '18',
-  LOCATION_TO_EMERGENCY_CONTACTS: '19',
-  LOCATION_FROM_EMERGENCY_CONTACTS: '20',
-  ALERT_NEAR_AMBULANCE: '21',
-  // EMERGENCY_ALERT : '22',
-  CANT_FIND_AMBULANCE: '23',
-  ABORTED: '27',
-  HAVE_REACHED: '28',
-  FINISHED: '29',
-};
+        // AMBULANCE_ONLINE : '0',
+        AMBULANCE_STATUS_CHANGE: '1',
+        // AMBULANCE_STATUS_CHANGED : '2',
+        // APPOINT_AMBULANCE : '3',
+        APPOINTMENT_REQUEST: '4', //might add amb to differentiate from hf later...
+        ACCEPT_APPOINTMENT: '5', //
+        DECLINE_APPOINTMENT: '6', //
+        // APPOINTMENT_ACCEPTED : '7', //
+        // APPOINTMENT_DECLINED : '8', //
+        LOCATION_TO_USER: '9',
+        // LOCATION_FROM_AMBULANCE : '10',
+        // LOCATION_TO_AMBULANCE : '11',
+        LOCATION_FROM_USER: '12',
+        AMBULANCE_LOCATION_UPDATE: '13',
+        // AMBULANCE_LOCATION_UPDATED : '14',
+        // AMBULANCE_OFFLINE : '15',
+        // ADD_EMERGENCY_CONTACTS : '16',
+        // REMOVE_EMERGENCY_CONTACTS : '17',
+        // UPDATE_EMERGENCY_CONTACTS : '18',
+        // LOCATION_TO_EMERGENCY_CONTACTS : '19',
+        // LOCATION_FROM_EMERGENCY_CONTACTS : '20',
+        // ALERT_NEAR_AMBULANCE : '21',
+        EMERGENCY_ALERT: '22',
+        ABORT: '24',
+        REACHED: '25',
+        FINISH: '26'
+    }
 
 switch (userType) {
   case USER_TYPES.AMBULANCE:
@@ -175,6 +180,7 @@ const [ambulanceAborted, setAmbulanceAborted] = useState();
   const [canNotFindAmbulance, setCanNotFindAmbulance] = useState(false);
   const [locationFromAmbulance, setLocationFromAmbulance] = useState()
   const [ambulanceHasReached, setAmbulanceHasReached] = useState()
+  const [isFree, setIsFree] = useState(false);
 
   const refUserLocation = useRef();
 
@@ -366,6 +372,21 @@ const [ambulanceAborted, setAmbulanceAborted] = useState();
     }
   }, [checkPermission, locationPermissionGranted]);
 
+  // on is free pressed
+  const onFreePressed = () => {
+    setIsFree(true);
+    const statusString = AMBULANCE_STATUS.FREE;
+    socketRef.current.emit(EVENTS.AMBULANCE_STATUS_CHANGE, {ambulanceID: ambulanceID, status: statusString});
+  }
+
+  // on is busy pressed
+   const onBusyPressed = () => {
+    setIsFree(false);
+    const statusString = AMBULANCE_STATUS.BUZY;
+    socketRef.current.emit(EVENTS.AMBULANCE_STATUS_CHANGE, {ambulanceID: ambulanceID, status: statusString});
+  }
+
+
   useEffect(() => {
     socketRef.current = io(connection_url, {
       // forceNew : true,
@@ -385,92 +406,104 @@ const [ambulanceAborted, setAmbulanceAborted] = useState();
     socketRef.current.on('connect', data => {
       console.log('connected hoy hoy hoy: ', data, connection_url);
     });
-    //TODO: Here 
+
+
+    // When an emergency alert is emitted
+    socketRef.current.on(EVENTS.EMERGENCY_ALERT, (data, ack) => {
+       console.table({
+        event: 'EMERGENCY_ALERT', 
+        userID: data.userID, 
+        coordinates: data.coordinates
+      });
+    })
+   
+   
     // When no Ambulance is found
-    socketRef.current.on(EVENTS.CANT_FIND_AMBULANCE, data => {
-      console.table({event: 'CANT_FIND_AMBULANCE'});
-      console.log(">>>>>> Can't find ambulances. Try again");
-      setCallingAmbulance(false);
-      setCanNotFindAmbulance(true);
-      setTimeout(()=>{
-        setCanNotFindAmbulance(false);
-      }, 5000)
-    });
+    // socketRef.current.on(EVENTS.CANT_FIND_AMBULANCE, data => {
+    //   console.table({event: 'CANT_FIND_AMBULANCE'});
+    //   console.log(">>>>>> Can't find ambulances. Try again");
+    //   setCallingAmbulance(false);
+    //   setCanNotFindAmbulance(true);
+    //   setTimeout(()=>{
+    //     setCanNotFindAmbulance(false);
+    //   }, 5000)
+    // });
 
-    socketRef.current.on(EVENTS.APPOINTMENT_ACCEPTED, data => {
-      // start LS
-      // state.streams.LS.start(data.ambulanceID);
-      // state.in_appointment_with.ambulanceID = data.ambulanceID;
-      setAppointmentAccepted(true);
-      // setAmbulanceId(data.ambulanceID);
-      setCallingAmbulance(false);
+    // 
+    // socketRef.current.on(EVENTS.APPOINTMENT_ACCEPTED, data => {
+    //   // start LS
+    //   // state.streams.LS.start(data.ambulanceID);
+    //   // state.in_appointment_with.ambulanceID = data.ambulanceID;
+    //   setAppointmentAccepted(true);
+    //   // setAmbulanceId(data.ambulanceID);
+    //   setCallingAmbulance(false);
 
-      // locationToAmbulance(locationFromMapboxLng, locationFromMapboxLat);
-      // console.log("user location sent from inside appointment accepted");
-    });
+    //   // locationToAmbulance(locationFromMapboxLng, locationFromMapboxLat);
+    //   // console.log("user location sent from inside appointment accepted");
+    // });
 
-    //when an ambulance is found
-    socketRef.current.on(EVENTS.LOCATION_FROM_AMBULANCE, data => {
-      console.log(`Ambulance at ${data.coordinates}`);
-      setLocationFromAmbulance(data.coordinates)
+    // //when an ambulance is found
+    // socketRef.current.on(EVENTS.LOCATION_FROM_AMBULANCE, data => {
+    //   console.log(`Ambulance at ${data.coordinates}`);
+    //   setLocationFromAmbulance(data.coordinates)
 
-    });
+    // });
 
 
-    // on Aborted
-    socketRef.current.on(EVENTS.ABORTED, data => {
-      // stop LS
-      // ambuAppState.streams.LS.stop();
-      setAppointmentAccepted(false);
-      // ambuAppState.in_appointment_with.ambulanceID = null;
-      // setAmbulanceId(null);
-      setLocationFromAmbulance(null);
-      setAmbulanceAborted(true)
-      setTimeout(()=>{
-        setAmbulanceAborted(false);
-      }, 5000)
+    // // on Aborted
+    // socketRef.current.on(EVENTS.ABORTED, data => {
+    //   // stop LS
+    //   // ambuAppState.streams.LS.stop();
+    //   setAppointmentAccepted(false);
+    //   // ambuAppState.in_appointment_with.ambulanceID = null;
+    //   // setAmbulanceId(null);
+    //   setLocationFromAmbulance(null);
+    //   setAmbulanceAborted(true)
+    //   setTimeout(()=>{
+    //     setAmbulanceAborted(false);
+    //   }, 5000)
 
-      console.log('Ambulance aborted');
-    });
+    //   console.log('Ambulance aborted');
+    // });
 
-    // on Reached
-    socketRef.current.on(EVENTS.HAVE_REACHED, data => {
-      // stop LS
-      // ambuAppState.streams.LS.stop();
-      setAppointmentAccepted(false);
-      // setAmbulanceId(null);
-      setLocationFromAmbulance(null);
-      setAmbulanceHasReached(true)
-      setTimeout(()=>{
-        setAmbulanceHasReached(false);
-      }, 5000)
-      console.log('Ambulance reached your location');
-    });
+    // // on Reached
+    // socketRef.current.on(EVENTS.HAVE_REACHED, data => {
+    //   // stop LS
+    //   // ambuAppState.streams.LS.stop();
+    //   setAppointmentAccepted(false);
+    //   // setAmbulanceId(null);
+    //   setLocationFromAmbulance(null);
+    //   setAmbulanceHasReached(true)
+    //   setTimeout(()=>{
+    //     setAmbulanceHasReached(false);
+    //   }, 5000)
+    //   console.log('Ambulance reached your location');
+    // });
 
-    // on Finished
-    socketRef.current.on(EVENTS.FINISHED, data => {
-      // ambuAppState.in_appointment_with.ambulanceID = null;
-      // setAmbulanceId(null);
-      setAppointmentAccepted(false);
-      console.log('Job finished');
-    });
+    // // on Finished
+    // socketRef.current.on(EVENTS.FINISHED, data => {
+    //   // ambuAppState.in_appointment_with.ambulanceID = null;
+    //   // setAmbulanceId(null);
+    //   setAppointmentAccepted(false);
+    //   console.log('Job finished');
+    // });
 
     return () => {
       socketRef.current.disconnect();
     };
   }, []);
 
-  const callAmbulance = () => {
-    setCallingAmbulance(true);
-    socketRef.current.emit(
-      EVENTS.ALERT_NEAR_AMBULANCE,
-      {
-        coordinates: [userPositionLng, userPositionLat],
-        userID: userId,
-      }, //,
-      // (response)=>console.log(response)
-    );
-  };
+  // const callAmbulance = () => {
+  //   setCallingAmbulance(true);
+  //   socketRef.current.emit(
+  //     EVENTS.ALERT_NEAR_AMBULANCE,
+  //     {
+  //       coordinates: [userPositionLng, userPositionLat],
+  //       userID: userId,
+  //     }, //,
+  //     // (response)=>console.log(response)
+  //   );
+  // };
 
   useEffect(() => {
 
@@ -582,7 +615,7 @@ const [ambulanceAborted, setAmbulanceAborted] = useState();
 
       {/* status bar display only when ambulance is called */}
       {/* Calling ambulance */}
-      {callingAmbulance && (
+      {false && (
         <View style={styles.statusBarContainer}>
           {/* Display arriving status  */}
           <View style={styles.statusBar}>
@@ -595,53 +628,9 @@ const [ambulanceAborted, setAmbulanceAborted] = useState();
             <Spinner isVisible type='Wave' size={25} color={colors.primary} style={{marginTop:5}}/>
           </View>
         </View>
-      )}
-      {/* Cant find ambulance */}
-      {canNotFindAmbulance && (
-        <View style={styles.statusBarContainer}>
-          {/* Display arriving status  */}
-          <View style={styles.statusBar}>
-            <CustomText
-              content="Could not find ambulance. Please try again later."
-              fontWeight="bold"
-              fontColor={Colors.red}
-              fontSize={16}
-            />
-            {/* <Spinner isVisible type='Wave' size={25} color={colors.primary} style={{marginTop:5}}/> */}
-          </View>
-        </View>
-      )}
-      {/* Ambulance aborted */}
-      {ambulanceAborted && (
-        <View style={styles.statusBarContainer}>
-          {/* Display arriving status  */}
-          <View style={styles.statusBar}>
-            <CustomText
-              content="The ambulance aborted your call."
-              fontWeight="bold"
-              fontColor={Colors.red}
-              fontSize={16}
-            />
-            {/* <Spinner isVisible type='Wave' size={25} color={colors.primary} style={{marginTop:5}}/> */}
-          </View>
-        </View>
-      )}
-
-       {/* Ambulance has reached */}
-      {ambulanceHasReached && (
-        <View style={styles.statusBarContainer}>
-          {/* Display arriving status  */}
-          <View style={styles.statusBar}>
-            <CustomText
-              content="The ambulance has reached your location."
-              fontWeight="bold"
-              fontColor={Colors.primary}
-              fontSize={16}
-            />
-            {/* <Spinner isVisible type='Wave' size={25} color={colors.primary} style={{marginTop:5}}/> */}
-          </View>
-        </View>
-      )}
+      )
+      }
+     
 
       {/* Get location button */}
       <Animated.View
@@ -679,21 +668,10 @@ const [ambulanceAborted, setAmbulanceAborted] = useState();
 
       {/* Bottom View  */}
       <View style={styles.bottomView}>
+        
         <View style={styles.bottomButtonContainer}>
-          {/* trinary condition () ? true : false */}
-          {!appointmentAccepted ?  (
-            // Display if ambulance not called
-            <CustomButton
-              onPress={e => {
-                // setAmbulanceCalled(true);
-                callAmbulance();
-              }}
-              width={Dimensions.get('window').width - 50}
-              backgroundColor={Colors.primary}
-              fontColor={Colors.white}
-              title="Call Ambulance"
-            />
-          ) : null}
+              <CustomButton title={"Free"}  width={150} onPress={onFreePressed} customStyle={{borderRadius: 0}} backgroundColor={isFree ? colors.green : colors.secondary} />
+              <CustomButton title={"Busy"}  width={150} onPress={onBusyPressed} customStyle={{borderRadius: 0}} backgroundColor={!isFree ? colors.red : colors.secondary}/>
         </View>
         {appointmentAccepted && (
           <View style={styles.driveDetailsContainer}>
@@ -789,10 +767,13 @@ const styles = StyleSheet.create({
     width: Dimensions.get('window').width,
   },
   bottomButtonContainer: {
-    flex: 1,
+    // flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 20,
+    backgroundColor: colors.secondary,
+    flexDirection: 'row',
+    justifyContent: 'center'
   },
   driveDetailsContainer: {
     backgroundColor: Colors.whiteSmoke,
