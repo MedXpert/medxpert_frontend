@@ -201,7 +201,7 @@ const Details = ({ route, navigation }) => {
               <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start' }}>
                 <IconFeather name="phone" size={15} color={Colors.primary} />
                 {data.phoneNumbers && data.phoneNumbers.map((phone, index) => (
-                  <>
+                  <View key={index} style={{ flexDirection: 'row', alignItems: 'center' }}>
                     <CustomText
                       key={index}
                       customStyles={styles.open}
@@ -209,7 +209,7 @@ const Details = ({ route, navigation }) => {
                       content={phone}
                     />
                     {index !== data.phoneNumbers.length - 1 && (<IconEntypo name="dot-single" size={20} color={Colors.primary} />)}
-                  </>
+                  </View>
                 ))}
               </View>
               <View style={styles.typeAndTravel}>
@@ -315,7 +315,7 @@ const Details = ({ route, navigation }) => {
           <FlatList
             data={data.imageGallaryLinks[0] ? data.imageGallaryLinks : [defaultPicture]}
             renderItem={renderItem}
-            keyExtractor={image => image}
+            keyExtractor={image => image + Math.random()}
             horizontal={true}
             style={styles.imageItemsFlatList}
           />

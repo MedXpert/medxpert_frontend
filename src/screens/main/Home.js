@@ -331,7 +331,7 @@ const Home = ({navigation}) => {
           // ref={c => (_map = c)}
           ref={c => (_map = c)}
           logoEnabled={false}
-          compassViewMargins={{x: 10, y: (30 * dimensionHeight) / 100}}
+          compassViewMargins={{x: 10, y: (40 * dimensionHeight) / 100}}
           style={styles.map}
           surfaceView>
           {/* Display user location */}
