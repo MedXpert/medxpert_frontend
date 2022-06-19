@@ -19,10 +19,10 @@ import BottomSheet from '@gorhom/bottom-sheet';
 // import MapboxDirectionsFactory from '@mapbox/mapbox-sdk/services/directions';
 import {lineString as makeLineString} from '@turf/helpers';
 import axios from 'axios';
-import {getDistance} from 'geolib';
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
-import IconAntDesign from 'react-native-vector-icons/AntDesign';
-import IconMaterialCommunity from 'react-native-vector-icons/MaterialCommunityIcons';
+import IconAntDesign from "react-native-vector-icons/AntDesign";
+import IconMaterialCommunity from "react-native-vector-icons/MaterialCommunityIcons";
 
 import {SearchBar} from '../../components/general/SearchBar';
 import Colors from '../../constants/colors';
@@ -37,9 +37,12 @@ import {useHealthCareFacilities} from '../../hooks/healthCareFacility';
 import {requestPermissions} from '../../services/permissions/requestPermissions';
 import {LOCATION_PERMISSION_MESSAGE} from '../../constants/string/requestPermissions/requestPermissions';
 import {RenderDirection} from '../../components/general/RenderDirection';
+import {getDistance} from "geolib";
+import { useEmergencyContacts } from "../../hooks/emergencyContact";
 
-const dimensionHeight = Dimensions.get('window').height;
-const dimensionWidth = Dimensions.get('window').width;
+
+const dimensionHeight = Dimensions.get("window").height;
+const dimensionWidth = Dimensions.get("window").width;
 
 const Home = ({navigation}) => {
   var _map;
@@ -51,7 +54,6 @@ const Home = ({navigation}) => {
   const lightStyleURL = MapboxGL.StyleURL.Light;
   const darkStyleURL = MapboxGL.StyleURL.Dark;
   const [styleUrl, setStyleUrl] = useState(streetStyleURL); // MapboxGL map style url
-  const permissionName = PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION; // location permission name
   const [locationPermissionGranted, setLocationPermissionGranted] =
     useState(false); // Whether the location permission is granted
   const [locationPermissionDenied, setLocationPermissionDenied] =
@@ -66,26 +68,34 @@ const Home = ({navigation}) => {
   const [route, setRoute] = useState(null);
   const [followUserLocation, setFollowUserLocation] = useState(false);
   const startValueMoveY = useRef(new Animated.Value(0)).current; // Initial value of move Y animated for the location
+  const locationPermission = PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION; // location permission name
 
   const refUserLocation = useRef();
 
-  const accessToken =
-    'sk.eyJ1IjoibGl5dW1rIiwiYSI6ImNsMWtteG11NzAyZWgzZG9kOWpyb2x1dWMifQ.X4v8HxdCSmdrvVaCWXVjog';
+  const phone = useEmergencyContacts({
+    type: "phone"
+  });
 
-  const geoApifyAccessToken = '87d55356e5ab47dab8be60202bb80ae3';
+  const email = useEmergencyContacts({
+    type: "email"
+  });
+
+  const accessToken =
+    "sk.eyJ1IjoibGl5dW1rIiwiYSI6ImNsMWtteG11NzAyZWgzZG9kOWpyb2x1dWMifQ.X4v8HxdCSmdrvVaCWXVjog";
+
+  const geoApifyAccessToken = "87d55356e5ab47dab8be60202bb80ae3";
 
   // const directionsClient = MapboxDirectionsFactory({accessToken}); // To be used to get the direction: ;
 
   // Exit the app and go to settings. This function is called when the 'Go to settings' button in the permission denied modal is pressed.
   const settings = () => {
     BackHandler.exitApp();
-    openSettings().catch(() => console.warn('Can not open settings'));
+    openSettings().catch(() => console.warn("Can not open settings"));
   };
 
   // Checks permission
   const checkPermission = useCallback(async () => {
-    const result = await requestPermissions(permissionName); // call requestPermissions function with the permissionName argument and wait for the result;
-
+    const result = await requestPermissions(locationPermission); // call requestPermissions function with the permissionName argument and wait for the result;
     //Set the values of location permission according to the result from 'requestPermissions' function
     if (result === RESULTS.GRANTED) {
       setLocationPermissionBlocked(false);
@@ -100,7 +110,7 @@ const Home = ({navigation}) => {
       setLocationPermissionDenied(false);
       setLocationPermissionBlocked(true);
     }
-  }, [permissionName]);
+  }, [locationPermission]);
 
   // Will be called when the user location is updated/changed
   const userLocationUpdate = location => {
@@ -143,7 +153,7 @@ const Home = ({navigation}) => {
         if (locationFromMapboxLat && locationFromMapboxLng) {
           setUserPositionLng(locationFromMapboxLng);
           setUserPositionLat(locationFromMapboxLat);
-          console.log('Inside mapbox User position');
+          console.log("Inside mapbox User position");
         } else {
           setUserPositionLng(lng);
           setUserPositionLat(lat);
@@ -194,10 +204,10 @@ const Home = ({navigation}) => {
 
     const res = await axios.get(
       `https://api.geoapify.com/v1/routing?waypoints=${startLoc.latitude},${startLoc.longitude}|${destLoc.latitude},${destLoc.longitude}&mode=drive&apiKey=${geoApifyAccessToken}`,
-    );
+    ); 
 
     const coordinates = res.data.features[0].geometry.coordinates[0];
-    const routeLineString = makeLineString(coordinates, {name: 'line 1'});
+    const routeLineString = makeLineString(coordinates, {name: "line 1"});
     setRoute(routeLineString);
 
     // console.log('Route: ', JSON.stringify(route.geometry));
@@ -256,6 +266,44 @@ const Home = ({navigation}) => {
     }
   }, [checkPermission, locationPermissionGranted]);
 
+  useEffect(()=>{
+    const addEmergencyContacts = async () => {
+
+      var storeToAsyncStorage = [];
+     
+      if(email.isSuccess && email.data){
+        const emails = email.data.data.emergencyContact;
+        // console.log("email", emails);
+        storeToAsyncStorage = emails;
+      }
+
+      if(phone.isSuccess && phone.data){
+        const phoneNumbers = phone.data.data.emergencyContact;
+        storeToAsyncStorage = [...storeToAsyncStorage, ...phoneNumbers];
+      }
+
+      await AsyncStorage.setItem("@emergencyContacts", JSON.stringify(storeToAsyncStorage));
+
+      const sdsd = await AsyncStorage.getItem("@emergencyContacts");
+
+      console.log(sdsd);
+      
+    };
+
+    addEmergencyContacts();
+  }, [phone.data, email.data, phone.isSuccess, email.isSuccess]);
+
+  useEffect(()=>{
+    const cleanUp = async ()=> {
+      await AsyncStorage.removeItem("@abortBackgroundFall");
+      await AsyncStorage.removeItem("@counting");
+      await AsyncStorage.removeItem("@fallDetectionAbort");
+      await AsyncStorage.removeItem("@fallDetected");
+    };
+    cleanUp();
+	
+  });
+
   useEffect(() => {
     if (locationFromMapboxLng && locationFromMapboxLat) {
       getDirections(
@@ -304,8 +352,8 @@ const Home = ({navigation}) => {
         buttonOnRightOnPress={() => {
           checkPermission(); // If button is clicked request permission again
         }}
-        buttonLeftTitle={'Close App'}
-        buttonRightTitle={'Give Permission'}
+        buttonLeftTitle={"Close App"}
+        buttonRightTitle={"Give Permission"}
         modalVisibility={locationPermissionDenied}
       />
 
@@ -318,8 +366,8 @@ const Home = ({navigation}) => {
         buttonOnRightOnPress={() => {
           settings(); // Go to permission settings
         }}
-        buttonLeftTitle={'Close App'}
-        buttonRightTitle={'Go to settings'}
+        buttonLeftTitle={"Close App"}
+        buttonRightTitle={"Go to settings"}
         modalVisibility={locationPermissionBlocked}
         buttonWidth={160}
       />
@@ -346,8 +394,8 @@ const Home = ({navigation}) => {
                 visible={true}
                 onUpdate={userLocationUpdate}
               />
-              {route ? <RenderDirection route={route} /> : null} //If there is
-              route, draw route from given source to destination
+              {/* If there is route, draw route from given source to destination */}
+              {route ? <RenderDirection route={route} /> : null}
             </>
           )}
           <MapboxGL.Camera
@@ -382,7 +430,7 @@ const Home = ({navigation}) => {
         ]}>
         <IconButton
           // icon={locationChanged ? 'crosshairs' : 'crosshairs-gps'}
-          icon={'crosshairs-gps'}
+          icon={"crosshairs-gps"}
           color={Colors.secondary}
           size={30}
           onPress={findMyLocation}
@@ -420,24 +468,24 @@ const Home = ({navigation}) => {
 
 const styles = StyleSheet.create({
   buttonsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
     marginTop: 20,
   },
   bottomSheetContainer: {
     flex: 1,
-    alignContent: 'center',
+    alignContent: "center",
   },
   container: {
     // flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     backgroundColor: Colors.secondary,
   },
   mapIconContainer: {
     backgroundColor: Colors.primary,
     borderRadius: 50,
-    position: 'absolute',
+    position: "absolute",
     top: (15 * dimensionHeight) / 100,
     right: 10,
   },
@@ -446,7 +494,7 @@ const styles = StyleSheet.create({
   },
   locationButtonContainer: {
     backgroundColor: Colors.primary,
-    position: 'absolute',
+    position: "absolute",
     bottom: 310,
     right: 10,
     borderRadius: 50,
@@ -461,7 +509,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   searchBarContainer: {
-    position: 'absolute',
+    position: "absolute",
     top: 30,
   },
 });

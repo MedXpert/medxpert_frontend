@@ -172,6 +172,7 @@ android {
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
         }
     }
+    
 
     // applicationVariants are e.g. debug, release
     applicationVariants.all { variant ->
@@ -197,7 +198,7 @@ dependencies {
     // implementation "org.maplibre.gl:android-sdk:9.4.0"
     implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.0.0"
     compile project(':react-native-disable-battery-optimizations-android')
-
+    
     debugImplementation("com.facebook.flipper:flipper:${FLIPPER_VERSION}") {
         exclude group:'com.facebook.fbjni'
     }

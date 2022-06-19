@@ -5,7 +5,7 @@ const createAppointment = async appointment => {
   delete appointment.healthFacilityId;
   return await httpClient.post(`/appointments/${healthFacilityId}`, appointment, {
     headers: {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
     }
   });
 };
