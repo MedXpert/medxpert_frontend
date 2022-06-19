@@ -14,7 +14,7 @@ import NavigationStackUser from './NavigationStackUser';
 import NavigationStackHCF from '../HCF/routes/NavigationStackHCF';
 import WelcomeStackScreen from './Welcome';
 import AuthStackScreen from './Auth';
-import NavigationStackAmbulance from '../ambulance/routes/NavigationStackAmbulance';
+import NavigationStackAmbulance from '../Ambulance/routes/NavigationStackAmbulance';
 import {AuthContext, WelcomeContext} from '../components/general/Context';
 
 // The main route that evaluates whether the user is logged in or not and decides where to navigate when the app starts.
