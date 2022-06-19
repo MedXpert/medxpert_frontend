@@ -6,7 +6,7 @@ const useUpdateHealthCareFacility = () => {
 
   return useMutation(updateHealthCareFacility, {
     onSuccess: () => {
-      queryClient.invalidateQueries(['appointment']);
+      queryClient.invalidateQueries(['healthCareFacility']);
     },
   });
 };

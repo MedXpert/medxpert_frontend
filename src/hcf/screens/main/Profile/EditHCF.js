@@ -43,17 +43,17 @@ const EditHCF = ({ route, navigation }) => {
       const phone = String(hcf.phoneNumbers.map(phone => phone).join(','))
       const services = String(hcf.services.map(service => service.name).join(','))
 
-      setValue('name', hcf.name || '');
-      setValue('address', hcf.address) || '';
-      setValue('email', hcf.email || '');
-      setValue('website', hcf.website || 'http://www.a.com');
-      setValue('phoneNumber', phone);
-      setValue('type', hcf.facility_type || '');
-      setValue('doctorCount', hcf.doctorCount || '1');
-      setValue('services', services || 'Doing this');
-      setValue('description', hcf.description || 'nice');
+      setValue('name', hcf?.name || '');
+      setValue('address', hcf?.address) || '';
+      setValue('email', hcf?.email || '');
+      setValue('website', hcf?.website || '');
+      setValue('phoneNumber', phone || '');
+      setValue('type', hcf?.facility_type || '');
+      setValue('doctorCount', hcf?.doctorCount || '');
+      setValue('services', services || '');
+      setValue('description', hcf?.description || '');
     }
-  }), [healthCareFacility];
+  }), [];
 
   useEffect(() => {
     if (updateHealthFacility.isSuccess) {
