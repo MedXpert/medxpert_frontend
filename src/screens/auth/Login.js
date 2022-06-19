@@ -35,10 +35,30 @@ const Login = ({ navigation }) => {
 
   // Login function
   const onLogin = data => {
-    // storeToken(token);
-    // loginStatus();
     login.mutate({...data});
   };
+
+  useEffect(()=> {
+    if (login.isError) {
+      showMessage({
+        message: "Error",
+        description: login.error.response.data.non_field_errors[0] || login.error.message,
+        type: "danger",
+        icon: "danger",
+        duration: 5000,
+      });
+    }
+
+    if(login.isSuccess) {
+      showMessage({
+        message: "Success",
+        description: "Login successful",
+        type: "success",
+        icon: "success",
+        duration: 3000,
+      });
+    }
+  }, [login])
 
   if(login.isSuccess) {
     storeToken(
@@ -50,27 +70,6 @@ const Login = ({ navigation }) => {
       }
     );
     loginStatus();
-  }
-
-  
-  if (login.isError) {
-    showMessage({
-      message: "Error",
-      description: login.error.response.data.non_field_errors[0] || login.error.message,
-      type: "danger",
-      icon: "danger",
-      duration: 5000,
-    });
-  }
-
-  if(login.isSuccess) {
-    showMessage({
-      message: "Success",
-      description: "Login successful",
-      type: "success",
-      icon: "success",
-      duration: 3000,
-    });
   }
 
   return (

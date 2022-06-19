@@ -308,12 +308,11 @@ const Details = ({ route, navigation }) => {
                     )}
 
                   </>) : (
-
                   <CustomButton
                     title={data.owner === loggedInUser.data.data.user.id ? "Owned By You" : "Claimed"}
                     fontSize={13}
-                    disabled={true}
                     width={"40%"}
+                    onPress={() => navigation.navigate('Claimed')}
                     height={45}
                     customStyle={[styles.buttonStyle, styles.grayButtons]}
                     icon={

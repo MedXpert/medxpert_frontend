@@ -7,65 +7,74 @@ import {
   Dimensions,
   FlatList,
   ActivityIndicator,
+  Pressable,
 } from 'react-native';
-import React, {useState} from 'react';
-import {IconButton} from 'react-native-paper';
+import React, { useState } from 'react';
+import { IconButton } from 'react-native-paper';
 import axios from 'axios';
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import Colors from '../../../constants/colors';
-import {CustomTextInput} from '../../general/CustomTextInput';
+import { CustomTextInput } from '../../general/CustomTextInput';
 import LogoSvg from '../../../assets/svg/logo/logo blue no background.svg';
-import {CustomText} from '../CustomText';
-
+import { CustomText } from '../CustomText';
+import { useSearchHealthCareFacility } from "../../../hooks/healthCareFacility";
+import { useLoggedInUser } from "../../../hooks/authentication";
+import { getDistance } from 'geolib';
 const SearchBar = ({
   containerWidth,
   elevation,
   marginHorizontal = 0,
   fontSize,
+  navigation,
+  currentLocation
 }) => {
-  const [fetchData, setFetchData] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
   const [textValue, setTextValue] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
   const [searchClicked, setSearchClicked] = useState(false);
-  const [countSearchResult, setCountSearchResult] = useState(0);
-
-  const fetchPosts = async () => {
-    const res = await axios.get('https://jsonplaceholder.typicode.com/posts');
-    const data = await res.data;
-    setFetchData(data);
-  };
-
+  const search = useSearchHealthCareFacility();
   // Calls the fetchData function and searches for the key given as a parameter
-  const searchPosts = async searchKey => {
-    setSearchClicked(true);
 
-    setIsLoading(true);
-    await fetchPosts();
+  const searchPosts = async searchKey => {
+
+    setSearchClicked(true);
     setFilteredData([]); // Empty the the existing list.
-    // Map each element from fetchData and store the ones that much the search key word to filteredData.
-    fetchData.map((value, index) => {
-      var isSearchValue = value.title.includes(searchKey);
-      if (isSearchValue) {
-        setCountSearchResult(countSearchResult + 1);
-        setFilteredData(existingItems => [
-          ...existingItems,
-          {id: Math.random() * 10 + 1, title: value.title},
-        ]);
+    search.mutate(searchKey);
+    if (search.isSuccess) {
+      const result = search.data.data.data
+      console.log(result)
+      if (result && result.length > 0) {
+        setFilteredData(result);
+      } else {
+        setFilteredData([]);
       }
-    });
-    //If there is no result set the filteredData array to empty
-    if (countSearchResult === 0) {
-      setFilteredData([]);
     }
-    setIsLoading(false); //Loading ends here
   };
 
-  const renderItem = ({item}) => {
+  const getGPSFromString = (coordinate) => {
+    return coordinate.substring(17, coordinate.length - 1).split(' ').map((item) => parseFloat(item));
+  }
+
+  const getDistanceFromGPS = (coordinateString, withString = false) => {
+    const coordinate = getGPSFromString(coordinateString);
+    const current = currentLocation.split(',')
+    const distance = getDistance(
+      { latitude: current[0], longitude: current[1] },
+      { latitude: coordinate[0], longitude: coordinate[1] },
+    );
+
+    return withString ? distance : distance > 1000 ? `${(distance / 1000).toFixed(2)} km` : `${distance} m`;
+  }
+
+
+
+  const renderItem = ({ item }) => {
+
     return (
-      <View style={styles.item}>
-        <CustomText content={item.title} />
-      </View>
+      <Pressable onPress={() => navigation.navigate('Details', { id: item.id, travelDistance: getDistanceFromGPS(item.GPSCoordinates, true) })} key={item.id}>
+        <View style={styles.item}>
+          <CustomText content={item.name} />
+        </View>
+      </Pressable>
     );
   };
 
@@ -79,14 +88,15 @@ const SearchBar = ({
     );
   };
   const loadingOrResults = () => {
-    return isLoading && searchClicked ? (
+    return search.isLoading ? (
       <ActivityIndicator />
-    ) : !isLoading && searchClicked && filteredData.length !== 0 ? (
+    ) : !search.isLoading && filteredData.length !== 0 ? (
       listItems()
-    ) : !isLoading && searchClicked && filteredData.length === 0 ? (
+    ) : !search.isLoading && filteredData.length === 0 ? (
       <CustomText content={'No match found.'} />
     ) : null;
   };
+
   return (
     <View>
       <View
@@ -104,7 +114,7 @@ const SearchBar = ({
             onChangeText={text => setTextValue(text)}
             value={textValue}
             placeholder={'Search'}
-            customStyle={[styles.textInput, {fontSize: fontSize}]}
+            customStyle={[styles.textInput, { fontSize: fontSize }]}
           />
         </View>
 
@@ -138,8 +148,10 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   item: {
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    marginBottom: 2,
     backgroundColor: Colors.whiteSmoke,
-    marginBottom: 5,
   },
   logoContainer: {
     paddingTop: 5,
@@ -150,8 +162,7 @@ const styles = StyleSheet.create({
     maxHeight: Dimensions.get('window').height / 2,
     borderBottomStartRadius: 10,
     borderBottomEndRadius: 10,
-    padding: 10,
-    alignItems: 'center',
+    marginTop: -10
   },
   textInput: {
     backgroundColor: Colors.white,
@@ -159,4 +170,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export {SearchBar};
+export { SearchBar };
