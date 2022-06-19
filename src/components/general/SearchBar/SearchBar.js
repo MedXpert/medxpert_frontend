@@ -20,6 +20,7 @@ import { CustomText } from '../CustomText';
 import { useSearchHealthCareFacility } from "../../../hooks/healthCareFacility";
 import { useLoggedInUser } from "../../../hooks/authentication";
 import { getDistance } from 'geolib';
+import Ionicons from 'react-native-vector-icons/Ionicons'
 const SearchBar = ({
   containerWidth,
   elevation,
@@ -65,6 +66,11 @@ const SearchBar = ({
     return withString ? distance : distance > 1000 ? `${(distance / 1000).toFixed(2)} km` : `${distance} m`;
   }
 
+  const clearSearch = () => {
+    setFilteredData([]);
+    setSearchClicked(false);
+    setTextValue(' ');
+  }
 
 
   const renderItem = ({ item }) => {
@@ -118,6 +124,7 @@ const SearchBar = ({
           />
         </View>
 
+        {filteredData.length === 0 ? (
         <IconButton
           icon="magnify"
           color={Colors.primary}
@@ -125,7 +132,22 @@ const SearchBar = ({
           onPress={() => {
             searchPosts(textValue);
           }}
-        />
+        />) : (
+        <IconButton
+          icon="close"
+          color={Colors.primary}
+          size={25}
+          onPress={clearSearch}
+        />)}
+
+        {/* <IconButton
+          icon="magnify"
+          color={Colors.primary}
+          size={25}
+          onPress={() => {
+            searchPosts(textValue);
+          }}
+        /> */}
       </View>
       {searchClicked && (
         <View style={styles.listContainer}>{loadingOrResults()}</View>
