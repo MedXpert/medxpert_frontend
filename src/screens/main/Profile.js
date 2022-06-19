@@ -94,16 +94,6 @@ const Profile = () => {
         <View>
           <View style={styles.changePassword}>
             <CustomButton
-              title="Change password"
-              backgroundColor={Colors.white}
-              fontColor={Colors.dark}
-              width={165}
-              customStyle={styles.changePasswordButton}
-              fontSize={14}
-              fontWeight="bold"
-              height={35}
-            />
-            <CustomButton
               title="Logout"
               backgroundColor={Colors.primary}
               fontColor={Colors.white}

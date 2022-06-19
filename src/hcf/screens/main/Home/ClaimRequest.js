@@ -1,5 +1,5 @@
 import { View, StyleSheet, ScrollView, Platform } from 'react-native';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import IconMaterialCommunity from 'react-native-vector-icons/MaterialCommunityIcons';
 import IconMaterial from 'react-native-vector-icons/MaterialIcons';
@@ -53,15 +53,18 @@ const ClaimRequest = ({ route, navigation }) => {
     },
   });
 
-  if (healthCareFacility.isSuccess && loggedInUser.isSuccess) {
-    const hcf = healthCareFacility?.data;
-    const user = loggedInUser.data?.data.user;
-    setValue('hcfName', hcf?.name);
-    setValue('requesterFirstName', user?.firstName);
-    setValue('requesterLastName', user?.lastName);
-    setValue('requesterPhoneNumber', user?.phoneNumber);
-    setValue('requesterEmail', user?.email);
-  }
+  useEffect(() => {
+    if (healthCareFacility.isSuccess && loggedInUser.isSuccess) {
+      const hcf = healthCareFacility?.data;
+      const user = loggedInUser.data?.data.user;
+      setValue('hcfName', hcf?.name);
+      setValue('requesterFirstName', user?.firstName);
+      setValue('requesterLastName', user?.lastName);
+      setValue('requesterPhoneNumber', user?.phoneNumber);
+      setValue('requesterEmail', user?.email);
+    }
+
+  }, [healthCareFacility]);
 
   // Document picker error handler
   const handleDocPickerError = err => {
@@ -97,32 +100,35 @@ const ClaimRequest = ({ route, navigation }) => {
   const onSubmit = data => {
     data['healthFacilityID'] = healthCareFacilityId;
     delete data['hcfName'];
-    
+
     claim.mutate(data);
   };
 
+  useEffect(() => {
+    if (claim.isError) {
+      showMessage({
+        message: "Error",
+        description: "Error Occured contact the developer",
+        type: "danger",
+        icon: "danger",
+        duration: 5000,
+      });
+    }
 
-  if (claim.isError) {
-    showMessage({
-      message: "Error",
-      description: "Error Occured contact the developer",
-      type: "danger",
-      icon: "danger",
-      duration: 5000,
-    });
-  }
+    if (claim.isSuccess) {
+      showMessage({
+        message: "Success",
+        description: "Claim Request Sent! Please wait for the response",
+        type: "success",
+        icon: "success",
+        duration: 3000,
+      });
 
-  if(claim.isSuccess) {
-    showMessage({
-      message: "Success",
-      description: "Claim Request Sent! Please wait for the response",
-      type: "success",
-      icon: "success",
-      duration: 3000,
-    });
-    
-    navigation.goBack();
-  }
+      navigation.goBack();
+    }
+  }, [claim]);
+
+
   // Remove selected file from the list when the close icon is pressed
   // const removeSelectedFile = index => {
   //   setResult(result.filter(item => item !== result[index]));
@@ -287,7 +293,7 @@ const ClaimRequest = ({ route, navigation }) => {
           <View style={{ marginTop: 15 }} />
           {/* Submit button */}
           <CustomButton
-            title={claim.isLoading ? 'submitting please wait':'Submit'}
+            title={claim.isLoading ? 'submitting please wait' : 'Submit'}
             width={'100%'}
             editable={!claim.isLoading}
             onPress={handleSubmit(onSubmit)}
