@@ -1,13 +1,12 @@
-import axios from 'axios';
+import httpClient from "../../auth/httpClient";
 
-const updateAppointment = async ({id, reminderStatus}) => {
-  try {
-    await axios.patch(`/api/appointments/${id}`, {
-      reminderStatus: reminderStatus,
-    });
-  } catch (error) {
-    console.warn('error from updateAppointment: ', error);
-  }
+const updateAppointment = async appointment => {
+  delete appointment.healthFacilityId;
+  return await httpClient.patch(`/appointments/${healthFacilityId}`, appointment, {
+    headers: {
+      'Content-Type': 'application/json',
+    }
+  });
 };
 
-export {updateAppointment};
+export { updateAppointment };

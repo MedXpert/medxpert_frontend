@@ -39,9 +39,12 @@ const dimensionsHeight = Dimensions.get('window').height;
 
 const Details = ({route, navigation}) => {
   const healthCareFacilityId = route.params.id;
-
   const {data, isError, isLoading, isSuccess} =
     useHealthCareFacility(healthCareFacilityId);
+
+  if(isSuccess) {
+    console.log(data);
+  }
 
   const [selectedImage, setSelectedImage] = useState();
   const [imageModalVisible, setImageModalVisible] = useState(false);
@@ -64,13 +67,13 @@ const Details = ({route, navigation}) => {
             style={styles.modalCloseTag}>
             <IconIon name="ios-close" size={50} color={Colors.primary} />
           </Pressable>
-          <Image
+          {/* <Image
             source={
               selectedImage ? selectedImage : isSuccess ? data.images[0] : null
             }
             style={styles.modalImage}
             resizeMode="contain"
-          />
+          /> */}
         </View>
       </Modal>
       {isLoading && (
@@ -92,11 +95,11 @@ const Details = ({route, navigation}) => {
               onPress={() => {
                 setImageModalVisible(true);
               }}>
-              <Image
+              {/* <Image
                 source={selectedImage ? selectedImage : data.images[0]}
                 resizeMode="cover"
                 style={styles.imageBackground}
-              />
+              /> */}
             </Pressable>
             {/* <CustomButton
           title=""
@@ -144,7 +147,7 @@ const Details = ({route, navigation}) => {
               <CustomText
                 customStyles={styles.open}
                 fontColor={Colors.gray}
-                content={data.availability}
+                content={data.phoneNumbers[0]}
               />
               <View style={styles.typeAndTravel}>
                 <View style={styles.type}>
@@ -152,7 +155,7 @@ const Details = ({route, navigation}) => {
                     content="Type"
                     customStyles={styles.typeTravelElement}
                   />
-                  <CustomText content={data.type} fontColor={Colors.gray} />
+                  <CustomText content={data.facility_type} fontColor={Colors.gray} />
                 </View>
                 <View style={styles.travel}>
                   <CustomText
@@ -160,7 +163,7 @@ const Details = ({route, navigation}) => {
                     customStyles={styles.typeTravelElement}
                   />
                   <CustomText
-                    content={data.travelTime}
+                    content={data.services}
                     fontColor={Colors.gray}
                   />
                 </View>
