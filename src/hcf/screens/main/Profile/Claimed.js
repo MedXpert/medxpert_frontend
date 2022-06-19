@@ -13,10 +13,6 @@ const Claimed = ({ navigation }) => {
   const pendingRequests = usePendingRequest();
   const claimedHCF = useClaimedRequest();
 
-  if (pendingRequests.isSuccess) {
-    console.log(pendingRequests.data.data)
-  }
-
   return (
     <View style={styles.container}>
 
@@ -47,6 +43,7 @@ const Claimed = ({ navigation }) => {
               rating={item.total_ratings}
               images={item.images}
               type={item.facility_type}
+              healthFacilityId={item.id}
             />
           ))}
         </ScrollView>
@@ -70,13 +67,13 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
   },
+  spinnerContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    flex: 1,
+  },
   hcfSection: {
     marginTop: 10,
-  },
-  spinnerContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
   },
   pendingButton: {
     paddingHorizontal: 10,
@@ -86,12 +83,5 @@ const styles = StyleSheet.create({
     borderRadius: 2,
   },
 });
-
-const hcfs = [
-  { name: 'hcf 0' },
-  { name: 'hcf 1' },
-  { name: 'hcf 2' },
-  { name: 'hcf 3' },
-];
 
 export default Claimed;

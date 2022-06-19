@@ -15,6 +15,7 @@ const RenderHCF = ({
   rating,
   type,
   travelTime,
+  healthFacilityId,
 }) => {
   // const navigation = useNavigation();
 
@@ -64,7 +65,7 @@ const RenderHCF = ({
             size={30}
             color={colors.primary}
             onPress={() => {
-              navigation.push('EditHCF');
+              navigation.push('EditHCF', {id: healthFacilityId});
             }}
           />
         </View>
