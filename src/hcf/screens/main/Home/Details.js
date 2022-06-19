@@ -25,6 +25,8 @@ import { useLoggedInUser } from "../../../../hooks/authentication"
 import { CustomText } from '../../../../components/general/CustomText';
 import { BackButton } from '../../../../components/general/BackButton';
 import { useHealthCareFacility } from '../../../../hooks/healthCareFacility';
+import { usePendingRequest } from '../../../../hooks/claimRequest';
+
 import Spinner from 'react-native-spinkit';
 
 const ImageItem = ({ image, onPress }) => (
@@ -50,6 +52,7 @@ const Details = ({ route, navigation }) => {
   const [selectedImage, setSelectedImage] = useState();
   const [imageModalVisible, setImageModalVisible] = useState(false);
 
+  const pendingRequests = usePendingRequest();
 
   const travelTime = (walk = True) => {
     const averageWalkingSpeed = 1.56464 // in m/s
@@ -79,17 +82,6 @@ const Details = ({ route, navigation }) => {
     }
   }
 
-  const makeACall = (phone) => {
-    if (Platform.OS === 'android') {
-      phoneNumber = `tel:${phone}`;
-    }
-    else {
-      phoneNumber = `telprompt:${phone}`;
-    }
-
-    Linking.openURL(phoneNumber);
-  }
-
   const renderItem = ({ item }) => (
     <ImageItem
       key={item}
@@ -106,9 +98,6 @@ const Details = ({ route, navigation }) => {
     navigation.navigate('ClaimRequest', { id: healthCareFacilityId });
   };
 
-  if(isSuccess && loggedInUser.isSuccess) {
-    console.log(data.owner, loggedInUser.data.data)
-  }
 
   return (
     <View style={styles.container}>
@@ -281,21 +270,45 @@ const Details = ({ route, navigation }) => {
                   }
                 />
 
-                {loggedInUser.isSuccess && data.owner === null ? (<CustomButton
-                  title="Claim"
-                  fontSize={13}
-                  width={"40%"}
-                  height={45}
-                  customStyle={styles.buttonStyle}
-                  onPress={claimHCF}
-                  icon={
-                    <IconEntypo
-                      name="hand"
-                      size={20}
-                      color={Colors.dark}
-                    />
-                  }
-                />) : (
+                {loggedInUser.isSuccess && pendingRequests.isSuccess && data.owner === null ? (
+                  <>
+                    {(pendingRequests.data.data.claimRequests.filter(hcf => hcf.healthFacilityID === healthCareFacilityId).length === 0) ? (
+                      <CustomButton
+                        title="Claim"
+                        fontSize={13}
+                        width={"40%"}
+                        height={45}
+                        customStyle={styles.buttonStyle}
+                        onPress={claimHCF}
+                        icon={
+                          <IconEntypo
+                            name="hand"
+                            size={20}
+                            color={Colors.dark}
+                          />
+                        }
+                      />
+                    ) : (
+                      <CustomButton
+                        title="Pending Request" 
+                        fontSize={13}
+                        width={"50%"}
+                        height={45}
+                        disabled={true}
+                        backgroundColor={Colors.green}
+                        customStyle={styles.buttonStyle}
+                        icon={
+                          <IconEntypo
+                            name="time-slot"
+                            size={20}
+                            color={Colors.dark}
+                          />
+                        }
+                      />
+                    )}
+
+                  </>) : (
+
                   <CustomButton
                     title={data.owner === loggedInUser.data.data.user.id ? "Owned By You" : "Claimed"}
                     fontSize={13}

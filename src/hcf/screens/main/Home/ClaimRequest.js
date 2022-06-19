@@ -30,8 +30,6 @@ const ClaimRequest = ({ route, navigation }) => {
   const [result, setResult] = useState();
   const healthCareFacilityId = route.params.id;
 
-  console.log(healthCareFacilityId)
-  // Declare useForm
 
 
   const healthCareFacility = useHealthCareFacility(healthCareFacilityId);
@@ -56,14 +54,13 @@ const ClaimRequest = ({ route, navigation }) => {
   });
 
   if (healthCareFacility.isSuccess && loggedInUser.isSuccess) {
-    const hcf = healthCareFacility.data;
-    const user = loggedInUser.data.data.user;
-
-    setValue('hcfName', hcf.name);
-    setValue('requesterFirstName', user.firstName);
-    setValue('requesterLastName', user.lastName);
-    setValue('requesterPhoneNumber', '0909090');
-    setValue('requesterEmail', user.email);
+    const hcf = healthCareFacility?.data;
+    const user = loggedInUser.data?.data.user;
+    setValue('hcfName', hcf?.name);
+    setValue('requesterFirstName', user?.firstName);
+    setValue('requesterLastName', user?.lastName);
+    setValue('requesterPhoneNumber', user?.phoneNumber);
+    setValue('requesterEmail', user?.email);
   }
 
   // Document picker error handler
