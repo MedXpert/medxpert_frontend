@@ -365,7 +365,7 @@ const Home = ({navigation}) => {
       {/* SearchBar */}
       <View style={styles.searchBarContainer}>
         {/* Display Search bar  */}
-        <SearchBar fontSize={16} marginHorizontal={20} />
+        <SearchBar fontSize={16} marginHorizontal={20} navigation={navigation} currentLocation={`${locationFromMapboxLng},${locationFromMapboxLat}`} />
       </View>
 
       {/* Get location button */}

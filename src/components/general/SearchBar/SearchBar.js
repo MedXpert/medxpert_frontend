@@ -29,25 +29,14 @@ const SearchBar = ({
   navigation,
   currentLocation
 }) => {
-  const [filteredData, setFilteredData] = useState([]);
   const [textValue, setTextValue] = useState('');
-  const [searchClicked, setSearchClicked] = useState(false);
   const search = useSearchHealthCareFacility();
   // Calls the fetchData function and searches for the key given as a parameter
 
   const searchPosts = async searchKey => {
 
-    setSearchClicked(true);
-    setFilteredData([]); // Empty the the existing list.
-    search.mutate(searchKey);
-    if (search.isSuccess) {
-      const result = search.data.data.data
-      console.log(result)
-      if (result && result.length > 0) {
-        setFilteredData(result);
-      } else {
-        setFilteredData([]);
-      }
+    if (searchKey.length > 0) {
+      search.mutate(searchKey);
     }
   };
 
@@ -67,7 +56,6 @@ const SearchBar = ({
   }
 
   const clearSearch = () => {
-    setFilteredData([]);
     setSearchClicked(false);
     setTextValue(' ');
   }
@@ -76,7 +64,7 @@ const SearchBar = ({
   const renderItem = ({ item }) => {
 
     return (
-      <Pressable onPress={() => navigation.navigate('Details', { id: item.id, travelDistance: getDistanceFromGPS(item.GPSCoordinates, true) })} key={item.id}>
+      <Pressable key={item.id} onPress={() => navigation.navigate('Details', { id: item.id, travelDistance: getDistanceFromGPS(item.GPSCoordinates, true) })} >
         <View style={styles.item}>
           <CustomText content={item.name} />
         </View>
@@ -87,7 +75,7 @@ const SearchBar = ({
   const listItems = () => {
     return (
       <FlatList
-        data={filteredData}
+        data={search.data.data.data}
         renderItem={renderItem}
         keyExtractor={item => item.id}
       />
@@ -95,11 +83,15 @@ const SearchBar = ({
   };
   const loadingOrResults = () => {
     return search.isLoading ? (
-      <ActivityIndicator />
-    ) : !search.isLoading && filteredData.length !== 0 ? (
+      <View style={styles.centerNoMatch}>
+        <CustomText content={'Searching please wait...'} />
+      </View>
+    ) : search.isSuccess && search.data && search?.data.data.data.length !== 0 ? (
       listItems()
-    ) : !search.isLoading && filteredData.length === 0 ? (
-      <CustomText content={'No match found.'} />
+    ) : search.isSuccess && search.data && search?.data.data.data.length === 0 ? (
+      <View style={styles.centerNoMatch}>
+        <CustomText content={'No match found.'} />
+      </View>
     ) : null;
   };
 
@@ -124,7 +116,6 @@ const SearchBar = ({
           />
         </View>
 
-        {filteredData.length === 0 ? (
         <IconButton
           icon="magnify"
           color={Colors.primary}
@@ -132,13 +123,7 @@ const SearchBar = ({
           onPress={() => {
             searchPosts(textValue);
           }}
-        />) : (
-        <IconButton
-          icon="close"
-          color={Colors.primary}
-          size={25}
-          onPress={clearSearch}
-        />)}
+        />
 
         {/* <IconButton
           icon="magnify"
@@ -149,7 +134,7 @@ const SearchBar = ({
           }}
         /> */}
       </View>
-      {searchClicked && (
+      {search.isSuccess && (
         <View style={styles.listContainer}>{loadingOrResults()}</View>
       )}
     </View>
@@ -190,6 +175,8 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.white,
     paddingLeft: 10,
   },
+
+  centerNoMatch: { flexDirection: 'row', justifyContent: 'center' }
 });
 
 export { SearchBar };

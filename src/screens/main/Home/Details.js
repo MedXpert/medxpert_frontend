@@ -315,7 +315,7 @@ const Details = ({ route, navigation }) => {
           <FlatList
             data={data.imageGallaryLinks[0] ? data.imageGallaryLinks : [defaultPicture]}
             renderItem={renderItem}
-            keyExtractor={image => image.id}
+            keyExtractor={image => image}
             horizontal={true}
             style={styles.imageItemsFlatList}
           />
