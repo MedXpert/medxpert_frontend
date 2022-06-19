@@ -11,22 +11,131 @@ import {
   Animated,
 } from 'react-native';
 import React, {useState, useEffect, useCallback, useRef, useMemo} from 'react';
-import MapboxGL from '@rnmapbox/maps';
 import {PERMISSIONS, RESULTS, openSettings} from 'react-native-permissions';
 import Geolocation from 'react-native-geolocation-service';
+import {io} from 'socket.io-client';
+import {lineString as makeLineString} from '@turf/helpers';
+import {getDistance} from 'geolib';
+import axios from 'axios';
 
+import MapboxGL from '@react-native-mapbox-gl/maps';
 import Colors from '../../constants/colors';
 import {CustomButton} from '../../components/general/CustomButton';
 import {CustomText} from '../../components/general/CustomText';
-import {PermissionModal} from '../../components/permissions/PermissionModal';
 import {IconButton} from 'react-native-paper';
 import {MapTypeModal} from '../../components/home/MapTypeModal';
+import {RenderDirection} from '../../components/general/RenderDirection';
 
+import {PermissionModal} from '../../components/permissions/PermissionModal';
 import {requestPermissions} from '../../services/permissions/requestPermissions';
 import {LOCATION_PERMISSION_MESSAGE} from '../../constants/string/requestPermissions/requestPermissions';
+import Spinner from 'react-native-spinkit';
+import colors from '../../constants/colors';
+
 
 const dimensionHeight = Dimensions.get('window').height;
 const dimensionWidth = Dimensions.get('window').width;
+
+// const io = require('socket.io-client/dist/socket.io');
+
+const SOCKETIO_SERVER_URL = 'http://127.0.0.1:5000';
+
+const geoApifyAccessToken = '87d55356e5ab47dab8be60202bb80ae3';
+
+var userType = 'u';
+var userId = 'userId' + Math.random();
+
+const USER_TYPES = {
+  USER: 'u',
+  AMBULANCE: 'a',
+  HEALTH_FACILITY: 'h',
+};
+
+const NAMESPACES = {
+  USER: '/USER_NAMESPACE',
+  AMBULANCE: '/AMBULANCE_NAMESPACE',
+};
+const EVENTS = {
+  AMBULANCE_ONLINE: '0',
+  // AMBULANCE_STATUS_CHANGE : '1',
+  AMBULANCE_STATUS_CHANGED: '2',
+  APPOINT_AMBULANCE: '3',
+  // APPOINTMENT_REQUEST : '4', //might add amb to differentiate from hf later...
+  // ACCEPT_APPOINTMENT : '5', //
+  // DECLINE_APPOINTMENT : '6', //
+  APPOINTMENT_ACCEPTED: '7', //
+  APPOINTMENT_DECLINED: '8', //
+  // LOCATION_TO_USER : '9',
+  LOCATION_FROM_AMBULANCE: '10',
+  LOCATION_TO_AMBULANCE: '11',
+  // LOCATION_FROM_USER : '12',
+  // AMBULANCE_LOCATION_UPDATE : '13',
+  AMBULANCE_LOCATION_UPDATED: '14',
+  AMBULANCE_OFFLINE: '15',
+  ADD_EMERGENCY_CONTACTS: '16',
+  REMOVE_EMERGENCY_CONTACTS: '17',
+  UPDATE_EMERGENCY_CONTACTS: '18',
+  LOCATION_TO_EMERGENCY_CONTACTS: '19',
+  LOCATION_FROM_EMERGENCY_CONTACTS: '20',
+  ALERT_NEAR_AMBULANCE: '21',
+  // EMERGENCY_ALERT : '22',
+  CANT_FIND_AMBULANCE: '23',
+  ABORTED: '27',
+  HAVE_REACHED: '28',
+  FINISHED: '29',
+};
+
+switch (userType) {
+  case USER_TYPES.AMBULANCE:
+    var namespace = NAMESPACES.AMBULANCE;
+    break;
+  case USER_TYPES.USER:
+    var namespace = NAMESPACES.USER;
+    break;
+  default:
+    throw 'Invalid user_type trying to connect with socketio server.';
+}
+
+// const ambuAppState = {
+//   // logged_in_user_id: userID,
+//   // user_type: USER_TYPES.USER,
+//   in_appointment_with: {
+//     ambulanceID: null, //useful?
+//   },
+// };
+
+// const LS_UPDATE_INTERVAL = 5_00;
+
+// const locationToAmbulance = (ambulanceID, lng, lat, socket) => {
+//   data = {
+//     /*ambulanceID: state.logged_in_user_id,*/ coordinates: [lng, lat],
+//     ambulanceID: ambulanceID,
+//   };
+//   // console.log('location to ambulance: ', data, socket);
+
+//   socket.emit(EVENTS.LOCATION_TO_AMBULANCE, data);
+// };
+
+// ambuAppState.streams = {
+//   LS: {
+//     key: null,
+//     start: (ambulanceID, lng, lat, socket) => {
+//       ambuAppState.streams.LS.key = setInterval(
+//         locationToAmbulance,
+//         LS_UPDATE_INTERVAL,
+//         ambulanceID,
+//         lng,
+//         lat,
+//         socket,
+//       );
+//     },
+//     stop: () => {
+//       clearInterval(ambuAppState.streams.LS.key);
+//     },
+//   },
+// };
+
+var connection_url = SOCKETIO_SERVER_URL + namespace;
 
 const Ambulance = ({navigation}) => {
   var _map;
@@ -50,13 +159,42 @@ const Ambulance = ({navigation}) => {
   const [locationFromMapboxLng, setLocationFromMapboxLng] = useState(); // User's current position tracked from the mapboxGL userLocation - Longitude
   const [locationFromMapboxLat, setLocationFromMapboxLat] = useState(); // User's current position tracked from the mapboxGL userLocation - Latitude
   const [mapTypeVisibility, setMapTypeVisibility] = useState(false); // MapType modal visibility
+  const [route, setRoute] = useState(null);
   const startValueMoveY = useRef(new Animated.Value(0)).current; // Initial value of move Y animated for the location
-  // const [driverNameVisibility, setDriverNameVisibility] = useState(false);
-
+  const [driverNameVisibility, setDriverNameVisibility] = useState(false);
   // turn on and off when ambulance is called
   const [ambulanceCalled, setAmbulanceCalled] = useState(false);
+const [ambulanceAborted, setAmbulanceAborted] = useState();
 
+
+  const [ambulanceId, setAmbulanceId] = useState(null);
+  const [appointmentAccepted, setAppointmentAccepted] = useState(false);
+  const [callingAmbulance, setCallingAmbulance] = useState(false);
+  const [canNotFindAmbulance, setCanNotFindAmbulance] = useState(false);
+  const [locationFromAmbulance, setLocationFromAmbulance] = useState()
+  const [ambulanceHasReached, setAmbulanceHasReached] = useState()
+
+  const refUserLocation = useRef();
+
+  const socketRef = useRef();
   // Exit the app and go to settings. This function is called when the 'Go to settings' button in the permission denied modal is pressed.
+
+  // const locationToAmbulance = useCallback(
+  //   ambulanceID => {
+  //     if (stream) {
+  //       data = {
+  //         /*ambulanceID: state.logged_in_user_id,*/ coordinates: [
+  //           userPositionLng,
+  //           userPositionLat,
+  //         ],
+  //         ambulanceID: ambulanceID,
+  //       };
+  //       socket.emit(EVENTS.LOCATION_TO_AMBULANCE, data);
+  //     }
+  //   },
+  //   [userPositionLng, userPositionLat, stream],
+  // );
+
   const settings = () => {
     BackHandler.exitApp();
     openSettings().catch(() => console.warn('Can not open settings'));
@@ -82,15 +220,54 @@ const Ambulance = ({navigation}) => {
     }
   }, [permissionName]);
 
+  // Will be called when ambulance appointment is accepted by one of the ambulances
+  const locationToAmbulance = (lng, lat) => {
+    socketRef.current.emit(EVENTS.LOCATION_TO_AMBULANCE, {
+      coordinates: [lng, lat],
+      ambulanceID: ambulanceId,
+    });
+  };
+
   // Will be called when the user location is updated/changed
   const userLocationUpdate = async location => {
     if (location) {
       let lng = location.coords.longitude;
       let lat = location.coords.latitude;
-      setLocationFromMapboxLng(lng);
-      setLocationFromMapboxLat(lat);
+
+      if (!locationFromMapboxLat || !locationFromMapboxLng) {
+        setLocationFromMapboxLng(lng);
+        setLocationFromMapboxLat(lat);
+        refUserLocation.current = {longitude: lng, latitude: lat};
+      } else {
+        if (appointmentAccepted) {
+            locationToAmbulance(lng, lat); // Send user location to the ambulance every time location coordinates are changed.
+          }
+         
+        const distance = getDistance(
+          {
+            latitude: refUserLocation.current.latitude,
+            longitude: refUserLocation.current.longitude,
+          },
+          {latitude: lat, longitude: lng},
+        );
+        // console.log(distance);
+
+        // The distance limit to change the location coordiantes
+        if (distance > 20) {
+         
+          setLocationFromMapboxLng(lng);
+          setLocationFromMapboxLat(lat);
+          
+          refUserLocation.current = {longitude: lng, latitude: lat};
+        }
+      }
     }
   };
+
+  // get current location
+  const getCurrentLocation = useCallback(() => {
+    return [userPositionLng, userPositionLat];
+  }, [userPositionLng, userPositionLat]);
 
   // Set center coordinate to the current position of the user.
   const findMyLocation = async () => {
@@ -134,6 +311,17 @@ const Ambulance = ({navigation}) => {
     setMapTypeVisibility(false);
   };
 
+  // get the of the given starting and ending point coordinates
+  const getDirections = useCallback(async (startLoc, destLoc) => {
+    const res = await axios.get(
+      `https://api.geoapify.com/v1/routing?waypoints=${startLoc.latitude},${startLoc.longitude}|${destLoc.latitude},${destLoc.longitude}&mode=drive&apiKey=${geoApifyAccessToken}`,
+    );
+
+    const coordinates = res.data.features[0].geometry.coordinates[0];
+    const routeLineString = makeLineString(coordinates, {name: 'line 1'});
+    setRoute(routeLineString);
+  }, []);
+
   // locationButton animation move Y direction
   const animatedMove = (endValue, duration) => {
     Animated.timing(startValueMoveY, {
@@ -154,6 +342,7 @@ const Ambulance = ({navigation}) => {
   useEffect(() => {
     onDriverNamePositionChange(ambulanceCalled);
   });
+
   useEffect(() => {
     // Call 'checkPermission' every time something in the function is changed.
     checkPermission();
@@ -175,6 +364,123 @@ const Ambulance = ({navigation}) => {
     }
   }, [checkPermission, locationPermissionGranted]);
 
+  useEffect(() => {
+    socketRef.current = io(connection_url, {
+      // forceNew : true,
+      auth: {
+        token: {
+          id: userId,
+          iat: '',
+          expiry: '',
+        },
+        userID: userId,
+      },
+    });
+    // console.log('socketref: ', socketRef.current);
+    // console.log('io: ', io);
+
+    // on Connect
+    socketRef.current.on('connect', data => {
+      console.log('connected hoy hoy hoy: ', data);
+    });
+
+    // When no Ambulance is found
+    socketRef.current.on(EVENTS.CANT_FIND_AMBULANCE, data => {
+      console.table({event: 'CANT_FIND_AMBULANCE'});
+      console.log(">>>>>> Can't find ambulances. Try again");
+      setCallingAmbulance(false);
+      setCanNotFindAmbulance(true);
+      setTimeout(()=>{
+        setCanNotFindAmbulance(false);
+      }, 5000)
+    });
+
+    socketRef.current.on(EVENTS.APPOINTMENT_ACCEPTED, data => {
+      // start LS
+      // state.streams.LS.start(data.ambulanceID);
+      // state.in_appointment_with.ambulanceID = data.ambulanceID;
+      setAppointmentAccepted(true);
+      setAmbulanceId(data.ambulanceID);
+      setCallingAmbulance(false);
+
+      // locationToAmbulance(locationFromMapboxLng, locationFromMapboxLat);
+      // console.log("user location sent from inside appointment accepted");
+    });
+
+    //when an ambulance is found
+    socketRef.current.on(EVENTS.LOCATION_FROM_AMBULANCE, data => {
+      console.log(`Ambulance at ${data.coordinates}`);
+      setLocationFromAmbulance(data.coordinates)
+
+    });
+
+
+    // on Aborted
+    socketRef.current.on(EVENTS.ABORTED, data => {
+      // stop LS
+      // ambuAppState.streams.LS.stop();
+      setAppointmentAccepted(false);
+      // ambuAppState.in_appointment_with.ambulanceID = null;
+      setAmbulanceId(null);
+      setLocationFromAmbulance(null);
+      setAmbulanceAborted(true)
+      setTimeout(()=>{
+        setAmbulanceAborted(false);
+      }, 5000)
+
+      console.log('Ambulance aborted');
+    });
+
+    // on Reached
+    socketRef.current.on(EVENTS.HAVE_REACHED, data => {
+      // stop LS
+      // ambuAppState.streams.LS.stop();
+      setAppointmentAccepted(false);
+      setAmbulanceId(null);
+      setLocationFromAmbulance(null);
+      setAmbulanceHasReached(true)
+      setTimeout(()=>{
+        setAmbulanceHasReached(false);
+      }, 5000)
+      console.log('Ambulance reached your location');
+    });
+
+    // on Finished
+    socketRef.current.on(EVENTS.FINISHED, data => {
+      // ambuAppState.in_appointment_with.ambulanceID = null;
+      setAmbulanceId(null);
+      setAppointmentAccepted(false);
+      console.log('Job finished');
+    });
+
+    return () => {
+      socketRef.current.disconnect();
+    };
+  }, []);
+
+  const callAmbulance = () => {
+    setCallingAmbulance(true);
+    socketRef.current.emit(
+      EVENTS.ALERT_NEAR_AMBULANCE,
+      {
+        coordinates: [userPositionLng, userPositionLat],
+        userID: userId,
+      }, //,
+      // (response)=>console.log(response)
+    );
+  };
+
+  useEffect(() => {
+
+    if (locationFromMapboxLng && locationFromMapboxLat && locationFromAmbulance) {
+      getDirections(
+        {longitude: locationFromMapboxLng, latitude: locationFromMapboxLat},
+        {longitude: locationFromAmbulance[0], latitude: locationFromAmbulance[1]},
+      );
+    }
+  }, [getDirections, locationFromMapboxLat, locationFromMapboxLng, locationFromAmbulance]);
+
+  // console.log('socket:', socket, io);
   return (
     <View style={styles.container}>
       {/* Map types modal */}
@@ -241,7 +547,7 @@ const Ambulance = ({navigation}) => {
           // ref={c => (_map = c)}
           ref={c => (_map = c)}
           logoEnabled={false}
-          compassViewMargins={{x: 10, y: (23 * dimensionHeight) / 100}}
+          compassViewMargins={{x: 10, y: (29 * dimensionHeight) / 100}}
           style={styles.map}
           surfaceView>
           {/* Display user location */}
@@ -250,12 +556,18 @@ const Ambulance = ({navigation}) => {
             <>
               <MapboxGL.Camera
                 zoomLevel={15}
+                followUserLocation
                 centerCoordinate={[userPositionLng, userPositionLat]}
               />
               <MapboxGL.UserLocation
                 visible={true}
                 onUpdate={userLocationUpdate}
               />
+              {/* If there is route, draw route from given source to destination  */}
+              {route && ambulanceId ? <RenderDirection route={route} /> : null}
+              {
+                locationFromAmbulance && ambulanceId ?  <MapboxGL.PointAnnotation id="23" coordinate={locationFromAmbulance} /> : null
+              }
             </>
           )}
           <MapboxGL.Camera
@@ -267,16 +579,64 @@ const Ambulance = ({navigation}) => {
       </View>
 
       {/* status bar display only when ambulance is called */}
-      {ambulanceCalled && (
+      {/* Calling ambulance */}
+      {callingAmbulance && (
         <View style={styles.statusBarContainer}>
           {/* Display arriving status  */}
           <View style={styles.statusBar}>
             <CustomText
-              content="Ambulance Arriving in 2 seconds"
+              content="Looking for nearby ambulances  "
               fontWeight="bold"
               fontColor={Colors.primary}
               fontSize={18}
             />
+            <Spinner isVisible type='Wave' size={25} color={colors.primary} style={{marginTop:5}}/>
+          </View>
+        </View>
+      )}
+      {/* Cant find ambulance */}
+      {canNotFindAmbulance && (
+        <View style={styles.statusBarContainer}>
+          {/* Display arriving status  */}
+          <View style={styles.statusBar}>
+            <CustomText
+              content="Could not find ambulance. Please try again later."
+              fontWeight="bold"
+              fontColor={Colors.red}
+              fontSize={16}
+            />
+            {/* <Spinner isVisible type='Wave' size={25} color={colors.primary} style={{marginTop:5}}/> */}
+          </View>
+        </View>
+      )}
+      {/* Ambulance aborted */}
+      {ambulanceAborted && (
+        <View style={styles.statusBarContainer}>
+          {/* Display arriving status  */}
+          <View style={styles.statusBar}>
+            <CustomText
+              content="The ambulance aborted your call."
+              fontWeight="bold"
+              fontColor={Colors.red}
+              fontSize={16}
+            />
+            {/* <Spinner isVisible type='Wave' size={25} color={colors.primary} style={{marginTop:5}}/> */}
+          </View>
+        </View>
+      )}
+
+       {/* Ambulance has reached */}
+      {ambulanceHasReached && (
+        <View style={styles.statusBarContainer}>
+          {/* Display arriving status  */}
+          <View style={styles.statusBar}>
+            <CustomText
+              content="The ambulance has reached your location."
+              fontWeight="bold"
+              fontColor={Colors.primary}
+              fontSize={16}
+            />
+            {/* <Spinner isVisible type='Wave' size={25} color={colors.primary} style={{marginTop:5}}/> */}
           </View>
         </View>
       )}
@@ -319,31 +679,21 @@ const Ambulance = ({navigation}) => {
       <View style={styles.bottomView}>
         <View style={styles.bottomButtonContainer}>
           {/* trinary condition () ? true : false */}
-          {ambulanceCalled ? (
-            // Display if ambulance called
-            <CustomButton
-              onPress={e => {
-                setAmbulanceCalled(false);
-              }}
-              width={Dimensions.get('window').width - 50}
-              backgroundColor={Colors.red}
-              fontColor={Colors.white}
-              title="Cancel Ambulance"
-            />
-          ) : (
+          {!appointmentAccepted ?  (
             // Display if ambulance not called
             <CustomButton
               onPress={e => {
-                setAmbulanceCalled(true);
+                // setAmbulanceCalled(true);
+                callAmbulance();
               }}
               width={Dimensions.get('window').width - 50}
               backgroundColor={Colors.primary}
               fontColor={Colors.white}
               title="Call Ambulance"
             />
-          )}
+          ) : null}
         </View>
-        {ambulanceCalled && (
+        {appointmentAccepted && (
           <View style={styles.driveDetailsContainer}>
             <View style={styles.driverImageContainer}>
               <Image
@@ -393,7 +743,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.primary,
     borderRadius: 50,
     position: 'absolute',
-    top: (5 * dimensionHeight) / 100,
+    top: 130,
     right: 10,
   },
   mapIcon: {
