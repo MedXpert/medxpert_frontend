@@ -15,29 +15,34 @@ import IconEntypo from 'react-native-vector-icons/Entypo';
 import IconIon from 'react-native-vector-icons/Ionicons';
 import Spinner from 'react-native-spinkit';
 
-import {CustomText} from '../../general/CustomText';
+import { CustomText } from '../../general/CustomText';
 import Colors from '../../../constants/colors';
 import colors from '../../../constants/colors';
-import {useHealthCareFacilities} from '../../../hooks/healthCareFacility';
+import { useFetchNearByHealthCareFacilities } from '../../../hooks/healthCareFacility';
 
 const dimensionHeight = Dimensions.get('window').height;
 const dimensionWidth = Dimensions.get('window').width;
 
-const BottomSheetContent = ({navigation}) => {
-  const {data, isSuccess, isError, isLoading, status} =
-    useHealthCareFacilities();
+const BottomSheetContent = ({ navigation, currentLocation }) => {
+  const { data, isSuccess, isError, isLoading, status } =
+    useFetchNearByHealthCareFacilities({
+      location: currentLocation,
+      limit: 10,
+    });
 
+  const defaultHospitalImage = "https://img.freepik.com/free-vector/people-walking-sitting-hospital-building-city-clinic-glass-exterior-flat-vector-illustration-medical-help-emergency-architecture-healthcare-concept_74855-10130.jpg?w=1060&t=st=1654985818~exp=1654986418~hmac=2e9753ea68dc4553e073744559aeb8a6ccc1e6bd305a989018a60e31674bcdfc"
+  
   // Render Health Facilities function
-  const renderHealthFacilities = ({item}) => {
+  const renderHealthFacilities = ({ item }) => {
     return (
       <Pressable
         onPress={() => {
-          navigation.navigate('Details', {id: item.id});
+          navigation.navigate('Details', { id: item.id });
         }}>
         <View style={styles.renderContainer}>
           {/* Card Image */}
           <View style={styles.renderContainerImage}>
-            <Image source={item.images[0]} style={styles.cardImage} />
+            <Image source={{ uri: (item.imageGallaryLinks.length == 0) ? defaultHospitalImage : item.imageGallaryLinks[0] }} style={styles.cardImage} />
           </View>
 
           {/* Card Content */}
@@ -47,7 +52,7 @@ const BottomSheetContent = ({navigation}) => {
               fontColor={colors.primary}
               fontSize={16}
               content={item.name}
-              customStyles={{fontWeight: '900'}}
+              customStyles={{ fontWeight: '900' }}
             />
 
             {/* Address  */}
@@ -68,19 +73,19 @@ const BottomSheetContent = ({navigation}) => {
             <View style={styles.typeDistanceRating}>
               <View style={styles.typeDistanceRatingInner}>
                 <CustomText
-                  content={item.type}
+                  content={item.facility_type}
                   fontSize={12}
                   fontColor={Colors.gray}
                 />
                 <IconEntypo name="dot-single" size={18} color={colors.gray} />
                 <IconIon
                   name="car-outline"
-                  style={{marginRight: 5}}
+                  style={{ marginRight: 5 }}
                   size={15}
                   color={colors.gray}
                 />
                 <CustomText
-                  content={item.travelTime}
+                  content={100}
                   fontSize={11}
                   color={colors.gray}
                 />
@@ -96,7 +101,7 @@ const BottomSheetContent = ({navigation}) => {
                   fullStarColor={Colors.golden}
                 />
                 <CustomText
-                  content={item.averageRating}
+                  content={item.averageRating || 0}
                   customStyles={styles.textStyle}
                   fontColor={colors.gray}
                   fontSize={10}
@@ -113,7 +118,7 @@ const BottomSheetContent = ({navigation}) => {
     <View style={styles.contentContainer}>
       <CustomText
         content={'Nearby Health Facilities'}
-        customStyles={{fontWeight: '900', marginLeft: 5, marginBottom: 10}}
+        customStyles={{ fontWeight: '900', marginLeft: 5, marginBottom: 10 }}
         fontSize={20}
       />
       {isLoading && (
@@ -129,7 +134,7 @@ const BottomSheetContent = ({navigation}) => {
       )}
       {isSuccess && (
         <FlatList
-          data={data}
+          data={data.data.data}
           horizontal
           renderItem={renderHealthFacilities}
           keyExtractor={item => item.id}
@@ -160,7 +165,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: 70,
   },
-  address: {flexDirection: 'row', marginTop: 5, marginLeft: -3},
+  address: { flexDirection: 'row', marginTop: 5, marginLeft: -3 },
   renderContainer: {
     backgroundColor: colors.secondary,
     minHeight: 250,
@@ -199,4 +204,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export {BottomSheetContent};
+export { BottomSheetContent };

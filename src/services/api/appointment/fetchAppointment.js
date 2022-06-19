@@ -1,15 +1,6 @@
-import axios from 'axios';
-
-const fetchAppointment = async id => {
-  try {
-    const res = await axios.get(`/api/appointments/${id}`);
-    if (res.data != null) {
-      const data = await res.data.appointment;
-      return data;
-    }
-  } catch (error) {
-    console.warn('fetch appointment function => ' + 'error: ' + error);
-  }
+import httpClient from "../../auth/httpClient";
+const fetchAppointment = async healthFacilityId => {
+    return await httpClient.get(`/appointments/${healthFacilityId}`);
 };
 
-export {fetchAppointment};
+export { fetchAppointment };
