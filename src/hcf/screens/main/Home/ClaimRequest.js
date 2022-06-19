@@ -23,7 +23,9 @@ import { useHealthCareFacility } from '../../../../hooks/healthCareFacility';
 import { color } from 'react-native-reanimated';
 import { BackButtonAndText } from '../../../../components/general/BackButtonAndText';
 import { useLoggedInUser } from "../../../../hooks/authentication";
-import { useClaimRequest } from "../../../../hooks/claimRequest"
+import { useClaimRequest } from "../../../../hooks/claimRequest";
+import { showMessage } from "react-native-flash-message";
+
 const ClaimRequest = ({ route, navigation }) => {
   const [result, setResult] = useState();
   const healthCareFacilityId = route.params.id;
@@ -102,12 +104,30 @@ const ClaimRequest = ({ route, navigation }) => {
     claim.mutate(data);
   };
 
-  if (claim.isLoading) {
-    console.log("loading")
+  if (claim.isError) {
+    console.log(claim.error.response.data)
   }
 
   if (claim.isError) {
-    console.log(claim.error.response.data)
+    showMessage({
+      message: "Error",
+      description: "Error Occured contact the developer",
+      type: "danger",
+      icon: "danger",
+      duration: 5000,
+    });
+  }
+
+  if(claim.isSuccess) {
+    showMessage({
+      message: "Success",
+      description: "Claim Request Sent! Please wait for the response",
+      type: "success",
+      icon: "success",
+      duration: 3000,
+    });
+    
+    navigation.goBack();
   }
   // Remove selected file from the list when the close icon is pressed
   // const removeSelectedFile = index => {
@@ -273,8 +293,9 @@ const ClaimRequest = ({ route, navigation }) => {
           <View style={{ marginTop: 15 }} />
           {/* Submit button */}
           <CustomButton
-            title={'Submit'}
+            title={claim.isLoading ? 'submitting please wait':'Submit'}
             width={'100%'}
+            editable={!claim.isLoading}
             onPress={handleSubmit(onSubmit)}
             customStyle={{ marginBottom: 20 }}
           />
