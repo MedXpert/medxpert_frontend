@@ -574,7 +574,7 @@ const [showFinishButton, setShowFinishButton] = useState(false);
           // ref={c => (_map = c)}
           ref={c => (_map = c)}
           logoEnabled={false}
-          compassViewMargins={{x: 10, y: (29 * dimensionHeight) / 100}}
+          compassViewMargins={{x: 10, y: (40 * dimensionHeight) / 100}}
           style={styles.map}
           surfaceView>
           {/* Display user location */}
