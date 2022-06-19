@@ -1,9 +1,9 @@
-import {View, StyleSheet, ScrollView, Flatlist} from 'react-native';
-import React, {useState} from 'react';
-import {useForm} from 'react-hook-form';
+import { View, StyleSheet, ScrollView, Platform } from 'react-native';
+import React, { useState } from 'react';
+import { useForm } from 'react-hook-form';
 import IconMaterialCommunity from 'react-native-vector-icons/MaterialCommunityIcons';
 import IconMaterial from 'react-native-vector-icons/MaterialIcons';
-import {IconButton} from 'react-native-paper';
+import { IconButton } from 'react-native-paper';
 
 import DocumentPicker, {
   DirectoryPickerResponse,
@@ -12,34 +12,57 @@ import DocumentPicker, {
   types,
 } from 'react-native-document-picker';
 
-import {CustomText} from '../../../../components/general/CustomText';
+import { CustomText } from '../../../../components/general/CustomText';
 import colors from '../../../../constants/colors';
-import {BackButton} from '../../../../components/general/BackButton';
-import {CustomTextInputValidation} from '../../../../components/general/CustomTextInputValidation';
-import {CustomButton} from '../../../../components/general/CustomButton';
-import {emailRegEx} from '../../../../constants/regEx';
-import {FlatList, TouchableOpacity} from 'react-native-gesture-handler';
-import {color} from 'react-native-reanimated';
-import {BackButtonAndText} from '../../../../components/general/BackButtonAndText';
-
-const ClaimRequest = ({navigation}) => {
+import { BackButton } from '../../../../components/general/BackButton';
+import { CustomTextInputValidation } from '../../../../components/general/CustomTextInputValidation';
+import { CustomButton } from '../../../../components/general/CustomButton';
+import { emailRegEx } from '../../../../constants/regEx';
+import { FlatList, TouchableOpacity } from 'react-native-gesture-handler';
+import { useHealthCareFacility } from '../../../../hooks/healthCareFacility';
+import { color } from 'react-native-reanimated';
+import { BackButtonAndText } from '../../../../components/general/BackButtonAndText';
+import { useLoggedInUser } from "../../../../hooks/authentication";
+import { useClaimRequest } from "../../../../hooks/claimRequest"
+const ClaimRequest = ({ route, navigation }) => {
   const [result, setResult] = useState();
+  const healthCareFacilityId = route.params.id;
+
+  console.log(healthCareFacilityId)
   // Declare useForm
+
+
+  const healthCareFacility = useHealthCareFacility(healthCareFacilityId);
+
+  const loggedInUser = useLoggedInUser();
+
+
   const {
     control,
     handleSubmit,
-    formState: {errors},
+    setValue,
+    formState: { errors },
   } = useForm({
     defaultValues: {
-      name: hcf.name,
-      firstName: '',
-      lastName: '',
-      phoneNumber: '',
-      email: '',
+      hcfName: '',
+      requesterFirstName: '',
+      requesterLastName: '',
+      requesterPhoneNumber: '',
+      requesterEmail: '',
       message: '',
-      attachment: '',
     },
   });
+
+  if (healthCareFacility.isSuccess && loggedInUser.isSuccess) {
+    const hcf = healthCareFacility.data;
+    const user = loggedInUser.data.data.user;
+
+    setValue('hcfName', hcf.name);
+    setValue('requesterFirstName', user.firstName);
+    setValue('requesterLastName', user.lastName);
+    setValue('requesterPhoneNumber', '0909090');
+    setValue('requesterEmail', user.email);
+  }
 
   // Document picker error handler
   const handleDocPickerError = err => {
@@ -58,9 +81,11 @@ const ClaimRequest = ({navigation}) => {
   const onDocPick = async () => {
     try {
       const pickerRes = await DocumentPicker.pick({
-        allowMultiSelection: true, // Multi Doc selection
-        type: [types.images, types.pdf, types.doc, types.docx], // Types allowed
+        type: [DocumentPicker.types.allFiles],
+        allowMultiSelection: false, // Multi Doc selection
+        // type: [types.images, types.pdf, types.doc, types.docx], // Types allowed
         presentationStyle: 'fullScreen', // fullscreen selection window
+
       });
       setResult(pickerRes); // Set the value to result state
     } catch (e) {
@@ -68,21 +93,26 @@ const ClaimRequest = ({navigation}) => {
     }
   };
 
+  const claim = useClaimRequest();
   // Called when submit button is pressed
   const onSubmit = data => {
-    if (result) {
-      // If there is result store the result to the 'attachment' key of the data object from the form
-      data.attachment = result;
-    } else {
-      console.warn('No data selected');
-    }
-    console.log(data); // Api function here
+    data['healthFacilityID'] = healthCareFacilityId;
+    delete data['hcfName'];
+    
+    claim.mutate(data);
   };
 
+  if (claim.isLoading) {
+    console.log("loading")
+  }
+
+  if (claim.isError) {
+    console.log(claim.error.response.data)
+  }
   // Remove selected file from the list when the close icon is pressed
-  const removeSelectedFile = index => {
-    setResult(result.filter(item => item !== result[index]));
-  };
+  // const removeSelectedFile = index => {
+  //   setResult(result.filter(item => item !== result[index]));
+  // };
 
   return (
     <View style={styles.container}>
@@ -98,23 +128,24 @@ const ClaimRequest = ({navigation}) => {
         <CustomText content={'Claim Request'} fontSize={18} fontWeight="600" />
       </View> */}
       <BackButtonAndText navigation={navigation} text={'Claim Request'} />
-      <ScrollView style={styles.innerContainer}>
+      <ScrollView style={styles.innerContainer} >
         <View style={styles.form}>
           {/* HCF Name */}
           <CustomTextInputValidation
             editable={false}
             customStyles={styles.textInput}
             control={control}
-            name={'name'}
-            label={'Name'}
+            name={'hcfName'}
+            label={'Health Care Facility'}
           />
           {/* First Name */}
           <CustomTextInputValidation
             customStyles={styles.textInput}
             control={control}
-            name={'firstName'}
+            editable={false}
+            name={'requesterFirstName'}
             label={'First Name'}
-            error={errors.firstName?.message}
+            error={errors.requesterFirstName?.message}
             changeBorderOnFocus={true}
             rules={{
               required: {
@@ -125,11 +156,12 @@ const ClaimRequest = ({navigation}) => {
           />
           {/* Last Name */}
           <CustomTextInputValidation
+            editable={false}
             customStyles={styles.textInput}
             control={control}
-            name={'lastName'}
+            name={'requesterLastName'}
             label={'Last Name'}
-            error={errors.lastName?.message}
+            error={errors.requesterLastName?.message}
             changeBorderOnFocus={true}
             rules={{
               required: {
@@ -142,9 +174,9 @@ const ClaimRequest = ({navigation}) => {
           <CustomTextInputValidation
             customStyles={styles.textInput}
             control={control}
-            name={'phoneNumber'}
+            name={'requesterPhoneNumber'}
             label={'Phone Number'}
-            error={errors.phoneNumber?.message}
+            error={errors.requesterPhoneNumber?.message}
             changeBorderOnFocus={true}
             keyboardType={'phone-pad'}
             rules={{
@@ -158,9 +190,10 @@ const ClaimRequest = ({navigation}) => {
           <CustomTextInputValidation
             customStyles={styles.textInput}
             control={control}
-            name={'email'}
+            name={'requesterEmail'}
             label={'Email'}
-            error={errors.email?.message}
+            editable={false}
+            error={errors.requesterEmail?.message}
             changeBorderOnFocus={true}
             rules={{
               required: {
@@ -195,7 +228,7 @@ const ClaimRequest = ({navigation}) => {
           {result && result.length > 0 && (
             <ScrollView style={styles.showSelected}>
               {result.map((item, index) => (
-                <View style={styles.docItemStyle}>
+                <View style={styles.docItemStyle} key={index}>
                   <View style={styles.docItemText}>
                     <CustomText content={item.name} key={item} />
                   </View>
@@ -218,7 +251,7 @@ const ClaimRequest = ({navigation}) => {
             </ScrollView>
           )}
           {/* Attachment button */}
-          <View style={{marginTop: 20}} />
+          {/* <View style={{ marginTop: 20 }} />
           <CustomButton
             title={'Attachment'}
             width={'100%'}
@@ -233,17 +266,17 @@ const ClaimRequest = ({navigation}) => {
                 name="attachment"
                 size={30}
                 color={colors.black}
-                style={{marginLeft: 10}}
+                style={{ marginLeft: 10 }}
               />
             }
-          />
-          <View style={{marginTop: 15}} />
+          /> */}
+          <View style={{ marginTop: 15 }} />
           {/* Submit button */}
           <CustomButton
             title={'Submit'}
             width={'100%'}
             onPress={handleSubmit(onSubmit)}
-            customStyle={{marginBottom: 20}}
+            customStyle={{ marginBottom: 20 }}
           />
         </View>
       </ScrollView>
@@ -310,9 +343,5 @@ const styles = StyleSheet.create({
     marginVertical: 5,
   },
 });
-
-const hcf = {
-  name: 'HealthCare Facility 1',
-};
 
 export default ClaimRequest;

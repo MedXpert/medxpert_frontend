@@ -21,7 +21,7 @@ import IconIon from 'react-native-vector-icons/Ionicons';
 import IconFontAws from 'react-native-vector-icons/FontAwesome5';
 import IconEntypo from 'react-native-vector-icons/Entypo';
 import IconFeather from 'react-native-vector-icons/Feather';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import { useLoggedInUser } from "../../../../hooks/authentication"
 import { CustomText } from '../../../../components/general/CustomText';
 import { BackButton } from '../../../../components/general/BackButton';
 import { useHealthCareFacility } from '../../../../hooks/healthCareFacility';
@@ -44,6 +44,8 @@ const Details = ({ route, navigation }) => {
 
   const { data, isError, isLoading, isSuccess } =
     useHealthCareFacility(healthCareFacilityId);
+
+  const loggedInUser = useLoggedInUser();
 
   const defaultPicture = 'https://i.ibb.co/xHswhnT/Default-Cover.png'
   const [selectedImage, setSelectedImage] = useState();
@@ -102,7 +104,7 @@ const Details = ({ route, navigation }) => {
   // navigate to ClaimRequest page when claim button is clicked
   const claimHCF = () => {
     // navigate to claim request page
-    navigation.navigate('ClaimRequest');
+    navigation.navigate('ClaimRequest', { id: healthCareFacilityId });
   };
 
   return (
@@ -276,21 +278,39 @@ const Details = ({ route, navigation }) => {
                   }
                 />
 
-                <CustomButton
-                  title="Claim"
-                  fontSize={13}
-                  width={"40%"}
-                  height={45}
-                  customStyle={styles.buttonStyle}
-                  onPress={claimHCF}
-                  icon={
-                    <IconEntypo
-                      name="hand"
-                      size={20}
-                      color={Colors.dark}
-                    />
-                  }
-                />
+                {data.owner === null ? ( <CustomButton
+                    title="Claim"
+                    fontSize={13}
+                    width={"40%"}
+                    height={45}
+                    customStyle={styles.buttonStyle}
+                    onPress={claimHCF}
+                    icon={
+                      <IconEntypo
+                        name="hand"
+                        size={20}
+                        color={Colors.dark}
+                      />
+                    }
+                  />): (
+                    <CustomButton
+                    title="Claimed"
+                    fontSize={13}
+                    disabled={true}
+                    width={"40%"}
+                    height={45}
+                    customStyle={[styles.buttonStyle, styles.grayButtons]}
+                    icon={
+                      <IconEntypo
+                        name="hand"
+                        size={20}
+                        color={Colors.dark}
+                      />
+                    }
+                  />
+                  )} 
+                  
+                 
                 {/* <View style={styles.claimButton}>
                   {data.verificationStatus && (
                     <CustomButton
