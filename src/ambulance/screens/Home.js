@@ -11,7 +11,7 @@ import {
   Animated,
   Switch
 } from 'react-native';
-import React, {useState, useEffect, useCallback, useRef, useMemo} from 'react';
+import React, {useState, useEffect, useCallback, useRef, useMemo, useId} from 'react';
 import {PERMISSIONS, RESULTS, openSettings} from 'react-native-permissions';
 import Geolocation from 'react-native-geolocation-service';
 import {io} from 'socket.io-client';
@@ -45,7 +45,6 @@ const geoApifyAccessToken = '87d55356e5ab47dab8be60202bb80ae3';
 
 // TODO: change the userType, useId and ambulanceId to be dynamic
 var userType = 'a';
-var userId = 'userId' + Math.random();
 var ambulanceID = 'ambulanceId' + Math.random();
 
 const USER_TYPES = {
@@ -172,6 +171,7 @@ const Ambulance = ({navigation}) => {
   // turn on and off when ambulance is called
   const [ambulanceCalled, setAmbulanceCalled] = useState(false);
 const [ambulanceAborted, setAmbulanceAborted] = useState();
+const [userId, setUserId] = useState();
 
 
   // const [ambulanceId, setAmbulanceId] = useState(null);
@@ -181,6 +181,10 @@ const [ambulanceAborted, setAmbulanceAborted] = useState();
   const [locationFromAmbulance, setLocationFromAmbulance] = useState()
   const [ambulanceHasReached, setAmbulanceHasReached] = useState()
   const [isFree, setIsFree] = useState(false);
+  const [isInAppointment, setIsInAppointment] = useState(false);
+  const [emergencyReceived, setEmergencyReceived] = useState(false);
+  const [alertInfo, setAlertInfo] = useState({});
+
 
   const refUserLocation = useRef();
 
@@ -229,8 +233,15 @@ const [ambulanceAborted, setAmbulanceAborted] = useState();
   }, [permissionName]);
 
   // Will be called when ambulance appointment is accepted by one of the ambulances
-  const locationToAmbulance = (lng, lat) => {
-    socketRef.current.emit(EVENTS.LOCATION_TO_AMBULANCE, {
+  const locationToUser = (lng, lat) => {
+    socketRef.current.emit(EVENTS.LOCATION_TO_USER, {
+      coordinates: [lng, lat],
+      useID: userId,
+    });
+  };
+
+   const ambulanceLocationUpdate = (lng, lat) => {
+    socketRef.current.emit(EVENTS.AMBULANCE_LOCATION_UPDATE, {
       coordinates: [lng, lat],
       ambulanceID: ambulanceID,
     });
@@ -247,10 +258,16 @@ const [ambulanceAborted, setAmbulanceAborted] = useState();
         setLocationFromMapboxLat(lat);
         refUserLocation.current = {longitude: lng, latitude: lat};
       } else {
-        if (appointmentAccepted) {
-            locationToAmbulance(lng, lat); // Send user location to the ambulance every time location coordinates are changed.
+        if (isInAppointment) {
+            locationToUser(lng, lat); 
+            // Send user location to the ambulance every time location coordinates are changed.
           }
+         if(isFree){
+          ambulanceLocationUpdate(lng, lat);
+          console.log( "sending location to server");
          
+         }
+
         const distance = getDistance(
           {
             latitude: refUserLocation.current.latitude,
@@ -386,6 +403,33 @@ const [ambulanceAborted, setAmbulanceAborted] = useState();
     socketRef.current.emit(EVENTS.AMBULANCE_STATUS_CHANGE, {ambulanceID: ambulanceID, status: statusString});
   }
 
+  // on accept pressed
+  const onAcceptEmergency = () => {
+    onBusyPressed();
+    setEmergencyReceived(false);
+    socketRef.current.emit(EVENTS.ACCEPT_APPOINTMENT, { userID: userId, ambulanceID: ambulanceID })
+    setIsInAppointment(true);
+    console.log("appointement accepted");
+  }
+
+  const onDeclineEmergency = () => {
+    setEmergencyReceived(false);
+    socketRef.current.emit(EVENTS.DECLINE_APPOINTMENT, 
+      {
+        userID: userId,
+        coordinates: alertInfo.coordinate,
+        ambulanceID: ambulanceID,
+        try: alertInfo.try,
+        failedAmbulances: alertInfo.failedAmbulances
+      })
+  }
+
+  const onReach = () => {}
+
+  const onAborted = () => {}
+
+  const onFinish = () => {}
+
 
   useEffect(() => {
     socketRef.current = io(connection_url, {
@@ -410,6 +454,9 @@ const [ambulanceAborted, setAmbulanceAborted] = useState();
 
     // When an emergency alert is emitted
     socketRef.current.on(EVENTS.EMERGENCY_ALERT, (data, ack) => {
+        setEmergencyReceived(true);
+        setUserId(data.userID);
+        setAlertInfo({coordinates: data.coordinates, try: data.try, failedAmbulances: data.failedAmbulances});
        console.table({
         event: 'EMERGENCY_ALERT', 
         userID: data.userID, 
@@ -417,93 +464,12 @@ const [ambulanceAborted, setAmbulanceAborted] = useState();
       });
     })
    
-   
-    // When no Ambulance is found
-    // socketRef.current.on(EVENTS.CANT_FIND_AMBULANCE, data => {
-    //   console.table({event: 'CANT_FIND_AMBULANCE'});
-    //   console.log(">>>>>> Can't find ambulances. Try again");
-    //   setCallingAmbulance(false);
-    //   setCanNotFindAmbulance(true);
-    //   setTimeout(()=>{
-    //     setCanNotFindAmbulance(false);
-    //   }, 5000)
-    // });
-
-    // 
-    // socketRef.current.on(EVENTS.APPOINTMENT_ACCEPTED, data => {
-    //   // start LS
-    //   // state.streams.LS.start(data.ambulanceID);
-    //   // state.in_appointment_with.ambulanceID = data.ambulanceID;
-    //   setAppointmentAccepted(true);
-    //   // setAmbulanceId(data.ambulanceID);
-    //   setCallingAmbulance(false);
-
-    //   // locationToAmbulance(locationFromMapboxLng, locationFromMapboxLat);
-    //   // console.log("user location sent from inside appointment accepted");
-    // });
-
-    // //when an ambulance is found
-    // socketRef.current.on(EVENTS.LOCATION_FROM_AMBULANCE, data => {
-    //   console.log(`Ambulance at ${data.coordinates}`);
-    //   setLocationFromAmbulance(data.coordinates)
-
-    // });
-
-
-    // // on Aborted
-    // socketRef.current.on(EVENTS.ABORTED, data => {
-    //   // stop LS
-    //   // ambuAppState.streams.LS.stop();
-    //   setAppointmentAccepted(false);
-    //   // ambuAppState.in_appointment_with.ambulanceID = null;
-    //   // setAmbulanceId(null);
-    //   setLocationFromAmbulance(null);
-    //   setAmbulanceAborted(true)
-    //   setTimeout(()=>{
-    //     setAmbulanceAborted(false);
-    //   }, 5000)
-
-    //   console.log('Ambulance aborted');
-    // });
-
-    // // on Reached
-    // socketRef.current.on(EVENTS.HAVE_REACHED, data => {
-    //   // stop LS
-    //   // ambuAppState.streams.LS.stop();
-    //   setAppointmentAccepted(false);
-    //   // setAmbulanceId(null);
-    //   setLocationFromAmbulance(null);
-    //   setAmbulanceHasReached(true)
-    //   setTimeout(()=>{
-    //     setAmbulanceHasReached(false);
-    //   }, 5000)
-    //   console.log('Ambulance reached your location');
-    // });
-
-    // // on Finished
-    // socketRef.current.on(EVENTS.FINISHED, data => {
-    //   // ambuAppState.in_appointment_with.ambulanceID = null;
-    //   // setAmbulanceId(null);
-    //   setAppointmentAccepted(false);
-    //   console.log('Job finished');
-    // });
 
     return () => {
       socketRef.current.disconnect();
     };
   }, []);
 
-  // const callAmbulance = () => {
-  //   setCallingAmbulance(true);
-  //   socketRef.current.emit(
-  //     EVENTS.ALERT_NEAR_AMBULANCE,
-  //     {
-  //       coordinates: [userPositionLng, userPositionLat],
-  //       userID: userId,
-  //     }, //,
-  //     // (response)=>console.log(response)
-  //   );
-  // };
 
   useEffect(() => {
 
@@ -615,22 +581,24 @@ const [ambulanceAborted, setAmbulanceAborted] = useState();
 
       {/* status bar display only when ambulance is called */}
       {/* Calling ambulance */}
-      {false && (
+      {emergencyReceived && !appointmentAccepted &&  (
         <View style={styles.statusBarContainer}>
           {/* Display arriving status  */}
           <View style={styles.statusBar}>
-            <CustomText
+            <CustomButton title={"Accept"}  width={150} onPress={onAcceptEmergency} customStyle={{ marginRight: 5}} backgroundColor={colors.green} />
+            <CustomButton title={"Decline"}  width={150} onPress={onDeclineEmergency} backgroundColor={colors.red} />
+          </View>
+        </View>
+      )
+      }
+     {/* <CustomText
               content="Looking for nearby ambulances  "
               fontWeight="bold"
               fontColor={Colors.primary}
               fontSize={18}
             />
-            <Spinner isVisible type='Wave' size={25} color={colors.primary} style={{marginTop:5}}/>
-          </View>
-        </View>
-      )
-      }
-     
+            
+            <Spinner isVisible type='Wave' size={25} color={colors.primary} style={{marginTop:5}}/> */}
 
       {/* Get location button */}
       <Animated.View
@@ -668,11 +636,25 @@ const [ambulanceAborted, setAmbulanceAborted] = useState();
 
       {/* Bottom View  */}
       <View style={styles.bottomView}>
-        
-        <View style={styles.bottomButtonContainer}>
+        {
+          (!isInAppointment && !emergencyReceived) ? (
+             <View style={styles.bottomButtonContainer}>
               <CustomButton title={"Free"}  width={150} onPress={onFreePressed} customStyle={{borderRadius: 0}} backgroundColor={isFree ? colors.green : colors.secondary} />
               <CustomButton title={"Busy"}  width={150} onPress={onBusyPressed} customStyle={{borderRadius: 0}} backgroundColor={!isFree ? colors.red : colors.secondary}/>
-        </View>
+            </View>
+          ) : null
+        }
+        {
+
+          isInAppointment ? (
+             <View style={styles.bottomButtonContainer}>
+             <CustomButton title={"Abort"} fontColor={colors.white} width={150} onPress={onAborted} customStyle={{marginRight: 5}}  backgroundColor={ colors.red}/>
+              <CustomButton title={"Reached"} fontColor={colors.white}  width={150} onPress={onReach}  backgroundColor={ colors.primary} />
+              
+            </View>
+          ) : null
+        }
+       
         {appointmentAccepted && (
           <View style={styles.driveDetailsContainer}>
             <View style={styles.driverImageContainer}>
@@ -747,7 +729,7 @@ const styles = StyleSheet.create({
   },
   statusBarContainer: {
     position: 'absolute',
-    top: 30,
+    top: 0,
   },
   statusBar: {
     flex: 1,
