@@ -8,7 +8,7 @@ import { BackButtonAndText } from '../../../../components/general/BackButtonAndT
 import { CustomButton } from '../../../../components/general/CustomButton';
 import { CustomTextInputValidation } from '../../../../components/general/CustomTextInputValidation';
 import { emailRegEx } from '../../../../constants/regEx';
-import { useHealthCareFacility } from "../../../../hooks/healthCareFacility";
+import { useHealthCareFacility, useUpdateAppointment } from "../../../../hooks/healthCareFacility";
 
 import Spinner from 'react-native-spinkit';
 const EditHCF = ({ route, navigation }) => {
@@ -16,6 +16,8 @@ const EditHCF = ({ route, navigation }) => {
   const healthCareFacilityId = route.params.id;
 
   const healthCareFacility = useHealthCareFacility(healthCareFacilityId);
+
+  const updateHealthFacility = useUpdateAppointment();
   const {
     control,
     handleSubmit,
@@ -32,22 +34,20 @@ const EditHCF = ({ route, navigation }) => {
       doctorCount: '',
       services: '',
       description: '',
-      imageGallery: '',
     },
   });
 
   if(healthCareFacility.isSuccess) {
     const hcf = healthCareFacility.data;
-    console.log(hcf)
-    setValue('name', hcf.name);
-    setValue('address', hcf.address);
-    setValue('email', hcf.email);
-    setValue('website', hcf.website);
+    setValue('name', hcf.name || '');
+    setValue('address', hcf.address) || '';
+    setValue('email', hcf.email || '');
+    setValue('website', hcf.website || '');
     setValue('phoneNumber', hcf.phoneNumbers.map(phone => phone).join(','));
-    setValue('type', hcf.facility_type);
-    setValue('doctorCount', hcf.doctorCount);
-    setValue('services', hcf.services);
-    setValue('description', hcf.description);
+    setValue('type', hcf.facility_type || '');
+    setValue('doctorCount', hcf.doctorCount || '');
+    setValue('services', hcf.services || '');
+    setValue('description', hcf.description || '');
   }
   const onSave = data => {
     console.log(data);
@@ -207,8 +207,8 @@ const EditHCF = ({ route, navigation }) => {
                   customStyles={styles.textInput}
                   control={control}
                   name={'phoneNumber'}
+                  keyboardType={'phone-pad'}
                   label={'Phone Numbers(Separated by Comma)'}
-                  keyboardType={'numeric'}
                   error={errors.phoneNumber?.message}
                   changeBorderOnFocus={true}
                   rules={{
@@ -238,6 +238,7 @@ const EditHCF = ({ route, navigation }) => {
                   customStyles={styles.textInput}
                   control={control}
                   name={'doctorCount'}
+                  keyboardType={'phone-pad'}
                   label={'Doctor Count'}
                   error={errors.doctorCount?.message}
                   changeBorderOnFocus={true}
