@@ -253,7 +253,7 @@ const EditHCF = ({navigation}) => {
                 },
               }}
             />
-            <View style={styles.imageGalleryButtonContainer}>
+            {/* <View style={styles.imageGalleryButtonContainer}>
               <CustomButton
                 title={'Edit Images'}
                 width={'100%'}
@@ -263,7 +263,7 @@ const EditHCF = ({navigation}) => {
                   navigation.push('EditImages');
                 }}
               />
-            </View>
+            </View> */}
           </View>
         </ScrollView>
       </View>

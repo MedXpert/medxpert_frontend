@@ -10,27 +10,19 @@ import Spinner from 'react-native-spinkit';
 
 const Claimed = ({ navigation }) => {
 
-  // const pendingRequests = usePendingRequest();
+  const pendingRequests = usePendingRequest();
   const claimedHCF = useClaimedRequest();
 
-  if(claimedHCF.isSuccess) {
-    console.log();
+  if (pendingRequests.isSuccess) {
+    console.log(pendingRequests.data.data)
   }
+
   return (
     <View style={styles.container}>
 
       <View style={styles.header}>
         {/* Header */}
         <CustomText content={'Claimed'} fontSize={18} />
-        <CustomButton
-          backgroundColor={colors.secondary}
-          fontSize={15}
-          fontColor={colors.gray}
-          width="auto"
-          height="auto"
-          customStyle={styles.pendingButton}
-          title={'Pending claims'}
-        />
       </View>
 
       {claimedHCF.isLoading && (
@@ -79,7 +71,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   hcfSection: {
-    marginTop: 30,
+    marginTop: 10,
   },
   spinnerContainer: {
     flexDirection: 'row',
