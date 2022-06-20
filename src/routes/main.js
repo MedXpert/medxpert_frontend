@@ -26,6 +26,7 @@ import FallDetected from "../screens/main/Emergency/FallDetected";
 import {backgroundService} from "../services/backgroundService/backgroundService";
 import Connecting from "../screens/main/Connecting";
 import Loading from "../screens/welcome/Loading";
+import NavigationStackAmbulance from "../Ambulance/routes/NavigationStackAmbulance";
 
 // Ignore new NativeEmitter error
 LogBox.ignoreLogs(["new NativeEventEmitter"]);
@@ -212,6 +213,8 @@ const Main = () => {
             <NavigationStackHCF />
           </AuthContext.Provider>
         );
+      } else if (role === "am") {
+        return <NavigationStackAmbulance />;
       } else {
         return (
           <AuthContext.Provider value={authContext}>

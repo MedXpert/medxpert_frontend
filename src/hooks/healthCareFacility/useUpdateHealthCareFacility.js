@@ -1,14 +1,14 @@
 import {useMutation, useQueryClient} from 'react-query';
 import {updateHealthCareFacility} from '../../services/api/healthCareFacility';
 
-const useUpdateAppointment = () => {
+const useUpdateHealthCareFacility = () => {
   const queryClient = new useQueryClient();
 
   return useMutation(updateHealthCareFacility, {
     onSuccess: () => {
-      queryClient.invalidateQueries(['appointment']);
+      queryClient.invalidateQueries(['healthCareFacility']);
     },
   });
 };
 
-export {useUpdateAppointment};
+export {useUpdateHealthCareFacility};

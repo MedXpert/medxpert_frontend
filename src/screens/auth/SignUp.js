@@ -5,7 +5,7 @@ import {
   useWindowDimensions,
   ScrollView
 } from 'react-native';
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import Colors from '../../constants/colors';
 import { CustomText } from '../../components/general/CustomText';
 import SignUpSvg from '../../assets/svg/auth/signUp.svg';
@@ -44,15 +44,20 @@ const SignUp = ({ navigation }) => {
     }
   });
 
-  if (register.isError) {
-    showMessage({
-      message: "Error",
-      description: register.error.response.data.error || register.error.message,
-      type: "danger",
-      icon: "danger",
-      duration: 5000,
-    });
-  }
+  useEffect(() => {
+    if (register.isError) {
+      console.log(register.error.response.data.error);
+      showMessage({
+        message: "Error",
+        description: register.error.response.data.error || register.error.message,
+        type: "danger",
+        icon: "danger",
+        duration: 5000,
+      });
+    }
+  }, [register]);
+
+
 
   return (
     <ScrollView>

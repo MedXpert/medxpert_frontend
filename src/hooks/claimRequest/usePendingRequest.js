@@ -1,7 +1,7 @@
 import {useQuery} from 'react-query';
-import {claimedRequest} from '../../services/api/claimRequest';
+import {pendingRequests} from '../../services/api/claimRequest';
 
 const usePendingRequest = () =>
-  useQuery('claim', claimedRequest, { refetchOnMount: false });
+  useQuery('claim', pendingRequests, { refetchOnMount: false });
 
 export {usePendingRequest};

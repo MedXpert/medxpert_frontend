@@ -19,6 +19,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useLoggedInUser, useUpdateProfile } from '../../hooks/authentication';
 import { CustomSpinner } from '../../components/general/CustomSpinner/CustomSpinner';
 import Toast from 'react-native-toast-message';
+import { showMessage } from 'react-native-flash-message';
 const Profile = () => {
 
   const { loginStatus } = useContext(AuthContext);
@@ -27,13 +28,6 @@ const Profile = () => {
 
   const loggedInUser = useLoggedInUser();
 
-  const showToast = () => {
-    Toast.show({
-      type: 'success',
-      text1: 'Hello',
-      text2: 'This is some something 👋'
-    });
-  }
 
   const {
     control,
@@ -68,22 +62,27 @@ const Profile = () => {
     loginStatus();
   }
 
-  if (loggedInUser.isSuccess) {
-    const user = loggedInUser.data.data.user;
-    setValue('fullName', user.firstName + ' ' + user.lastName)
-    setValue('email', user.email)
-    setValue('phone', user.phoneNumber)
-  }
+  useEffect(() => {
+    if (loggedInUser.isSuccess) {
+      const user = loggedInUser.data.data.user;
+      setValue('fullName', user.firstName + ' ' + user.lastName)
+      setValue('email', user.email)
+      setValue('phone', user.phoneNumber)
+    }
+  }, [loggedInUser]);
+  
+  useEffect(() => {
 
-
-  if (updateUserProfile.isSuccess) {
-    Toast.show({
-      type: 'success',
-      text1: "Updated Successfully",
-      position: 'bottom'
-    })
-  }
-
+    if (updateUserProfile.isSuccess) {
+      showMessage({
+        message: "Success",
+        description: "Profile Updated Successfully",
+        type: "success",
+        icon: "success",
+        duration: 5000,
+      });
+    }
+  }, [updateUserProfile]);
   return (
     <View>
       {loggedInUser.isLoading && (
@@ -93,16 +92,6 @@ const Profile = () => {
       {loggedInUser.isSuccess && (
         <View>
           <View style={styles.changePassword}>
-            <CustomButton
-              title="Change password"
-              backgroundColor={Colors.white}
-              fontColor={Colors.dark}
-              width={165}
-              customStyle={styles.changePasswordButton}
-              fontSize={14}
-              fontWeight="bold"
-              height={35}
-            />
             <CustomButton
               title="Logout"
               backgroundColor={Colors.primary}
@@ -124,15 +113,6 @@ const Profile = () => {
                 source={{ uri: loggedInUser.data.data.profilePicture || `https://ui-avatars.com/api/?name=${loggedInUser.data.data.user.firstName + ' ' + loggedInUser.data.data.user.lastName}&background=random&size=120&bold=true&color=random&format=png` }}
                 style={styles.profilePicture}
               />
-              {/* image icon for changing profile */}
-              <View style={styles.editProfilePicture}>
-                <Pressable
-                  onPress={() => {
-                    console.log('clicked');
-                  }}>
-                  <IconAnt name="camera" size={25} color={Colors.lightGray} />
-                </Pressable>
-              </View>
             </View>
           </View>
           {/* name */}
@@ -234,7 +214,7 @@ const styles = StyleSheet.create({
   changePassword: {
     flex: 1,
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'flex-end',
     padding: 20,
   },
   isLoading: { width: 350, height: 350, alignSelf: 'center', justifyContent: 'center', alignItems: 'center' },

@@ -1,6 +1,6 @@
 import httpClient from "../../auth/httpClient";
-const claimedRequest = async () => {
+const pendingRequests = async () => {
     return await httpClient.get(`/claimrequests?claim=pending`);
 };
 
-export { claimedRequest };
+export { pendingRequests };

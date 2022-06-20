@@ -1,7 +1,7 @@
 import {useMutation, useQueryClient} from 'react-query';
 import { claimRequest } from '../../services/api/claimRequest';
 
-const useLogin = () => {
+const useClaimRequest = () => {
   const queryClient = new useQueryClient();
 
   return useMutation(claimRequest, {
@@ -11,4 +11,4 @@ const useLogin = () => {
   });
 };
 
-export {useLogin};
+export {useClaimRequest};
