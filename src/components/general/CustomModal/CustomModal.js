@@ -1,15 +1,15 @@
-import {View, Text, Modal, StyleSheet} from 'react-native';
-import React from 'react';
+import {View, Text, Modal, StyleSheet} from "react-native";
+import React from "react";
 
-import {CustomText} from '../CustomText';
-import colors from '../../../constants/colors';
-import {CustomButton} from '../CustomButton';
+import {CustomText} from "../CustomText";
+import colors from "../../../constants/colors";
+import {CustomButton} from "../CustomButton";
 
 const CustomModal = ({
   visibility,
   modalTitle,
   modalTitleFontSize = 17,
-  modalTitleFontWeight = '900',
+  modalTitleFontWeight = "900",
   modalContent,
   leftButtonTitle,
   rightButtonTitle,
@@ -24,7 +24,7 @@ const CustomModal = ({
   otherVariables,
 }) => {
   return (
-    <Modal transparent visible={visibility} animationType={'fade'}>
+    <Modal transparent visible={visibility} animationType={"fade"}>
       <View style={styles.modalStyle}>
         <View style={styles.innerModal}>
           <CustomText
@@ -62,10 +62,10 @@ const CustomModal = ({
 
 const styles = StyleSheet.create({
   modalStyle: {
-    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    backgroundColor: "rgba(0, 0, 0, 0.7)",
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   innerModal: {
     backgroundColor: colors.white,
@@ -73,20 +73,20 @@ const styles = StyleSheet.create({
     height: 170,
     margin: 20,
     padding: 20,
-    alignContent: 'center',
-    justifyContent: 'center',
-    alignItems: 'center',
+    alignContent: "center",
+    justifyContent: "center",
+    alignItems: "center",
   },
   modalButtons: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
+    flexDirection: "row",
+    justifyContent: "flex-end",
     marginTop: 20,
-    width: '100%',
+    width: "100%",
   },
-  modalTitle: {alignSelf: 'flex-start'},
+  modalTitle: {alignSelf: "flex-start"},
   modalContent: {
     marginTop: 10,
-    alignSelf: 'flex-start',
+    alignSelf: "flex-start",
   },
 });
 

@@ -17,6 +17,8 @@ import { storeToken } from '../../services/storeToken/storeToken';
 import { useLogin } from '../../hooks/authentication/index'
 import { CustomTextInputValidation } from '../../components/general/CustomTextInputValidation';
 import { useForm } from 'react-hook-form';
+import { showMessage } from "react-native-flash-message";
+
 const Login = ({ navigation }) => {
 
   const { height, width } = useWindowDimensions();
@@ -50,8 +52,25 @@ const Login = ({ navigation }) => {
     loginStatus();
   }
 
-  if(login.isError) {
-    console.log(login.error)
+  
+  if (login.isError) {
+    showMessage({
+      message: "Error",
+      description: login.error.response.data.non_field_errors[0] || login.error.message,
+      type: "danger",
+      icon: "danger",
+      duration: 5000,
+    });
+  }
+
+  if(login.isSuccess) {
+    showMessage({
+      message: "Success",
+      description: "Login successful",
+      type: "success",
+      icon: "success",
+      duration: 3000,
+    });
   }
 
   return (
@@ -102,7 +121,6 @@ const Login = ({ navigation }) => {
         <View style={styles.forgotPasswordContainer}>
           <CustomText content={'Forgot password?'} fontColor={Colors.primary} />
         </View>
-        {login.isError && (<CustomText content={login.error.message} fontColor={Colors.red} />)}
         <View style={styles.buttonsContainer}>
           <CustomButton
             width={350}

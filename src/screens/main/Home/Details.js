@@ -1,32 +1,33 @@
-import React, {useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
-  ImageBackground,
   FlatList,
   Image,
   StyleSheet,
   Pressable,
   Modal,
-  Text,
   Dimensions,
+  Platform,
+  Linking
 } from 'react-native';
 import ContentLoader, {
   FacebookLoader,
   InstagramLoader,
 } from 'react-native-easy-content-loader';
 import StarRating from 'react-native-star-rating';
-import {CustomButton} from '../../../components/general/CustomButton';
+import { CustomButton } from '../../../components/general/CustomButton';
 import Colors from '../../../constants/colors';
 import IconIon from 'react-native-vector-icons/Ionicons';
+import IconFontAws from 'react-native-vector-icons/FontAwesome5';
 import IconEntypo from 'react-native-vector-icons/Entypo';
 import IconFeather from 'react-native-vector-icons/Feather';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import {CustomText} from '../../../components/general/CustomText';
-import {BackButton} from '../../../components/general/BackButton';
-import {useHealthCareFacility} from '../../../hooks/healthCareFacility';
+import { CustomText } from '../../../components/general/CustomText';
+import { BackButton } from '../../../components/general/BackButton';
+import { useHealthCareFacility } from '../../../hooks/healthCareFacility';
 import Spinner from 'react-native-spinkit';
 
-const ImageItem = ({image, onPress}) => (
+const ImageItem = ({ image, onPress }) => (
   <Pressable onPress={onPress}>
     <View>
       <Image source={image} style={styles.imageItem} resizeMethod="scale" />
@@ -37,21 +38,67 @@ const ImageItem = ({image, onPress}) => (
 const dimensionsWidth = Dimensions.get('window').width;
 const dimensionsHeight = Dimensions.get('window').height;
 
-const Details = ({route, navigation}) => {
+const Details = ({ route, navigation }) => {
   const healthCareFacilityId = route.params.id;
-  const {data, isError, isLoading, isSuccess} =
+  const travelDistance = route.params.travelDistance;
+
+  const { data, isError, isLoading, isSuccess } =
     useHealthCareFacility(healthCareFacilityId);
 
-  if(isSuccess) {
-    console.log(data);
-  }
+    if(isSuccess){
+      console.log('====================================');
+      console.log("data from details page", data);
+      console.log('====================================');
+    }
 
+  const defaultPicture = 'https://i.ibb.co/xHswhnT/Default-Cover.png'
   const [selectedImage, setSelectedImage] = useState();
   const [imageModalVisible, setImageModalVisible] = useState(false);
 
-  const renderItem = ({item}) => (
+
+  const travelTime = (walk = True) => {
+    const averageWalkingSpeed = 1.56464 // in m/s
+    const averageCarSpeed = 8.33333 // in m/s 30 km/h
+
+    const travelTimeWalking = Number(travelDistance) / averageWalkingSpeed;
+    const travelTimeInWalkingHours = travelTimeWalking / 60 / 60;
+    const travelTimeInWalkingMinutes = travelTimeWalking / 60;
+
+    const travelTimeCar = Number(travelDistance) / averageCarSpeed;
+    const travelTimeInCarHours = travelTimeCar / 60 / 60;
+    const travelTimeInCarMinutes = travelTimeCar / 60;
+
+    if (walk) {
+      if (travelTimeInWalkingHours < 1) {
+        return `${Math.round(travelTimeInWalkingMinutes)} min`;
+      } else {
+        return `${Math.round(travelTimeInWalkingHours)} h`;
+      }
+    }
+    else {
+      if (travelTimeInWalkingHours < 1) {
+        return `${Math.round(travelTimeInCarMinutes)} min`;
+      } else {
+        return `${Math.round(travelTimeInCarHours)} h`;
+      }
+    }
+  }
+
+  const makeACall = (phone) => {
+    if (Platform.OS === 'android') {
+      phoneNumber = `tel:${phone}`;
+    }
+    else {
+      phoneNumber = `telprompt:${phone}`;
+    }
+
+    Linking.openURL(phoneNumber);
+  }
+
+  const renderItem = ({ item }) => (
     <ImageItem
-      image={item}
+      key={item}
+      image={{ uri: item }}
       onPress={() => {
         setSelectedImage(item);
       }}
@@ -60,22 +107,6 @@ const Details = ({route, navigation}) => {
 
   return (
     <View style={styles.container}>
-      <Modal visible={imageModalVisible}>
-        <View style={styles.modalFullScreen}>
-          <Pressable
-            onPress={() => setImageModalVisible(false)}
-            style={styles.modalCloseTag}>
-            <IconIon name="ios-close" size={50} color={Colors.primary} />
-          </Pressable>
-          {/* <Image
-            source={
-              selectedImage ? selectedImage : isSuccess ? data.images[0] : null
-            }
-            style={styles.modalImage}
-            resizeMode="contain"
-          /> */}
-        </View>
-      </Modal>
       {isLoading && (
         <View style={styles.spinnerContainer}>
           <Spinner
@@ -89,17 +120,37 @@ const Details = ({route, navigation}) => {
       )}
       {isSuccess && (
         <>
+          <Modal visible={imageModalVisible}>
+            <View style={styles.modalFullScreen}>
+              <Pressable
+                onPress={() => setImageModalVisible(false)}
+                style={styles.modalCloseTag}>
+                <IconIon name="ios-close" size={50} color={Colors.primary} />
+              </Pressable>
+              <Image
+                source={
+                  {
+                    uri: data.imageGallaryLinks[0] || defaultPicture,
+                  }
+
+                }
+                style={styles.modalImage}
+                resizeMode="contain"
+              />
+            </View>
+          </Modal>
+
           <View style={styles.head}>
             <Pressable
               style={styles.imageBackground}
               onPress={() => {
                 setImageModalVisible(true);
               }}>
-              {/* <Image
-                source={selectedImage ? selectedImage : data.images[0]}
+              <Image
+                source={{ uri: data.imageGallaryLinks[0] || defaultPicture }}
                 resizeMode="cover"
                 style={styles.imageBackground}
-              /> */}
+              />
             </Pressable>
             {/* <CustomButton
           title=""
@@ -119,11 +170,20 @@ const Details = ({route, navigation}) => {
           </View>
           <View style={styles.main}>
             <View style={styles.mainContainer}>
-              <CustomText
-                fontSize={30}
-                customStyles={styles.bold}
-                content={data.name}
-              />
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <CustomText
+                  fontSize={26}
+                  customStyles={styles.bold}
+                  content={data.name}
+                  customStyle={styles.marginRight5}
+                />
+                {(data.verificationIndexPer10 === 5) ?
+                  (<IconFontAws name="check" size={20} color={Colors.primary} />) :
+                  data.verificationIndexPer10 == 10 ?
+                    (<IconFontAws name="check-double" size={20} color={Colors.primary} />) :
+                    (null)
+                }
+              </View>
               <View style={styles.location}>
                 <IconEntypo
                   name="location-pin"
@@ -144,11 +204,20 @@ const Details = ({route, navigation}) => {
                   fullStarColor={Colors.golden}
                 />
               </View>
-              <CustomText
-                customStyles={styles.open}
-                fontColor={Colors.gray}
-                content={data.phoneNumbers[0]}
-              />
+              <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start' }}>
+                <IconFeather name="phone" size={15} color={Colors.primary} />
+                {data.phoneNumbers && data.phoneNumbers.map((phone, index) => (
+                  <>
+                    <CustomText
+                      key={index}
+                      customStyles={styles.open}
+                      fontColor={Colors.gray}
+                      content={phone}
+                    />
+                    {index !== data.phoneNumbers.length - 1 && (<IconEntypo name="dot-single" size={20} color={Colors.primary} />)}
+                  </>
+                ))}
+              </View>
               <View style={styles.typeAndTravel}>
                 <View style={styles.type}>
                   <CustomText
@@ -162,10 +231,20 @@ const Details = ({route, navigation}) => {
                     content="Travel Time"
                     customStyles={styles.typeTravelElement}
                   />
-                  <CustomText
-                    content={data.services}
-                    fontColor={Colors.gray}
-                  />
+                  <View style={{ flexDirection: 'row', alignContent: 'center' }}>
+                    <IconFontAws name="walking" size={14} color={Colors.primary} />
+                    <CustomText
+                      content={travelTime(true)}
+                      fontColor={Colors.gray}
+                      customStyles={[styles.marginLeft5, styles.marginRight5]}
+                    />
+                    <IconFontAws name="car-alt" size={16} color={Colors.primary} />
+                    <CustomText
+                      content={travelTime(false)}
+                      fontColor={Colors.gray}
+                      customStyles={styles.marginLeft5}
+                    />
+                  </View>
                 </View>
               </View>
 
@@ -175,9 +254,10 @@ const Details = ({route, navigation}) => {
                   customStyles={styles.typeAndTravelElement}
                 />
                 <CustomText
-                  content={data.description}
+                  content={data.description || `Hello there, ${data.name} is ${travelDistance} away from you.it will take you ${travelTime(true)} to walk there and ${travelTime(false)} to drive there. To continue, click the direction button and navigate using the map to get to them.`}
                   fontColor={Colors.gray}
-                  fontSize={12}
+                  fontSize={14}
+                  customStyles={{ textAlign: 'justify' }}
                 />
               </View>
 
@@ -187,6 +267,9 @@ const Details = ({route, navigation}) => {
                   fontSize={13}
                   width={110}
                   height={45}
+                  onPress={()=>{
+                    navigation.navigate("Home", {GPSCoordinates: data?.GPSCoordinates})
+                  }}
                   customStyle={styles.buttonStyle}
                   icon={
                     <IconEntypo
@@ -217,30 +300,32 @@ const Details = ({route, navigation}) => {
                     });
                   }}
                 />
-
-                <CustomButton
-                  title="Call"
-                  fontSize={13}
-                  width={100}
-                  height={45}
-                  fontColor={Colors.lightGray}
-                  customStyle={[styles.buttonStyle, styles.grayButtons]}
-                  icon={
-                    <IconEntypo
-                      name="phone"
-                      size={20}
-                      color={Colors.lightGray}
-                    />
-                  }
-                />
+                {data.phoneNumbers && data.phoneNumbers.length > 0 && (
+                  <CustomButton
+                    title="Call"
+                    onPress={() => { makeACall(data.phoneNumbers[0]) }}
+                    fontSize={13}
+                    width={100}
+                    height={45}
+                    fontColor={Colors.lightGray}
+                    customStyle={[styles.buttonStyle, styles.grayButtons]}
+                    icon={
+                      <IconEntypo
+                        name="phone"
+                        size={20}
+                        color={Colors.lightGray}
+                      />
+                    }
+                  />)
+                }
               </View>
             </View>
           </View>
-
           <FlatList
-            data={data.images}
+
+            data={data.imageGallaryLinks[0] ? data.imageGallaryLinks : [defaultPicture]}
             renderItem={renderItem}
-            keyExtractor={image => image.id}
+            keyExtractor={image => image}
             horizontal={true}
             style={styles.imageItemsFlatList}
           />
@@ -295,22 +380,23 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     backgroundColor: Colors.secondary,
   },
-  modalCloseTag: {position: 'absolute', top: 20, right: 20},
-  modalImage: {width: '100%', height: 400},
-  mainContainer: {paddingTop: 70, paddingHorizontal: 14},
-  bold: {fontWeight: 'bold'},
-  location: {flexDirection: 'row', marginVertical: 5},
-  marginLeft5: {marginLeft: 5},
-  stars: {width: 150, marginBottom: 5},
-  open: {fontSize: 16, marginTop: 5},
+  modalCloseTag: { position: 'absolute', top: 20, right: 20 },
+  modalImage: { width: '100%', height: 400 },
+  mainContainer: { paddingTop: 50, paddingLeft: 14, paddingRight: 35 },
+  bold: { fontWeight: 'bold' },
+  location: { flexDirection: 'row', marginVertical: 5 },
+  marginLeft5: { marginLeft: 5 },
+  marginRight5: { marginRight: 5 },
+  stars: { width: 150, marginBottom: 5 },
+  open: { fontSize: 14, marginTop: 5 },
   typeAndTravel: {
-    marginTop: 5,
+    marginTop: 10,
     flexDirection: 'row',
   },
-  type: {flexDirection: 'column', marginRight: 120},
-  travel: {flexDirection: 'column'},
-  typeTravelElement: {fontWeight: 'bold', marginBottom: 5},
-  overview: {flexDirection: 'column', marginTop: 8},
+  type: { flexDirection: 'column', marginRight: 120 },
+  travel: { flexDirection: 'column' },
+  typeTravelElement: { fontWeight: 'bold', marginBottom: 5 },
+  overview: { flexDirection: 'column', marginTop: 8 },
   buttons: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -330,75 +416,5 @@ const styles = StyleSheet.create({
     flex: 1,
   },
 });
-
-// const healthFacilities = [
-//   {
-//     name: 'Yekatit 12 Hospital',
-//     images: [
-//       {id: 1, uri: 'https://mapio.net/images-p/48157911.jpg'},
-//       {id: 2, uri: 'https://mapio.net/images-p/43332058.jpg'},
-//       {id: 3, uri: 'https://mapio.net/images-p/48157911.jpg'},
-//       {id: 4, uri: 'https://mapio.net/images-p/37190120.jpg'},
-//       {id: 5, uri: 'https://mapio.net/images-p/37190120.jpg'},
-//     ],
-//     id: 1,
-//     address: '6 kilo , Addis Ababa, Ethiopia',
-//     description:
-//       'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
-//     street: '123 Main Street',
-//     travelTime: '5 min',
-//     rating: 4.5,
-//     type: 'clinic',
-//     availability: 'Open 24 hours',
-//   },
-//   {
-//     name: 'Zewditu Hospital',
-//     images: [{id: 1, uri: 'https://mapio.net/images-p/2347273.jpg'}],
-//     id: 7,
-//     address: '6 kilo , Addis Ababa, Ethiopia',
-//     description:
-//       'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
-//     street: '123 Main Street',
-//     travelTime: '30 min',
-//     rating: 4,
-//     type: 'Hospital',
-//     availability: 'Open 24 hours',
-//   },
-//   {
-//     name: 'Tikur Anbesa Hospital',
-//     images: [
-//       {id: 1, uri: 'https://mapio.net/images-p/17493410.jpg'},
-//       {id: 2, uri: 'https://mapio.net/images-p/3638281.jpg'},
-//     ],
-//     id: 2,
-//     address: 'Senga tera',
-//     description:
-//       'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
-//     street: 'Senga tera Street',
-//     travelTime: '1 hr',
-//     rating: 4.8,
-//     type: 'Hospital',
-//     availability: 'Open 24 hours',
-//   },
-//   {
-//     name: 'Yekatit 12 Hospital',
-//     images: [
-//       {id: 1, uri: 'https://mapio.net/images-p/48157911.jpg'},
-//       {id: 2, uri: 'https://mapio.net/images-p/43332058.jpg'},
-//       {id: 3, uri: 'https://mapio.net/images-p/48157911.jpg'},
-//       {id: 4, uri: 'https://mapio.net/images-p/37190120.jpg'},
-//       {id: 5, uri: 'https://mapio.net/images-p/37190120.jpg'},
-//     ],
-//     id: 6,
-//     address: '6 kilo , Addis Ababa, Ethiopia',
-//     description:
-//       'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
-//     street: '123 Main Street',
-//     travelTime: '5 min',
-//     rating: 4.5,
-//     type: 'clinic',
-//     availability: 'Open 24 hours',
-//   },
-// ];
 
 export default Details;

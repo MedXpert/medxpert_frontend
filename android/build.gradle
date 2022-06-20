@@ -7,6 +7,7 @@ buildscript {
         compileSdkVersion = 30
         targetSdkVersion = 30
         ndkVersion = "21.4.7075529"
+        androidXCore = "1.7.0"
 
     googlePlayServicesVersion = "+" // default: "+"
     firebaseMessagingVersion = "21.1.0"
@@ -45,9 +46,8 @@ allprojects {
                 basic(BasicAuthentication)
             }
             credentials {
-            username = "mapbox"
-            password = "sk.eyJ1IjoibGl5dW1rIiwiYSI6ImNsMWtteG11NzAyZWgzZG9kOWpyb2x1dWMifQ.X4v8HxdCSmdrvVaCWXVjog"
-
+                username = "mapbox"
+                password = "sk.eyJ1IjoibGl5dW1rIiwiYSI6ImNsMWtteG11NzAyZWgzZG9kOWpyb2x1dWMifQ.X4v8HxdCSmdrvVaCWXVjog"
             }
         }
         google()
