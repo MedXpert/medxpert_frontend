@@ -12,24 +12,14 @@ import {FallDetectionEmitter, start} from "react-native-fall-detection-module";
 import {LogBox} from "react-native";
 import NetInfo from "@react-native-community/netinfo";
 
-
-import SplashScreen from "../screens/welcome/Splash";
-import NavigationStackUser from "./NavigationStackUser";
-import NavigationStackHCF from "../HCF/routes/NavigationStackHCF";
-import WelcomeStackScreen from "./Welcome";
-import AuthStackScreen from "./Auth";
-import {
-  AuthContext,
-  WelcomeContext,
-  FallContext,
-} from "../components/general/Context";
-import FallDetected from "../screens/main/Emergency/FallDetected";
-import {backgroundService} from "../services/backgroundService/backgroundService";
-import Connecting from "../screens/main/Connecting";
-import Loading from "../screens/welcome/Loading";
-
-// Ignore new NativeEmitter error
-LogBox.ignoreLogs(["new NativeEventEmitter"]);
+import SplashScreen from '../screens/welcome/Splash';
+import NavigationStackUser from './NavigationStackUser';
+import NavigationStackHCF from '../HCF/routes/NavigationStackHCF';
+import WelcomeStackScreen from './Welcome';
+import Loading from '../screens/welcome/Loading';
+import AuthStackScreen from './Auth';
+import NavigationStackAmbulance from '../Ambulance/routes/NavigationStackAmbulance';
+import {AuthContext, WelcomeContext} from '../components/general/Context';
 
 // The main route that evaluates whether the user is logged in or not and decides where to navigate when the app starts.
 const Main = () => {
@@ -210,12 +200,14 @@ const Main = () => {
             <NavigationStackHCF />
           </AuthContext.Provider>
         );
-      } else {
-        return(
-          <AuthContext.Provider value={authContext}>
-            <Loading />
-          </AuthContext.Provider>
-        );
+      } else if (role === 'h') {
+        return <AuthContext.Provider value={authContext}><NavigationStackHCF /></AuthContext.Provider>;
+      } 
+       else if (role === 'am') {
+        return <NavigationStackAmbulance />
+      }
+      else {
+        return <AuthContext.Provider value={authContext}><Loading /></AuthContext.Provider>;
       }
     } else {
       if (openingForTheFirstTime) {
