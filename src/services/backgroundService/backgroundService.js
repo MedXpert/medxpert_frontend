@@ -59,9 +59,9 @@ export const backgroundService = async () => {
         sendEmail(element, subject, message);
       });
 
-      // phoneEmergency.forEach((element) => {
-      //   sendSms(element, message);
-      // })
+      phoneEmergency.forEach(element => {
+        sendSms(element, message);
+      });
 
       await BackgroundService.stop();
     } else {

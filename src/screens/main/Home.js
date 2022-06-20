@@ -9,39 +9,38 @@ import {
   Image,
   Pressable,
   Animated,
-} from 'react-native';
-import React, {useState, useEffect, useCallback, useRef, useMemo} from 'react';
-import MapboxGL from '@react-native-mapbox-gl/maps';
-import {PERMISSIONS, RESULTS, openSettings} from 'react-native-permissions';
-import Geolocation from 'react-native-geolocation-service';
-import {log, onChange} from 'react-native-reanimated';
-import BottomSheet from '@gorhom/bottom-sheet';
+} from "react-native";
+import React, {useState, useEffect, useCallback, useRef, useMemo} from "react";
+import MapboxGL from "@react-native-mapbox-gl/maps";
+import {PERMISSIONS, RESULTS, openSettings} from "react-native-permissions";
+import Geolocation from "react-native-geolocation-service";
+import {log, onChange} from "react-native-reanimated";
+import BottomSheet from "@gorhom/bottom-sheet";
 // import MapboxDirectionsFactory from '@mapbox/mapbox-sdk/services/directions';
-import {lineString as makeLineString} from '@turf/helpers';
-import axios from 'axios';
+import {lineString as makeLineString} from "@turf/helpers";
+import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import IconAntDesign from "react-native-vector-icons/AntDesign";
 import IconMaterialCommunity from "react-native-vector-icons/MaterialCommunityIcons";
 
-import {SearchBar} from '../../components/general/SearchBar';
-import Colors from '../../constants/colors';
-import {CustomButton} from '../../components/general/CustomButton';
-import {CustomText} from '../../components/general/CustomText';
-import {PermissionModal} from '../../components/permissions/PermissionModal';
-import {IconButton} from 'react-native-paper';
-import {MapTypeModal} from '../../components/home/MapTypeModal';
-import {BottomSheetContent} from '../../components/home/BottomSheetContent';
-import {useHealthCareFacilities} from '../../hooks/healthCareFacility';
+import {SearchBar} from "../../components/general/SearchBar";
+import Colors from "../../constants/colors";
+import {CustomButton} from "../../components/general/CustomButton";
+import {CustomText} from "../../components/general/CustomText";
+import {PermissionModal} from "../../components/permissions/PermissionModal";
+import {IconButton} from "react-native-paper";
+import {MapTypeModal} from "../../components/home/MapTypeModal";
+import {BottomSheetContent} from "../../components/home/BottomSheetContent";
+import {useHealthCareFacilities} from "../../hooks/healthCareFacility";
 
-import {requestPermissions} from '../../services/permissions/requestPermissions';
-import {LOCATION_PERMISSION_MESSAGE} from '../../constants/string/requestPermissions/requestPermissions';
-import {RenderDirection} from '../../components/general/RenderDirection';
+import {requestPermissions} from "../../services/permissions/requestPermissions";
+import {LOCATION_PERMISSION_MESSAGE} from "../../constants/string/requestPermissions/requestPermissions";
+import {RenderDirection} from "../../components/general/RenderDirection";
 import {getDistance} from "geolib";
-import { useEmergencyContacts } from "../../hooks/emergencyContact";
-import { useAllHealthCareFacilities } from '../../hooks/healthCareFacility';
-import colors from '../../constants/colors';
-
+import {useEmergencyContacts} from "../../hooks/emergencyContact";
+import {useAllHealthCareFacilities} from "../../hooks/healthCareFacility";
+import colors from "../../constants/colors";
 
 const dimensionHeight = Dimensions.get("window").height;
 const dimensionWidth = Dimensions.get("window").width;
@@ -76,34 +75,40 @@ const Home = ({navigation, route}) => {
   const [coordinatesFromDetail, setCoordinatesFromDetail] = useState(null);
   const [healthCareFacilityName, setHealthCareFacilityName] = useState(false);
 
-  
-
   const refUserLocation = useRef();
 
   const phone = useEmergencyContacts({
-    type: "phone"
+    type: "phone",
   });
 
   const email = useEmergencyContacts({
-    type: "email"
+    type: "email",
   });
 
-  const {data, isSuccess, isError, isLoading, error} = useAllHealthCareFacilities();
+  const {data, isSuccess, isError, isLoading, error} =
+    useAllHealthCareFacilities();
 
-    const getGPSFromString = (coordinate) => {
-    return coordinate.substring(17, coordinate.length - 1).split(' ').map((item) => parseFloat(item));
-  }
+  const getGPSFromString = coordinate => {
+    return coordinate
+      .substring(17, coordinate.length - 1)
+      .split(" ")
+      .map(item => parseFloat(item));
+  };
 
-  const getDistanceFromGPS = (coordinateString, withString=false) => {
+  const getDistanceFromGPS = (coordinateString, withString = false) => {
     const coordinate = getGPSFromString(coordinateString);
- 
-    const distance =  getDistance(
-        { latitude: locationFromMapboxLng, longitude: locationFromMapboxLat },
-        { latitude: coordinate[0], longitude: coordinate[1]},
-      );
 
-    return withString ? distance: distance > 1000 ? `${(distance / 1000).toFixed(2)} km` : `${distance} m`; 
-  }
+    const distance = getDistance(
+      {latitude: locationFromMapboxLng, longitude: locationFromMapboxLat},
+      {latitude: coordinate[0], longitude: coordinate[1]},
+    );
+
+    return withString
+      ? distance
+      : distance > 1000
+        ? `${(distance / 1000).toFixed(2)} km`
+        : `${distance} m`;
+  };
 
   const accessToken =
     "sk.eyJ1IjoibGl5dW1rIiwiYSI6ImNsMWtteG11NzAyZWgzZG9kOWpyb2x1dWMifQ.X4v8HxdCSmdrvVaCWXVjog";
@@ -167,7 +172,6 @@ const Home = ({navigation, route}) => {
     }
   };
 
-
   // Set center coordinate to the current position of the user.
   const findMyLocation = async () => {
     // Use Geolocation library to get updated location of the user
@@ -198,11 +202,10 @@ const Home = ({navigation, route}) => {
 
   const onMapPress = () => {
     setRouteDirection(null);
-    setCoordinatesFromDetail(null)  
+    setCoordinatesFromDetail(null);
     navigation.setParams({GPSCoordinates: null});
     console.log("Map pressed", route.params?.GPSCoordinates);
-
-  }
+  };
 
   // To be rendered in the map
   // const renderRoadDirections = ({routeDirection}) => {
@@ -223,15 +226,13 @@ const Home = ({navigation, route}) => {
 
   // Get direction from starting point to destination
   const getDirections = useCallback(async (startLoc, destLoc) => {
-
     const res = await axios.get(
       `https://api.geoapify.com/v1/routing?waypoints=${startLoc.latitude},${startLoc.longitude}|${destLoc.latitude},${destLoc.longitude}&mode=drive&apiKey=${geoApifyAccessToken}`,
-    ); 
+    );
 
     const coordinates = res.data.features[0].geometry.coordinates[0];
     const routeLineString = makeLineString(coordinates, {name: "line 1"});
     setRouteDirection(routeLineString);
-
   }, []);
 
   // Choose the Map type that'll be displayed
@@ -266,16 +267,16 @@ const Home = ({navigation, route}) => {
     }
   };
 
-  useEffect(()=>{
-    if(gpsCoordinates){
+  useEffect(() => {
+    if (gpsCoordinates) {
       const gpsCoords = getGPSFromString(gpsCoordinates);
       console.log(gpsCoords);
       setCoordinatesFromDetail(gpsCoords);
-    }else {
+    } else {
       console.log("not found gpscoordinates");
       setCoordinatesFromDetail(null);
     }
-  },[gpsCoordinates])
+  }, [gpsCoordinates]);
 
   useEffect(() => {
     // Call 'checkPermission' every time something in the function is changed.
@@ -298,31 +299,32 @@ const Home = ({navigation, route}) => {
     }
   }, [checkPermission, locationPermissionGranted]);
 
-  useEffect(()=>{
+  useEffect(() => {
     const addEmergencyContacts = async () => {
-
       var storeToAsyncStorage = [];
-     
-      if(email.isSuccess && email.data){
+
+      if (email.isSuccess && email.data) {
         const emails = email.data.data.emergencyContact;
         // console.log("email", emails);
         storeToAsyncStorage = emails;
       }
 
-      if(phone.isSuccess && phone.data){
+      if (phone.isSuccess && phone.data) {
         const phoneNumbers = phone.data.data.emergencyContact;
         storeToAsyncStorage = [...storeToAsyncStorage, ...phoneNumbers];
       }
 
-      await AsyncStorage.setItem("@emergencyContacts", JSON.stringify(storeToAsyncStorage));
-      
+      await AsyncStorage.setItem(
+        "@emergencyContacts",
+        JSON.stringify(storeToAsyncStorage),
+      );
     };
 
     addEmergencyContacts();
   }, [phone.data, email.data, phone.isSuccess, email.isSuccess]);
 
-  useEffect(()=>{
-    const cleanUp = async ()=> {
+  useEffect(() => {
+    const cleanUp = async () => {
       await AsyncStorage.removeItem("@abortBackgroundFall");
       await AsyncStorage.removeItem("@counting");
       await AsyncStorage.removeItem("@fallDetectionAbort");
@@ -332,17 +334,26 @@ const Home = ({navigation, route}) => {
   });
 
   useEffect(() => {
-    if (locationFromMapboxLng && locationFromMapboxLat && coordinatesFromDetail) {
-      "getDirection use Effect"
+    if (
+      locationFromMapboxLng &&
+      locationFromMapboxLat &&
+      coordinatesFromDetail
+    ) {
+      ("getDirection use Effect");
       getDirections(
         {longitude: locationFromMapboxLng, latitude: locationFromMapboxLat},
-        {longitude: coordinatesFromDetail[0], latitude: coordinatesFromDetail[1]},
+        {
+          longitude: coordinatesFromDetail[0],
+          latitude: coordinatesFromDetail[1],
+        },
       );
     }
-  }, [getDirections, locationFromMapboxLat, locationFromMapboxLng, coordinatesFromDetail]);
-
- 
-
+  }, [
+    getDirections,
+    locationFromMapboxLat,
+    locationFromMapboxLng,
+    coordinatesFromDetail,
+  ]);
 
   return (
     <View style={styles.container}>
@@ -411,7 +422,7 @@ const Home = ({navigation, route}) => {
           ref={c => (_map = c)}
           logoEnabled={false}
           onPress={onMapPress}
-          compassViewMargins={{x: 10, y: (40   * dimensionHeight) / 100}}
+          compassViewMargins={{x: 10, y: (40 * dimensionHeight) / 100}}
           style={styles.map}
           surfaceView>
           {/* Display user location */}
@@ -427,27 +438,44 @@ const Home = ({navigation, route}) => {
                 onUpdate={userLocationUpdate}
               />
               {/* If there is route, draw route from given source to destination */}
-              {
-                isSuccess && data && (
-                  data.data.map((item) =>
-                  {
-                    if(item.GPSCoordinates){
-                      const coordinates = getGPSFromString(item.GPSCoordinates);
-                      {/* return <MapboxGL.PointAnnotation key={item.id} id= {JSON.stringify(item.id)} coordinate={[coordinates[0], coordinates[1]]}/> */}
-                      return (<MapboxGL.MarkerView key={item.id} x={0.5} y={0.5} coordinate={[coordinates[0], coordinates[1]]}> 
-                        <Pressable style={{width: 45}} onPress={() => {
-                          navigation.navigate('Details', { id: item.id, travelDistance: getDistanceFromGPS(item.GPSCoordinates, true) });
-                        }}>
-                          <Image source={require('../../assets/img/hospital-icon-img.png')} style={{ width: 45, height: 45 }} />
+              {isSuccess &&
+                data &&
+                data.data.map(item => {
+                  if (item.GPSCoordinates) {
+                    const coordinates = getGPSFromString(item.GPSCoordinates);
+                    {
+                      /* return <MapboxGL.PointAnnotation key={item.id} id= {JSON.stringify(item.id)} coordinate={[coordinates[0], coordinates[1]]}/> */
+                    }
+                    return (
+                      <MapboxGL.MarkerView
+                        key={item.id}
+                        x={0.5}
+                        y={0.5}
+                        coordinate={[coordinates[0], coordinates[1]]}>
+                        <Pressable
+                          style={{width: 45}}
+                          onPress={() => {
+                            navigation.navigate("Details", {
+                              id: item.id,
+                              travelDistance: getDistanceFromGPS(
+                                item.GPSCoordinates,
+                                true,
+                              ),
+                            });
+                          }}>
+                          <Image
+                            source={require("../../assets/img/hospital-icon-img.png")}
+                            style={{width: 45, height: 45}}
+                          />
                         </Pressable>
-                      </MapboxGL.MarkerView>);
-                    }
-                    }
-                  )
-                )
-              }
-             
-              {routeDirection && coordinatesFromDetail ? <RenderDirection route={routeDirection} /> : null}
+                      </MapboxGL.MarkerView>
+                    );
+                  }
+                })}
+
+              {routeDirection && coordinatesFromDetail ? (
+                <RenderDirection route={routeDirection} />
+              ) : null}
             </>
           )}
           <MapboxGL.Camera
@@ -465,7 +493,12 @@ const Home = ({navigation, route}) => {
       {/* SearchBar */}
       <View style={styles.searchBarContainer}>
         {/* Display Search bar  */}
-        <SearchBar fontSize={16} marginHorizontal={20} navigation={navigation} currentLocation={`${locationFromMapboxLng},${locationFromMapboxLat}`} />
+        <SearchBar
+          fontSize={16}
+          marginHorizontal={20}
+          navigation={navigation}
+          currentLocation={`${locationFromMapboxLng},${locationFromMapboxLat}`}
+        />
       </View>
 
       {/* Get location button */}
@@ -508,7 +541,7 @@ const Home = ({navigation, route}) => {
         index={1}
         onChange={onSheetChange}
         ref={bsRef}
-        snapPoints={['7%', '37%', '100%']}>
+        snapPoints={["7%", "37%", "100%"]}>
         <BottomSheetContent
           navigation={navigation}
           currentLocation={`${locationFromMapboxLng},${locationFromMapboxLat}`}
