@@ -708,7 +708,7 @@ const Ambulance = ({navigation}) => {
             />
           ) : null}
         </View>
-        {appointmentAccepted && (
+        {/* {appointmentAccepted && (
           <View style={styles.driveDetailsContainer}>
             <View style={styles.driverImageContainer}>
               <Image
@@ -732,7 +732,7 @@ const Ambulance = ({navigation}) => {
               />
             </View>
           </View>
-        )}
+        )} */}
       </View>
     </View>
   );
