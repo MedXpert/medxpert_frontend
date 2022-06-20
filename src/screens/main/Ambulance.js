@@ -9,91 +9,90 @@ import {
   Image,
   Pressable,
   Animated,
-} from 'react-native';
-import React, {useState, useEffect, useCallback, useRef, useMemo} from 'react';
-import {PERMISSIONS, RESULTS, openSettings} from 'react-native-permissions';
-import Geolocation from 'react-native-geolocation-service';
-import {io} from 'socket.io-client';
-import {lineString as makeLineString} from '@turf/helpers';
-import {getDistance} from 'geolib';
-import axios from 'axios';
+} from "react-native";
+import React, {useState, useEffect, useCallback, useRef, useMemo} from "react";
+import {PERMISSIONS, RESULTS, openSettings} from "react-native-permissions";
+import Geolocation from "react-native-geolocation-service";
+import {io} from "socket.io-client";
+import {lineString as makeLineString} from "@turf/helpers";
+import {getDistance} from "geolib";
+import axios from "axios";
 
-import MapboxGL from '@react-native-mapbox-gl/maps';
-import Colors from '../../constants/colors';
-import {CustomButton} from '../../components/general/CustomButton';
-import {CustomText} from '../../components/general/CustomText';
-import {IconButton} from 'react-native-paper';
-import {MapTypeModal} from '../../components/home/MapTypeModal';
-import {RenderDirection} from '../../components/general/RenderDirection';
+import MapboxGL from "@react-native-mapbox-gl/maps";
+import Colors from "../../constants/colors";
+import {CustomButton} from "../../components/general/CustomButton";
+import {CustomText} from "../../components/general/CustomText";
+import {IconButton} from "react-native-paper";
+import {MapTypeModal} from "../../components/home/MapTypeModal";
+import {RenderDirection} from "../../components/general/RenderDirection";
 
-import {PermissionModal} from '../../components/permissions/PermissionModal';
-import {requestPermissions} from '../../services/permissions/requestPermissions';
-import {LOCATION_PERMISSION_MESSAGE} from '../../constants/string/requestPermissions/requestPermissions';
-import Spinner from 'react-native-spinkit';
-import colors from '../../constants/colors';
+import {PermissionModal} from "../../components/permissions/PermissionModal";
+import {requestPermissions} from "../../services/permissions/requestPermissions";
+import {LOCATION_PERMISSION_MESSAGE} from "../../constants/string/requestPermissions/requestPermissions";
+import Spinner from "react-native-spinkit";
+import colors from "../../constants/colors";
 
-
-const dimensionHeight = Dimensions.get('window').height;
-const dimensionWidth = Dimensions.get('window').width;
+const dimensionHeight = Dimensions.get("window").height;
+const dimensionWidth = Dimensions.get("window").width;
 
 // const io = require('socket.io-client/dist/socket.io');
 
-const SOCKETIO_SERVER_URL = 'http://127.0.0.1:5000';
+const SOCKETIO_SERVER_URL = "https://rts-mdx.herokuapp.com";
 
-const geoApifyAccessToken = '87d55356e5ab47dab8be60202bb80ae3';
+const geoApifyAccessToken = "87d55356e5ab47dab8be60202bb80ae3";
 
-var userType = 'u';
-var userId = 'userId' + Math.random();
+var userType = "u";
+var userId = "userId" + Math.random();
 
 const USER_TYPES = {
-  USER: 'u',
-  AMBULANCE: 'a',
-  HEALTH_FACILITY: 'h',
+  USER: "u",
+  AMBULANCE: "a",
+  HEALTH_FACILITY: "h",
 };
 
 const NAMESPACES = {
-  USER: '/USER_NAMESPACE',
-  AMBULANCE: '/AMBULANCE_NAMESPACE',
+  USER: "/USER_NAMESPACE",
+  AMBULANCE: "/AMBULANCE_NAMESPACE",
 };
 const EVENTS = {
-  AMBULANCE_ONLINE: '0',
+  AMBULANCE_ONLINE: "0",
   // AMBULANCE_STATUS_CHANGE : '1',
-  AMBULANCE_STATUS_CHANGED: '2',
-  APPOINT_AMBULANCE: '3',
+  AMBULANCE_STATUS_CHANGED: "2",
+  APPOINT_AMBULANCE: "3",
   // APPOINTMENT_REQUEST : '4', //might add amb to differentiate from hf later...
   // ACCEPT_APPOINTMENT : '5', //
   // DECLINE_APPOINTMENT : '6', //
-  APPOINTMENT_ACCEPTED: '7', //
-  APPOINTMENT_DECLINED: '8', //
+  APPOINTMENT_ACCEPTED: "7", //
+  APPOINTMENT_DECLINED: "8", //
   // LOCATION_TO_USER : '9',
-  LOCATION_FROM_AMBULANCE: '10',
-  LOCATION_TO_AMBULANCE: '11',
+  LOCATION_FROM_AMBULANCE: "10",
+  LOCATION_TO_AMBULANCE: "11",
   // LOCATION_FROM_USER : '12',
   // AMBULANCE_LOCATION_UPDATE : '13',
-  AMBULANCE_LOCATION_UPDATED: '14',
-  AMBULANCE_OFFLINE: '15',
-  ADD_EMERGENCY_CONTACTS: '16',
-  REMOVE_EMERGENCY_CONTACTS: '17',
-  UPDATE_EMERGENCY_CONTACTS: '18',
-  LOCATION_TO_EMERGENCY_CONTACTS: '19',
-  LOCATION_FROM_EMERGENCY_CONTACTS: '20',
-  ALERT_NEAR_AMBULANCE: '21',
+  AMBULANCE_LOCATION_UPDATED: "14",
+  AMBULANCE_OFFLINE: "15",
+  ADD_EMERGENCY_CONTACTS: "16",
+  REMOVE_EMERGENCY_CONTACTS: "17",
+  UPDATE_EMERGENCY_CONTACTS: "18",
+  LOCATION_TO_EMERGENCY_CONTACTS: "19",
+  LOCATION_FROM_EMERGENCY_CONTACTS: "20",
+  ALERT_NEAR_AMBULANCE: "21",
   // EMERGENCY_ALERT : '22',
-  CANT_FIND_AMBULANCE: '23',
-  ABORTED: '27',
-  HAVE_REACHED: '28',
-  FINISHED: '29',
+  CANT_FIND_AMBULANCE: "23",
+  ABORTED: "27",
+  HAVE_REACHED: "28",
+  FINISHED: "29",
 };
 
 switch (userType) {
-  case USER_TYPES.AMBULANCE:
-    var namespace = NAMESPACES.AMBULANCE;
-    break;
-  case USER_TYPES.USER:
-    var namespace = NAMESPACES.USER;
-    break;
-  default:
-    throw 'Invalid user_type trying to connect with socketio server.';
+case USER_TYPES.AMBULANCE:
+  var namespace = NAMESPACES.AMBULANCE;
+  break;
+case USER_TYPES.USER:
+  var namespace = NAMESPACES.USER;
+  break;
+default:
+  throw "Invalid user_type trying to connect with socketio server.";
 }
 
 // const ambuAppState = {
@@ -164,15 +163,14 @@ const Ambulance = ({navigation}) => {
   const [driverNameVisibility, setDriverNameVisibility] = useState(false);
   // turn on and off when ambulance is called
   const [ambulanceCalled, setAmbulanceCalled] = useState(false);
-const [ambulanceAborted, setAmbulanceAborted] = useState();
-
+  const [ambulanceAborted, setAmbulanceAborted] = useState();
 
   const [ambulanceId, setAmbulanceId] = useState(null);
   const [appointmentAccepted, setAppointmentAccepted] = useState(false);
   const [callingAmbulance, setCallingAmbulance] = useState(false);
   const [canNotFindAmbulance, setCanNotFindAmbulance] = useState(false);
-  const [locationFromAmbulance, setLocationFromAmbulance] = useState()
-  const [ambulanceHasReached, setAmbulanceHasReached] = useState()
+  const [locationFromAmbulance, setLocationFromAmbulance] = useState();
+  const [ambulanceHasReached, setAmbulanceHasReached] = useState();
 
   const refUserLocation = useRef();
 
@@ -197,7 +195,7 @@ const [ambulanceAborted, setAmbulanceAborted] = useState();
 
   const settings = () => {
     BackHandler.exitApp();
-    openSettings().catch(() => console.warn('Can not open settings'));
+    openSettings().catch(() => console.warn("Can not open settings"));
   };
 
   // Checks permission
@@ -240,9 +238,9 @@ const [ambulanceAborted, setAmbulanceAborted] = useState();
         refUserLocation.current = {longitude: lng, latitude: lat};
       } else {
         if (appointmentAccepted) {
-            locationToAmbulance(lng, lat); // Send user location to the ambulance every time location coordinates are changed.
-          }
-         
+          locationToAmbulance(lng, lat); // Send user location to the ambulance every time location coordinates are changed.
+        }
+
         const distance = getDistance(
           {
             latitude: refUserLocation.current.latitude,
@@ -254,10 +252,9 @@ const [ambulanceAborted, setAmbulanceAborted] = useState();
 
         // The distance limit to change the location coordiantes
         if (distance > 20) {
-         
           setLocationFromMapboxLng(lng);
           setLocationFromMapboxLat(lat);
-          
+
           refUserLocation.current = {longitude: lng, latitude: lat};
         }
       }
@@ -318,7 +315,7 @@ const [ambulanceAborted, setAmbulanceAborted] = useState();
     );
 
     const coordinates = res.data.features[0].geometry.coordinates[0];
-    const routeLineString = makeLineString(coordinates, {name: 'line 1'});
+    const routeLineString = makeLineString(coordinates, {name: "line 1"});
     setRoute(routeLineString);
   }, []);
 
@@ -370,8 +367,8 @@ const [ambulanceAborted, setAmbulanceAborted] = useState();
       auth: {
         token: {
           id: userId,
-          iat: '',
-          expiry: '',
+          iat: "",
+          expiry: "",
         },
         userID: userId,
       },
@@ -380,19 +377,19 @@ const [ambulanceAborted, setAmbulanceAborted] = useState();
     // console.log('io: ', io);
 
     // on Connect
-    socketRef.current.on('connect', data => {
-      console.log('connected hoy hoy hoy: ', data);
+    socketRef.current.on("connect", data => {
+      console.log("connected hoy hoy hoy: ", data);
     });
 
     // When no Ambulance is found
     socketRef.current.on(EVENTS.CANT_FIND_AMBULANCE, data => {
-      console.table({event: 'CANT_FIND_AMBULANCE'});
+      console.table({event: "CANT_FIND_AMBULANCE"});
       console.log(">>>>>> Can't find ambulances. Try again");
       setCallingAmbulance(false);
       setCanNotFindAmbulance(true);
-      setTimeout(()=>{
+      setTimeout(() => {
         setCanNotFindAmbulance(false);
-      }, 5000)
+      }, 5000);
     });
 
     socketRef.current.on(EVENTS.APPOINTMENT_ACCEPTED, data => {
@@ -410,10 +407,8 @@ const [ambulanceAborted, setAmbulanceAborted] = useState();
     //when an ambulance is found
     socketRef.current.on(EVENTS.LOCATION_FROM_AMBULANCE, data => {
       console.log(`Ambulance at ${data.coordinates}`);
-      setLocationFromAmbulance(data.coordinates)
-
+      setLocationFromAmbulance(data.coordinates);
     });
-
 
     // on Aborted
     socketRef.current.on(EVENTS.ABORTED, data => {
@@ -423,12 +418,12 @@ const [ambulanceAborted, setAmbulanceAborted] = useState();
       // ambuAppState.in_appointment_with.ambulanceID = null;
       setAmbulanceId(null);
       setLocationFromAmbulance(null);
-      setAmbulanceAborted(true)
-      setTimeout(()=>{
+      setAmbulanceAborted(true);
+      setTimeout(() => {
         setAmbulanceAborted(false);
-      }, 5000)
+      }, 5000);
 
-      console.log('Ambulance aborted');
+      console.log("Ambulance aborted");
     });
 
     // on Reached
@@ -438,11 +433,11 @@ const [ambulanceAborted, setAmbulanceAborted] = useState();
       setAppointmentAccepted(false);
       setAmbulanceId(null);
       setLocationFromAmbulance(null);
-      setAmbulanceHasReached(true)
-      setTimeout(()=>{
+      setAmbulanceHasReached(true);
+      setTimeout(() => {
         setAmbulanceHasReached(false);
-      }, 5000)
-      console.log('Ambulance reached your location');
+      }, 5000);
+      console.log("Ambulance reached your location");
     });
 
     // on Finished
@@ -450,7 +445,7 @@ const [ambulanceAborted, setAmbulanceAborted] = useState();
       // ambuAppState.in_appointment_with.ambulanceID = null;
       setAmbulanceId(null);
       setAppointmentAccepted(false);
-      console.log('Job finished');
+      console.log("Job finished");
     });
 
     return () => {
@@ -471,14 +466,25 @@ const [ambulanceAborted, setAmbulanceAborted] = useState();
   };
 
   useEffect(() => {
-
-    if (locationFromMapboxLng && locationFromMapboxLat && locationFromAmbulance) {
+    if (
+      locationFromMapboxLng &&
+      locationFromMapboxLat &&
+      locationFromAmbulance
+    ) {
       getDirections(
         {longitude: locationFromMapboxLng, latitude: locationFromMapboxLat},
-        {longitude: locationFromAmbulance[0], latitude: locationFromAmbulance[1]},
+        {
+          longitude: locationFromAmbulance[0],
+          latitude: locationFromAmbulance[1],
+        },
       );
     }
-  }, [getDirections, locationFromMapboxLat, locationFromMapboxLng, locationFromAmbulance]);
+  }, [
+    getDirections,
+    locationFromMapboxLat,
+    locationFromMapboxLng,
+    locationFromAmbulance,
+  ]);
 
   // console.log('socket:', socket, io);
   return (
@@ -520,8 +526,8 @@ const [ambulanceAborted, setAmbulanceAborted] = useState();
         buttonOnRightOnPress={() => {
           checkPermission(); // If button is clicked request permission again
         }}
-        buttonLeftTitle={'Close App'}
-        buttonRightTitle={'Give Permission'}
+        buttonLeftTitle={"Close App"}
+        buttonRightTitle={"Give Permission"}
         modalVisibility={locationPermissionDenied}
       />
 
@@ -534,8 +540,8 @@ const [ambulanceAborted, setAmbulanceAborted] = useState();
         buttonOnRightOnPress={() => {
           settings(); // Go to permission settings
         }}
-        buttonLeftTitle={'Close App'}
-        buttonRightTitle={'Go to settings'}
+        buttonLeftTitle={"Close App"}
+        buttonRightTitle={"Go to settings"}
         modalVisibility={locationPermissionBlocked}
         buttonWidth={160}
       />
@@ -565,9 +571,12 @@ const [ambulanceAborted, setAmbulanceAborted] = useState();
               />
               {/* If there is route, draw route from given source to destination  */}
               {route && ambulanceId ? <RenderDirection route={route} /> : null}
-              {
-                locationFromAmbulance && ambulanceId ?  <MapboxGL.PointAnnotation id="23" coordinate={locationFromAmbulance} /> : null
-              }
+              {locationFromAmbulance && ambulanceId ? (
+                <MapboxGL.PointAnnotation
+                  id="23"
+                  coordinate={locationFromAmbulance}
+                />
+              ) : null}
             </>
           )}
           <MapboxGL.Camera
@@ -590,7 +599,13 @@ const [ambulanceAborted, setAmbulanceAborted] = useState();
               fontColor={Colors.primary}
               fontSize={18}
             />
-            <Spinner isVisible type='Wave' size={25} color={colors.primary} style={{marginTop:5}}/>
+            <Spinner
+              isVisible
+              type="Wave"
+              size={25}
+              color={colors.primary}
+              style={{marginTop: 5}}
+            />
           </View>
         </View>
       )}
@@ -625,7 +640,7 @@ const [ambulanceAborted, setAmbulanceAborted] = useState();
         </View>
       )}
 
-       {/* Ambulance has reached */}
+      {/* Ambulance has reached */}
       {ambulanceHasReached && (
         <View style={styles.statusBarContainer}>
           {/* Display arriving status  */}
@@ -655,7 +670,7 @@ const [ambulanceAborted, setAmbulanceAborted] = useState();
         ]}>
         <IconButton
           // icon={locationChanged ? 'crosshairs' : 'crosshairs-gps'}
-          icon={'crosshairs-gps'}
+          icon={"crosshairs-gps"}
           color={Colors.secondary}
           size={30}
           onPress={findMyLocation}
@@ -679,14 +694,14 @@ const [ambulanceAborted, setAmbulanceAborted] = useState();
       <View style={styles.bottomView}>
         <View style={styles.bottomButtonContainer}>
           {/* trinary condition () ? true : false */}
-          {!appointmentAccepted ?  (
+          {!appointmentAccepted ? (
             // Display if ambulance not called
             <CustomButton
               onPress={e => {
                 // setAmbulanceCalled(true);
                 callAmbulance();
               }}
-              width={Dimensions.get('window').width - 50}
+              width={Dimensions.get("window").width - 50}
               backgroundColor={Colors.primary}
               fontColor={Colors.white}
               title="Call Ambulance"
@@ -699,7 +714,7 @@ const [ambulanceAborted, setAmbulanceAborted] = useState();
               <Image
                 style={styles.driverImage}
                 source={{
-                  uri: 'https://images.unsplash.com/photo-1633332755192-727a05c4013d?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=580&q=80',
+                  uri: "https://images.unsplash.com/photo-1633332755192-727a05c4013d?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=580&q=80",
                 }}
               />
             </View>
@@ -725,24 +740,24 @@ const [ambulanceAborted, setAmbulanceAborted] = useState();
 
 const styles = StyleSheet.create({
   buttonsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
     marginTop: 20,
   },
   bottomSheetContainer: {
     flex: 1,
-    alignContent: 'center',
+    alignContent: "center",
   },
   container: {
     // flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     backgroundColor: Colors.secondary,
   },
   mapIconContainer: {
     backgroundColor: Colors.primary,
     borderRadius: 50,
-    position: 'absolute',
+    position: "absolute",
     top: 130,
     right: 10,
   },
@@ -751,7 +766,7 @@ const styles = StyleSheet.create({
   },
   locationButtonContainer: {
     backgroundColor: Colors.primary,
-    position: 'absolute',
+    position: "absolute",
     bottom: 240,
     right: 10,
     borderRadius: 50,
@@ -766,36 +781,36 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   statusBarContainer: {
-    position: 'absolute',
+    position: "absolute",
     top: 30,
   },
   statusBar: {
     flex: 1,
     backgroundColor: Colors.white,
     color: Colors.primary,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
     elevation: 3,
     paddingVertical: 20,
-    width: Dimensions.get('window').width,
+    width: Dimensions.get("window").width,
   },
 
   bottomView: {
-    position: 'absolute',
+    position: "absolute",
     bottom: 35,
-    width: Dimensions.get('window').width,
+    width: Dimensions.get("window").width,
   },
   bottomButtonContainer: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     paddingVertical: 20,
   },
   driveDetailsContainer: {
     backgroundColor: Colors.whiteSmoke,
     flex: 1,
-    flexDirection: 'row',
+    flexDirection: "row",
     height: 120,
     borderTopLeftRadius: 25,
     borderTopRightRadius: 25,
@@ -816,7 +831,7 @@ const styles = StyleSheet.create({
   },
   driveDescription: {
     flex: 1,
-    flexDirection: 'column',
+    flexDirection: "column",
     paddingTop: 10,
   },
   nameGap: {paddingBottom: 3},
