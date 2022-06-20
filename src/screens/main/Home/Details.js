@@ -45,6 +45,12 @@ const Details = ({ route, navigation }) => {
   const { data, isError, isLoading, isSuccess } =
     useHealthCareFacility(healthCareFacilityId);
 
+    if(isSuccess){
+      console.log('====================================');
+      console.log("data from details page", data);
+      console.log('====================================');
+    }
+
   const defaultPicture = 'https://i.ibb.co/xHswhnT/Default-Cover.png'
   const [selectedImage, setSelectedImage] = useState();
   const [imageModalVisible, setImageModalVisible] = useState(false);
@@ -261,6 +267,9 @@ const Details = ({ route, navigation }) => {
                   fontSize={13}
                   width={110}
                   height={45}
+                  onPress={()=>{
+                    navigation.navigate("Home", {GPSCoordinates: data?.GPSCoordinates})
+                  }}
                   customStyle={styles.buttonStyle}
                   icon={
                     <IconEntypo
@@ -313,6 +322,7 @@ const Details = ({ route, navigation }) => {
             </View>
           </View>
           <FlatList
+
             data={data.imageGallaryLinks[0] ? data.imageGallaryLinks : [defaultPicture]}
             renderItem={renderItem}
             keyExtractor={image => image + Math.random()}

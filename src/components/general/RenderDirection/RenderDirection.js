@@ -1,6 +1,7 @@
-import {View, Text} from 'react-native';
-import React from 'react';
-import Colors from '../../../constants/colors';
+import {View, Text} from "react-native";
+import React from "react";
+import colors from "../../../constants/colors";
+
 import MapboxGL from '@react-native-mapbox-gl/maps';
 
 const RenderDirection = ({route}) => {
@@ -9,8 +10,8 @@ const RenderDirection = ({route}) => {
       <MapboxGL.LineLayer
         id="routeFill"
         style={{
-          lineColor: Colors.primary,
-          lineWidth: 3.2,
+          lineColor: colors.primary,
+          lineWidth: 4,
           lineCap: MapboxGL.LineJoin.Round,
           lineOpacity: 1.84,
         }}

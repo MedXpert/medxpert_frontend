@@ -1,15 +1,15 @@
-import {View, Text, StyleSheet} from 'react-native';
-import React from 'react';
+import {View, Text, StyleSheet} from "react-native";
+import React from "react";
 
-import Colors from '../../../constants/colors';
-import {isRequired} from 'react-native/Libraries/DeprecatedPropTypes/DeprecatedColorPropType';
+import Colors from "../../../constants/colors";
+import {isRequired} from "react-native/Libraries/DeprecatedPropTypes/DeprecatedColorPropType";
 
 const CustomText = ({
   content = isRequired(),
   fontSize = 14,
   fontColor = Colors.black,
   fontWeight,
-  fontFamily = 'Poppins',
+  fontFamily = "Poppins",
   customStyles = {},
 }) => {
   const buttonDynamicStyles = {

@@ -62,6 +62,7 @@ const BottomSheetContent = ({ navigation, currentLocation }) => {
   const renderHealthFacilities = ({ item }) => {
     return (
       <Pressable
+        key={item.id}
         onPress={() => {
           navigation.navigate('Details', { id: item.id, travelDistance: getDistanceFromGPS(item.GPSCoordinates, true) });
         }}>
