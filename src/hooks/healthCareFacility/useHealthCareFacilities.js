@@ -1,7 +1,7 @@
-import {useQuery} from 'react-query';
-import {fetchHealthCareFacilities} from '../../services/api/healthCareFacility';
+import {useQuery} from "react-query";
+import {fetchHealthCareFacilities} from "../../services/api/healthCareFacility";
 
 const useHealthCareFacilities = () =>
-  useQuery('healthCareFacilities', fetchHealthCareFacilities);
+  useQuery("healthCareFacilities", fetchHealthCareFacilities);
 
 export {useHealthCareFacilities};

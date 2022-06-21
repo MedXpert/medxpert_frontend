@@ -1,5 +1,5 @@
 import {
-  Toxt,
+  Text,
   View,
   StyleSheet,
   Dimensions,
@@ -11,30 +11,33 @@ import {
   Animated,
 } from 'react-native';
 import React, {useState, useEffect, useCallback, useRef, useMemo} from 'react';
-import MapboxGL from '@rnmapbox/maps';
+import MapboxGL from '@react-native-mapbox-gl/maps';
 import {PERMISSIONS, RESULTS, openSettings} from 'react-native-permissions';
 import Geolocation from 'react-native-geolocation-service';
-import {onChange} from 'react-native-reanimated';
+import { onChange } from 'react-native-reanimated';
 import BottomSheet from '@gorhom/bottom-sheet';
+import { getDistance } from 'geolib';
 
-import IconA from 'react-native-vector-icons/AntDesign';
-import IconM from 'react-native-vector-icons/MaterialCommunityIcons';
+import IconAntDesign from 'react-native-vector-icons/AntDesign';
+import IconMaterialCommunity from 'react-native-vector-icons/MaterialCommunityIcons';
 
-import {SearchBar} from '../../../components/general/SearchBar';
+import { SearchBar } from '../../../components/general/SearchBar';
 import Colors from '../../../constants/colors';
-import {PermissionModal} from '../../../components/permissions/PermissionModal';
-import {IconButton} from 'react-native-paper';
-import {MapTypeModal} from '../../../components/home/MapTypeModal';
-import {BottomSheetContent} from '../../../components/home/BottomSheetContent';
-import {useHealthCareFacilities} from '../../hooks/healthCareFacility';
+import { CustomButton } from '../../components/general/CustomButton';
+import { CustomText } from '../../components/general/CustomText';
+import { PermissionModal } from '../../../components/permissions/PermissionModal';
+import { IconButton } from 'react-native-paper';
+import { MapTypeModal } from '../../../components/home/MapTypeModal';
+import { BottomSheetContent } from '../../../components/home/BottomSheetContent';
+import { useHealthCareFacilities } from '../../hooks/healthCareFacility';
 
-import {requestPermissions} from '../../../services/permissions/requestPermissions';
-import {LOCATION_PERMISSION_MESSAGE} from '../../../constants/string/requestPermissions/requestPermissions';
+import { requestPermissions } from '../../../services/permissions/requestPermissions';
+import { LOCATION_PERMISSION_MESSAGE } from '../../../constants/string/requestPermissions/requestPermissions';
 
 const dimensionHeight = Dimensions.get('window').height;
 const dimensionWidth = Dimensions.get('window').width;
 
-const Home = ({navigation}) => {
+const Home = ({ navigation }) => {
   var _map;
   var _camera;
   var bsRef = useRef();
@@ -53,33 +56,15 @@ const Home = ({navigation}) => {
     useState(false); //Whether the location permission is Denied
   const [userPositionLng, setUserPositionLng] = useState(0); // User's current position
   const [userPositionLat, setUserPositionLat] = useState(0); // User's current position
-  const [locationFromMapboxLng, setLocationFromMapboxLng] = useState(); // User's current position tracked from the mapboxGL userLocation - Longitude
-  const [locationFromMapboxLat, setLocationFromMapboxLat] = useState(); // User's current position tracked from the mapboxGL userLocation - Latitude
+  const [locationFromMapboxLng, setLocationFromMapboxLng] = useState(0); // User's current position tracked from the mapboxGL userLocation - Longitude
+  const [locationFromMapboxLat, setLocationFromMapboxLat] = useState(0); // User's current position tracked from the mapboxGL userLocation - Latitude
   const [mapTypeVisibility, setMapTypeVisibility] = useState(false); // MapType modal visibility
   const startValueMoveY = useRef(new Animated.Value(0)).current; // Initial value of move Y animated for the location
-
+  const refUserLocation = useRef();
   // Exit the app and go to settings. This function is called when the 'Go to settings' button in the permission denied modal is pressed.
   const settings = () => {
     BackHandler.exitApp();
     openSettings().catch(() => console.warn('Can not open settings'));
-  };
-
-  // locationButton animation move Y direction
-  const animatedMove = (endValue, duration) => {
-    Animated.timing(startValueMoveY, {
-      toValue: endValue,
-      duration: duration,
-      useNativeDriver: true,
-    }).start();
-  };
-
-  // Tracks the index of BottomSheet
-  const onSheetChange = index => {
-    if (index === 1) {
-      animatedMove(0, 50);
-    } else if (index === 0) {
-      animatedMove(220, 50);
-    }
   };
 
   // Checks permission
@@ -107,8 +92,27 @@ const Home = ({navigation}) => {
     if (location) {
       let lng = location.coords.longitude;
       let lat = location.coords.latitude;
-      setLocationFromMapboxLng(lng);
-      setLocationFromMapboxLat(lat);
+      // setLocationFromMapboxLng(lng);
+      // setLocationFromMapboxLat(lat);
+
+      if (!locationFromMapboxLat || !locationFromMapboxLng) {
+        setLocationFromMapboxLng(lng);
+        setLocationFromMapboxLat(lat);
+        refUserLocation.current = { longitude: lng, latitude: lat };
+      } else {
+        const distance = getDistance(
+          {
+            latitude: refUserLocation.current.latitude,
+            longitude: refUserLocation.current.longitude,
+          },
+          { latitude: lat, longitude: lng },
+        );
+        if (distance > 100) {
+          setLocationFromMapboxLng(lng);
+          setLocationFromMapboxLat(lat);
+          refUserLocation.current = { longitude: lng, latitude: lat };
+        }
+      }
     }
   };
 
@@ -134,7 +138,7 @@ const Home = ({navigation}) => {
         // See error code charts below.
         console.log(error.code, error.message);
       },
-      {enableHighAccuracy: true, timeout: 15000, maximumAge: 10000},
+      { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 },
     );
 
     await _camera.flyTo([userPositionLng, userPositionLat]);
@@ -154,6 +158,24 @@ const Home = ({navigation}) => {
     setMapTypeVisibility(false);
   };
 
+  // locationButton animation move Y direction
+  const animatedMove = (endValue, duration) => {
+    Animated.timing(startValueMoveY, {
+      toValue: endValue,
+      duration: duration,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  // Tracks the index of BottomSheet
+  const onSheetChange = index => {
+    if (index === 1) {
+      animatedMove(0, 50);
+    } else if (index === 0) {
+      animatedMove(220, 50);
+    }
+  };
+
   useEffect(() => {
     // Call 'checkPermission' every time something in the function is changed.
     checkPermission();
@@ -170,7 +192,7 @@ const Home = ({navigation}) => {
           // See error code charts below.
           console.log(error.code, error.message);
         },
-        {enableHighAccuracy: true, timeout: 15000, maximumAge: 10000},
+        { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 },
       );
     }
   }, [checkPermission, locationPermissionGranted]);
@@ -241,18 +263,19 @@ const Home = ({navigation}) => {
           // ref={c => (_map = c)}
           ref={c => (_map = c)}
           logoEnabled={false}
-          compassViewMargins={{x: 10, y: (40 * dimensionHeight) / 100}}
+          compassViewMargins={{ x: 10, y: (30 * dimensionHeight) / 100 }}
           style={styles.map}
-          surfaceView
-          onPress={() => {
-            navigation.push('Details', {hcfName: 'Health Care Facility 1'});
-          }}>
+          surfaceView>
           {/* Display user location */}
           {/* Checks if the user has granted location permission to the app. */}
           {locationPermissionGranted && (
             <>
               <MapboxGL.Camera
                 zoomLevel={15}
+                // animationDuration={4000}
+                // followUserLevel={15}
+                // followUserLocation={followUserLocation}
+                // animationMode={'flyTo'}
                 centerCoordinate={[userPositionLng, userPositionLat]}
               />
               <MapboxGL.UserLocation
@@ -264,6 +287,10 @@ const Home = ({navigation}) => {
           <MapboxGL.Camera
             ref={c => (_camera = c)}
             zoomLevel={15}
+            // animationMode={'flyTo'}
+            // animationDuration={4000}
+            // followZoomLevel={15}
+            // followUserLocation={followUserLocation}
             centerCoordinate={[userPositionLng, userPositionLat]}
           />
         </MapboxGL.MapView>
@@ -272,7 +299,7 @@ const Home = ({navigation}) => {
       {/* SearchBar */}
       <View style={styles.searchBarContainer}>
         {/* Display Search bar  */}
-        <SearchBar fontSize={16} marginHorizontal={20} />
+        <SearchBar fontSize={16} marginHorizontal={20} navigation={navigation} currentLocation={`${locationFromMapboxLng},${locationFromMapboxLat}`} />
       </View>
 
       {/* Get location button */}
@@ -315,8 +342,8 @@ const Home = ({navigation}) => {
         index={1}
         onChange={onSheetChange}
         ref={bsRef}
-        snapPoints={['7%', '35%', '100%']}>
-        <BottomSheetContent navigation={navigation} />
+        snapPoints={['7%', '37%', '100%']}>
+        <BottomSheetContent navigation={navigation} currentLocation={`${locationFromMapboxLng},${locationFromMapboxLat}`} />
       </BottomSheet>
     </View>
   );

@@ -1,12 +1,13 @@
-import axios from 'axios';
-import {fetchAppointments} from './fetchAppointment';
+import httpClient from "../../auth/httpClient";
+
 const createAppointment = async appointment => {
-  try {
-    const post = await axios.post('/api/appointments', appointment);
-    return post;
-  } catch (error) {
-    console.warn('create appointment => error: ', error);
-  }
+  const healthFacilityId = appointment.healthFacilityId;
+  delete appointment.healthFacilityId;
+  return await httpClient.post(`/appointments/${healthFacilityId}`, appointment, {
+    headers: {
+      "Content-Type": "application/json",
+    }
+  });
 };
 
-export {createAppointment};
+export { createAppointment };

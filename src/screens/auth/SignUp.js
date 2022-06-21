@@ -3,75 +3,202 @@ import {
   StyleSheet,
   TouchableOpacity,
   useWindowDimensions,
+  ScrollView
 } from 'react-native';
-import React, {useContext} from 'react';
-import Icon from 'react-native-vector-icons/Ionicons';
-import {AuthContext} from '../../components/general/Context';
-
+import React, { useContext, useEffect, useState } from 'react';
 import Colors from '../../constants/colors';
-import {CustomText} from '../../components/general/CustomText';
+import { CustomText } from '../../components/general/CustomText';
 import SignUpSvg from '../../assets/svg/auth/signUp.svg';
-import {CustomButton} from '../../components/general/CustomButton';
-import {storeToken} from '../../services/storeToken/storeToken';
+import { CustomButton } from '../../components/general/CustomButton';
+import { useForm } from 'react-hook-form';
+import { CustomTextInputValidation } from '../../components/general/CustomTextInputValidation';
+import { useSignUp } from '../../hooks/authentication/useSignUp';
+import colors from '../../constants/colors';
+import { emailRegEx } from '../../constants/regEx';
+import { showMessage } from "react-native-flash-message";
 
-const SignUp = ({navigation}) => {
-  const {height, width} = useWindowDimensions();
-  const {loginStatus} = useContext(AuthContext);
+const SignUp = ({ navigation }) => {
+  const { height, width } = useWindowDimensions();
+  const [role, setRole] = useState('u');
+  const register = useSignUp();
+  const onSubmit = data => {
 
-  // sign up function
-  const onSignUp = token => {
-    storeToken(token);
-    loginStatus();
+    const fullName = data.fullName.split(" ");
+    const newUser = {
+      firstName: fullName[0],
+      lastName: fullName[1] ? fullName[1] : "",
+      email: data.email,
+      password: data.password,
+      profilePicture: `https://ui-avatars.com/api/?name=${fullName}&background=random&size=120&bold=true&color=random&format=png`,
+      role: role,
+    }
+    register.mutate({ ...newUser });
   };
 
-  return (
-    <View style={styles.container}>
-      <View style={styles.signUpSvgContainer}>
-        <SignUpSvg width={width} height={height / 4} />
-      </View>
-      <View style={styles.signUpFormContainer}>
-        <View style={styles.signUpText}>
-          <CustomText content={'signUp'} fontSize={28} />
-        </View>
-        <View style={styles.inputContainer}>
-          <CustomText content={'Full Name'} fontColor={Colors.gray} />
-        </View>
-        <View style={styles.inputContainer}>
-          <CustomText content={'Email'} fontColor={Colors.gray} />
-        </View>
-        <View style={styles.inputContainer}>
-          <CustomText content={'Password'} fontColor={Colors.gray} />
-          {/* To be rendered conditionally. should be pressable/button. Toggles between show password and hide password. */}
-          <Icon name="eye-outline" size={20} color={Colors.gray} />
-          {/* <Icon name="eye-off-outline" size={20} color={Colors.gray} /> */}
-        </View>
+  const { control, handleSubmit, formState: { errors }, getValues } = useForm({
+    defaultValues: {
+      fullName: "",
+      email: "",
+      password: "",
+      profilePicture: "",
+    }
+  });
 
-        <View style={styles.inputContainer}>
-          <CustomText content={'Confirm Password'} fontColor={Colors.gray} />
+  useEffect(() => {
+    if (register.isError) {
+      console.log(register.error.response.data.error);
+      showMessage({
+        message: "Error",
+        description: register.error.response.data.error || register.error.message,
+        type: "danger",
+        icon: "danger",
+        duration: 5000,
+      });
+    }
+  }, [register]);
+
+
+
+  return (
+    <ScrollView>
+      <View style={styles.container}>
+        <View style={styles.signUpSvgContainer}>
+          <SignUpSvg width={width} height={height / 5} />
         </View>
-        <View style={styles.buttonsContainer}>
-          <CustomButton
-            width={350}
-            height={60}
-            title={'signUp'}
-            customStyle={styles.signUpButtonStyle}
-            onPress={() => {
-              onSignUp('staticToken');
-            }}
-          />
-          <View style={styles.registerContainer}>
-            <CustomText content={'Joined us before?'} />
-            <TouchableOpacity
-              onPress={() => {
-                navigation.navigate('Login');
-              }}>
-              <CustomText content={' Login'} fontColor={Colors.primary} />
-            </TouchableOpacity>
-          </View>
-        </View>
-        <View />
+        {register.isSuccess ? (<View style={styles.successMessage}>
+          <CustomText content="Welcome to MedXpert" fontSize={28} fontWeight="bold" customStyles={styles.welcomeText} />
+          <CustomText content="Signed up successfully" fontSize={20} customStyles={styles.successText} />
+          <CustomButton width={200}
+            height={50} backgroundColor={colors.primary} title="Login" onPress={() => navigation.navigate("Login")} />
+        </View>) : (
+          <View style={styles.signUpFormContainer}>
+            <View style={styles.signUpText}>
+              <CustomText content={"Create Account"} fontSize={28} />
+            </View>
+            <View style={styles.inputContainer}>
+              <CustomTextInputValidation
+                customStyles={styles.inputs}
+                label="Full Name"
+                control={control}
+                editable={!register.isLoading}
+                name="fullName"
+                error={errors.fullName?.message}
+                rules={{
+                  required: {
+                    value: true,
+                    message: "Full name is required.",
+                  },
+                  validate: value => {
+                    const fullName = value.split(" ");
+                    if (fullName.length < 2) {
+                      return "At least father name is required.";
+                    }
+                    return true;
+                  }
+                }}
+              />
+            </View>
+            <View style={styles.inputContainer}>
+              <CustomTextInputValidation
+                customStyles={styles.inputs}
+                label="Email"
+                control={control}
+                editable={!register.isLoading}
+                name="email"
+                error={errors.email?.message}
+                rules={{
+                  required: {
+                    value: true,
+                    message: "Email is required.",
+                  },
+                  pattern: {
+                    value: emailRegEx,
+                    message: 'Please enter a valid email address',
+                  },
+                }}
+              />
+            </View>
+            <View style={styles.inputContainer}>
+              <CustomTextInputValidation
+                customStyles={styles.inputs}
+                secureTextEntry={true}
+                label="Password"
+                control={control}
+                editable={!register.isLoading}
+                name="password"
+                error={errors.password?.message}
+                rules={{
+                  required: {
+                    value: true,
+                    message: "Password is required.",
+                  },
+                  validate: value => {
+                    if (value.length < 6) {
+                      return 'password must be at least 6 characters';
+                    }
+                    return true;
+                  }
+
+                }}
+              />
+            </View>
+
+            <View style={styles.inputContainer}>
+              <CustomTextInputValidation
+                customStyles={styles.inputs}
+                label="Confirm Password"
+                secureTextEntry={true}
+                control={control}
+                editable={!register.isLoading}
+                name="confirmPassword"
+                error={errors.confirmPassword?.message}
+                rules={{
+                  required: {
+                    value: true,
+                    message: "Confirm password is required.",
+                  },
+                  validate: (value) => {
+                    // validate: {
+                    //   emailEqual: value => (value === getValues().email) || 'Email confirmation error!',
+                    // }
+                    // if (watch('password') != val) {
+                    //   return "Your passwords do no match";
+                    // }
+                    if (getValues().password !== value) {
+                      return "Your passwords doesn't match";
+                    }
+                  },
+                }}
+              />
+            </View>
+            <View>
+              <CustomText content="I am a" fontColor={colors.gray} />
+              <View style={styles.roleButtons}>
+                <CustomButton title="User" onPress={() => setRole('u')} fontSize={14} backgroundColor={(role === 'u') ? colors.primary : colors.whiteSmoke} width="50%" />
+                <CustomButton title="Health Facility Owner" onPress={() => setRole('h')} fontSize={14} backgroundColor={(role === 'h') ? colors.primary : colors.whiteSmoke} width="50%" />
+              </View>
+            </View>
+            <View style={styles.buttonsContainer}>
+              <CustomButton
+                width={350}
+                height={60}
+                title={register.isLoading ? "Please wait..." : "Create Account"}
+                customStyle={styles.signUpButtonStyle}
+                onPress={handleSubmit(onSubmit)}
+              />
+              <View style={styles.registerContainer}>
+                <CustomText content={"Joined us before?"} />
+                <TouchableOpacity
+                  onPress={() => {
+                    navigation.navigate("Login");
+                  }}>
+                  <CustomText content={"Login"} fontColor={Colors.primary} />
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>)}
       </View>
-    </View>
+    </ScrollView>
   );
 };
 
@@ -80,18 +207,22 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: Colors.secondary,
   },
+  successMessage: { flex: 1, alignItems: "center", justifyContent: "center" },
+  welcomeText: { marginVertical: 5 },
+  successText: { marginBottom: 20 },
   buttonsContainer: {
-    marginTop: 10,
-    alignItems: 'center',
+    marginTop: 0,
+    alignItems: "center",
   },
+  roleButtons: { width: 350, paddingVertical: 10, flexDirection: 'row', justifyContent: 'flex-start' },
   signUpFormContainer: {
-    alignItems: 'center',
+    alignItems: "center",
     flex: 1,
     padding: 30,
     paddingTop: 0,
   },
   signUpSvgContainer: {
-    alignItems: 'center',
+    alignItems: "center",
     marginTop: 30,
   },
   signUpButtonStyle: {
@@ -102,19 +233,22 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   inputContainer: {
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    backgroundColor: Colors.white,
+    alignItems: "center",
+    justifyContent: "space-between",
     borderRadius: 10,
-    flexDirection: 'row',
+    flexDirection: "row",
     height: 60,
-    marginBottom: 20,
-    width: 350,
     paddingHorizontal: 15,
+    marginVertical: 20,
+  },
+  inputs: {
+    width: 350,
+    height: 50,
+    elevation: 0.5
   },
   registerContainer: {
-    flexDirection: 'row',
-    marginTop: 20,
+    flexDirection: "row",
+    marginTop: 10,
   },
 });
 
