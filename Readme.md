@@ -25,21 +25,8 @@ $ npm install or npm install —legacy-peer-deps
 ```
 $ npm run android
 ```
-# Tools and Technologies Used
-## Tools:
-- VS Code
-- Git and GitHub
-- Trello
-- Postman
-- draw.io
 ## Frameworks and Technologies:
 - React-Native
-- Django
-- Flask
-- Scrapy
-- Postgres
-- Postgis
-- GeoDjango
 - Socketio
 - MapBox
 
